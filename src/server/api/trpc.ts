@@ -21,7 +21,18 @@ import { getServerAuthSession } from "@/server/auth";
 import { prisma } from "@/server/db";
 
 type CreateContextOptions = {
-  session: Session | null;
+  session:
+    | (Session & {
+        walletAddress?: string;
+        isAdmin?: boolean;
+        isSuperAdmin?: boolean;
+        user: {
+          walletAddress?: string;
+          isAdmin?: boolean;
+          isSuperAdmin?: boolean;
+        };
+      })
+    | null;
 };
 
 /**
@@ -119,6 +130,19 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+const enforceUserIsAdmin = t.middleware(({ next, ctx }) => {
+  if (!ctx.session?.isAdmin && !ctx.session?.isSuperAdmin) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "No Proviledges" });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
 /**
  * Protected (authenticated) procedure
  *
@@ -128,3 +152,4 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const protectedAdminProcedure = t.procedure.use(enforceUserIsAdmin);

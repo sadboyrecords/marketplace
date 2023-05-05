@@ -1,0 +1,12 @@
+export const AVAILABLE_PLAYBACK_STATES = {
+  REPEAT_ONE: 'REPEAT_ONE',
+  REPEAT_ALL: 'REPEAT_ALL',
+  // PLAY_ONCE: 'PLAY_ONCE',
+  PLAY_ALL: 'PLAY_ALL',
+};
+
+export const FAIL_ATTEMPTS = 3;
+
+export const PREV_BUTTON_RESET_TIME = 15;
+
+export const SEEK_STEP = 10;
