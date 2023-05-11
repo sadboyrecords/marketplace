@@ -1,5 +1,5 @@
-import { z } from 'zod';
-import { nanoid } from 'nanoid';
+import { z } from "zod";
+import { nanoid } from "nanoid";
 // import { prisma } from 'server/db/client';
 // import {
 //   router,
@@ -13,11 +13,10 @@ import {
   protectedProcedure,
   protectedAdminProcedure,
 } from "@/server/api/trpc";
-import { type IMint } from '@/utils/types';
+import { type IMint } from "@/utils/types";
 
 export const candyMachineRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
- 
     const candyMachines = await ctx.prisma.candyMachines.findMany({
       take: 100,
     });
@@ -75,7 +74,7 @@ export const candyMachineRouter = createTRPCRouter({
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           // title: 'asc',
-          createdAt: 'asc',
+          createdAt: "asc",
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;
@@ -137,7 +136,7 @@ export const candyMachineRouter = createTRPCRouter({
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           // title: 'asc',
-          createdAt: 'asc',
+          createdAt: "asc",
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;
@@ -196,7 +195,7 @@ export const candyMachineRouter = createTRPCRouter({
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           // title: 'asc',
-          createdAt: 'asc',
+          createdAt: "asc",
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;
@@ -219,7 +218,7 @@ export const candyMachineRouter = createTRPCRouter({
     }),
   getByAddress: publicProcedure
     .input(z.object({ candyMachineId: z.string() }))
-    .query(async ({ ctx, input}) => {
+    .query(async ({ ctx, input }) => {
       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
       const cm = await ctx.prisma.candyMachines?.findFirstOrThrow?.({
         where: {
@@ -279,7 +278,7 @@ export const candyMachineRouter = createTRPCRouter({
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ ctx, input }) => {
-      if(!input.slug) throw new Error('No slug provided');
+      if (!input.slug) throw new Error("No slug provided");
       const cm = await ctx.prisma.candyMachines?.findFirst?.({
         where: {
           slug: {
@@ -287,12 +286,48 @@ export const candyMachineRouter = createTRPCRouter({
           },
         },
         include: {
-          creators: true,
+          creators: {
+            include: {
+              pinnedProfilePicture: {
+                select: {
+                  width: true,
+                  height: true,
+                  path: true,
+                  status: true,
+                },
+              },
+            },
+          },
           likes: true,
           song: {
-            include: {
-              tokens: true,
-              creators: true,
+            select: {
+              id: true,
+              artistNames: true,
+              title: true,
+              lossyArtworkIPFSHash: true,
+              lossyArtworkURL: true,
+              lossyAudioURL: true,
+              lossyAudioIPFSHash: true,
+              pinnedImage: {
+                select: {
+                  width: true,
+                  height: true,
+                  path: true,
+                  status: true,
+                },
+              },
+              creators: {
+                select: {
+                  name: true,
+                  walletAddress: true,
+                  firstName: true,
+                },
+              },
+              tokens: {
+                select: {
+                  mintAddress: true,
+                },
+              },
               candyMachines: {
                 select: {
                   candyMachineId: true,
@@ -326,11 +361,11 @@ export const candyMachineRouter = createTRPCRouter({
               battle: {
                 select: {
                   id: true,
-                }
-              }
-            }
+                },
+              },
+            },
           },
-        }
+        },
       });
     }),
   getAllDrafts: protectedProcedure.query(async ({ ctx }) => {
@@ -346,7 +381,7 @@ export const candyMachineRouter = createTRPCRouter({
       },
     });
   }),
-  getFeatured: publicProcedure.query(async ({ ctx, input}) => {
+  getFeatured: publicProcedure.query(async ({ ctx, input }) => {
     // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
     const cm = await ctx.prisma.candyMachines?.findMany?.({
       where: {
@@ -392,9 +427,9 @@ export const candyMachineRouter = createTRPCRouter({
   }),
   getLikesByUser: publicProcedure
     .input(z.object({ candyMachineId: z.string(), walletAddress: z.string() }))
-    .query(async ({ ctx, input}) => {
+    .query(async ({ ctx, input }) => {
       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
-      console.log({ input, ctx });
+
       const dropLikes = await ctx.prisma.likedDrops?.findFirst?.({
         where: {
           candyMachineId: {
@@ -424,7 +459,6 @@ export const candyMachineRouter = createTRPCRouter({
           },
         },
       });
-      console.log({ dropLikes });
       return {
         ...dropLikes,
       };
@@ -440,21 +474,21 @@ export const candyMachineRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       const limit = input.limit ?? 6;
       const { cursor } = input;
-      console.log({ input, ctx })
+
       const drops = await ctx.prisma.candyMachineDraft?.findMany?.({
         where: {
           partnerCode: {
             equals: "BRIDG3",
-          }
+          },
         },
-        include:{
+        include: {
           drop: {
             select: {
               slug: true,
               dropName: true,
-            }
-          }
-        }
+            },
+          },
+        },
       });
 
       let nextCursor: typeof cursor | undefined = undefined;
@@ -484,17 +518,17 @@ export const candyMachineRouter = createTRPCRouter({
         // metaDataHash: z.array(z.number()),
       })
     )
-    .mutation(async ({ ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       const { formSubmission } = input;
       if (!ctx.session.walletAddress) {
-        throw new Error('Wallet not connected');
+        throw new Error("Wallet not connected");
       }
       return await ctx.prisma.candyMachineDraft?.create?.({
         data: {
           dropName: formSubmission.collectionName,
           formSubmission: formSubmission as object,
           ownerWalletAddress: ctx.session.walletAddress,
-          currentStep: 'CREATED',
+          currentStep: "CREATED",
           audioUri: input.audioUri,
           audioIpfsHash: input.audioIpfsHash,
           imageIpfsHash: input.imageIpfshash,
@@ -506,7 +540,7 @@ export const candyMachineRouter = createTRPCRouter({
       //   slug: newSlug, // cm slug,
       // };
     }),
-    updateDraft: protectedProcedure
+  updateDraft: protectedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -514,18 +548,18 @@ export const candyMachineRouter = createTRPCRouter({
         jsonUri: z.string().optional(),
         metaDataHash: z.array(z.number()).optional(),
         currentStep: z.enum([
-          'CREATED',
-          'METADATA_UPLOAD',
-          'CREATE_COLLECTION',
-          'CREATE_CANDY_MACHINE',
-          'INSERT_ITEMS',
-          'UPDATE_DB',
+          "CREATED",
+          "METADATA_UPLOAD",
+          "CREATE_COLLECTION",
+          "CREATE_CANDY_MACHINE",
+          "INSERT_ITEMS",
+          "UPDATE_DB",
         ]),
         candyMachineId: z.string().optional(),
         collectionAddress: z.string().optional(),
       })
     )
-    .mutation(async ({ ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       return await ctx.prisma.candyMachineDraft?.update?.({
         where: {
           id: input.id,
@@ -533,7 +567,7 @@ export const candyMachineRouter = createTRPCRouter({
         data: {
           currentStep: input.currentStep,
           candyMachineIdPlaceholder: input.candyMachineId,
-          status: 'PENDING',
+          status: "PENDING",
           jsonIpfsHash: input.jsonIpfshash,
           metadataUri: input.jsonUri,
           metaDataHash: input.metaDataHash,
@@ -550,13 +584,13 @@ export const candyMachineRouter = createTRPCRouter({
         imageIpfshash: z.string().optional(),
         audioUri: z.string().optional(),
         imageUri: z.string().optional(),
-        status: z.enum(['PENDING', 'DRAFT', 'LAUNCHED']),
+        status: z.enum(["PENDING", "DRAFT", "LAUNCHED"]),
         // jsonIpfshash: z.string(),
         // jsonUri: z.string(),
         // metaDataHash: z.array(z.number()),
       })
     )
-    .mutation(async ({ ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       const { formSubmission } = input;
       return await ctx.prisma.candyMachineDraft?.update?.({
         where: {
@@ -566,7 +600,7 @@ export const candyMachineRouter = createTRPCRouter({
           dropName: formSubmission?.collectionName,
           formSubmission: formSubmission as object,
           ownerWalletAddress: ctx.session?.walletAddress,
-          currentStep: 'CREATED',
+          currentStep: "CREATED",
           audioUri: input.audioUri,
           audioIpfsHash: input.audioIpfsHash,
           imageIpfsHash: input.imageIpfshash,
@@ -611,8 +645,7 @@ export const candyMachineRouter = createTRPCRouter({
         ),
       })
     )
-    .mutation(async ({ ctx, input}) => {
-      console.log({ input });
+    .mutation(async ({ ctx, input }) => {
       let newSlug = input.slug;
       await ctx.prisma.$transaction(async (tx) => {
         const found = await tx.candyMachines.findFirst({
@@ -620,7 +653,6 @@ export const candyMachineRouter = createTRPCRouter({
             slug: input.slug,
           },
         });
-        console.log({ found });
 
         newSlug = found ? `${input.slug}-${nanoid(6)}` : input.slug;
 
@@ -657,7 +689,7 @@ export const candyMachineRouter = createTRPCRouter({
                 },
                 create: {
                   mintAddress: input.collectionAddress,
-                  chain: 'solana',
+                  chain: "solana",
                   tokenUri: input.tokenUri,
                   collectionAddress: input.collectionAddress,
                   audioUri: input.songUri,
@@ -667,7 +699,7 @@ export const candyMachineRouter = createTRPCRouter({
                   slug: newSlug,
                   lossyArtworkIPFSHash: input.imageIpfsHash,
                   lossyArtworkURL: input.candyMachineImageUrl,
-                  platformId: 'niftytunes',
+                  platformId: "niftytunes",
                   creators: {
                     connectOrCreate: creators,
                   },
@@ -677,7 +709,10 @@ export const candyMachineRouter = createTRPCRouter({
             candyMachines: {
               create: {
                 candyMachineId: input.candyMachineId,
-                ownerWalletAddress: input.externalID && input.treasury ? input.treasury : input.creatorWalletAddress,
+                ownerWalletAddress:
+                  input.externalID && input.treasury
+                    ? input.treasury
+                    : input.creatorWalletAddress,
                 startDate: input.startDate,
                 // isPublic: true,
                 // input.isPublic || input.startDate > new Date() ? false : true,
@@ -695,7 +730,6 @@ export const candyMachineRouter = createTRPCRouter({
                 creators: {
                   connectOrCreate: creators,
                 },
-
               },
             },
           },
@@ -707,7 +741,7 @@ export const candyMachineRouter = createTRPCRouter({
                 },
                 create: {
                   mintAddress: input.collectionAddress,
-                  chain: 'solana',
+                  chain: "solana",
                   tokenUri: input.tokenUri,
                   collectionAddress: input.collectionAddress,
                   audioUri: input.songUri,
@@ -717,7 +751,7 @@ export const candyMachineRouter = createTRPCRouter({
                   slug: newSlug,
                   lossyArtworkIPFSHash: input.imageIpfsHash,
                   lossyArtworkURL: input.candyMachineImageUrl,
-                  platformId: 'niftytunes',
+                  platformId: "niftytunes",
                   creators: {
                     connectOrCreate: creators,
                   },
@@ -760,7 +794,7 @@ export const candyMachineRouter = createTRPCRouter({
             },
             data: {
               isPublished: true,
-              currentStep: 'UPDATE_DB',
+              currentStep: "UPDATE_DB",
               candyMachineSlug: newSlug,
               status: "LAUNCHED",
               candyMachineId: input.candyMachineId,
@@ -803,13 +837,12 @@ export const candyMachineRouter = createTRPCRouter({
           .optional(),
       })
     )
-    .mutation(async ({ ctx, input}) => {
-      console.log({ input, ctx });
+    .mutation(async ({ ctx, input }) => {
       if (
         !ctx.session.walletAddress ||
         ctx.session.walletAddress !== input.userAddress
       ) {
-        throw new Error('Unauthorized');
+        throw new Error("Unauthorized");
       }
       const updatedCreators = input?.creators?.map((creator) => {
         return {
@@ -853,7 +886,6 @@ export const candyMachineRouter = createTRPCRouter({
           },
         },
       });
-      // console.log({ updated })
       return {
         ...updated,
       };
@@ -866,7 +898,7 @@ export const candyMachineRouter = createTRPCRouter({
         // userAddress: z.string(),
       })
     )
-    .mutation(async ({ ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       // if (
       //   !ctx.session.walletAddress ||
       //   ctx.session.walletAddress !== input.userAddress
@@ -902,7 +934,7 @@ export const candyMachineRouter = createTRPCRouter({
         imageIpfsHash: z.string(),
       })
     )
-    .mutation(async ({ ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       const likedTrack = await ctx.prisma.candyMachines.upsert({
         where: {
           candyMachineId: input.candyMachineId,
@@ -946,7 +978,7 @@ export const candyMachineRouter = createTRPCRouter({
         isLiked: z.boolean(),
       })
     )
-    .mutation(async ({ ctx, input}) => {
+    .mutation(async ({ ctx, input }) => {
       const likedDrop = await ctx.prisma.likedDrops.upsert({
         where: {
           dropAndLikedBy: {
@@ -968,365 +1000,3 @@ export const candyMachineRouter = createTRPCRouter({
       };
     }),
 });
-
-// export const candyMachineRouterOld = createTRPCRouter()
-//   .query('getAll', {
-//     async resolve({ ctx }) {
-//       const candyMachines = await ctx.ctx.prisma.candyMachines.findMany({
-//         take: 100,
-//       });
-//       return {
-//         candyMachines,
-//       };
-//     },
-//   })
-//   .query('getByAddress', {
-//     input: z.object({ candyMachineId: z.string() }),
-//     async resolve({ ctx, input}) {
-//       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
-//       const cm = await ctx.ctx.prisma.candyMachines?.findFirstOrThrow?.({
-//         where: {
-//           candyMachineId: {
-//             contains: input.candyMachineId,
-//           },
-//         },
-//       });
-//       return {
-//         ...cm,
-//       };
-//     },
-//   })
-//   .query('getBySlug', {
-//     input: z.object({ slug: z.string() }),
-//     async resolve({ ctx, input}) {
-//       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
-//       const cm = await ctx.ctx.prisma.candyMachines?.findFirst?.({
-//         where: {
-//           slug: {
-//             equals: input.slug,
-//           },
-//         },
-//         include: {
-//           creators: true,
-//           likes: true,
-//           song: true,
-//         },
-//       });
-//       return {
-//         ...cm,
-//       };
-//     },
-//   })
-//   .query('getLikesByUser', {
-//     input: z.object({ candyMachineId: z.string(), walletAddress: z.string() }),
-//     async resolve({ ctx, input}) {
-//       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
-//       console.log({ input, ctx });
-//       const dropLikes = await ctx.ctx.prisma.likedDrops?.findFirst?.({
-//         where: {
-//           candyMachineId: {
-//             equals: input.candyMachineId,
-//           },
-//           likedByWallet: {
-//             equals: input.walletAddress,
-//           },
-//         },
-//         // include: {
-//         //   candyMachine: true,
-//         // },
-//         select: {
-//           isLiked: true,
-//           candyMachine: {
-//             select: {
-//               _count: {
-//                 select: {
-//                   likes: {
-//                     where: {
-//                       isLiked: true,
-//                     },
-//                   },
-//                 },
-//               },
-//             },
-//           },
-//         },
-//         // include: {
-//         //   candyMachine: {
-//         //     select: {
-//         //       _count: {
-//         //         select: {
-//         //           likes: {
-//         //             where: {
-//         //               isLiked: true,
-//         //             }
-//         //           }
-//         //         }
-//         //       },
-//         //     },
-//         //   },
-//         // },
-//       });
-//       console.log({ dropLikes });
-//       return {
-//         ...dropLikes,
-//       };
-//     },
-//   })
-//   .mutation('create', {
-//     input: z.object({
-//       candyMachineId: z.string(),
-//       creatorWalletAddress: z.string(),
-//       startDate: z.date(),
-//       endDate: z.date(),
-//       slug: z.string(),
-//       description: z.string(),
-//       candyMachineImageUrl: z.string(),
-//       dropName: z.string(),
-//       songUri: z.string(),
-//       songIpfsHash: z.string(),
-//       songTitle: z.string(),
-//       songTitleSlug: z.string(),
-//       jsonIpfsHash: z.string(),
-//       imageIpfsHash: z.string(),
-//       creators: z.array(
-//         z.object({
-//           address: z.string(),
-//         })
-//       ),
-//     }),
-//     async resolve({ ctx, input}) {
-//       console.log({ input, ctx });
-//       const found = await ctx.ctx.prisma.candyMachines.findFirst({
-//         where: {
-//           slug: input.slug,
-//         },
-//       });
-//       console.log({ found });
-
-//       const newSlug = found ? `${input.slug}-${nanoid(6)}` : input.slug;
-//       // const cm = await ctx.ctx.prisma.candyMachines.create({
-//       //   data: {
-//       //     candyMachineId: input.candyMachineId,
-//       //     ownerWalletAddress: input.creatorWalletAddress,
-//       //     startDate: input.startDate,
-//       //     endDate: input.endDate,
-//       //     slug: newSlug,
-//       //     description: input.description,
-//       //     candyMachineImageUrl: input.candyMachineImageUrl,
-//       //     dropName: input.dropName,
-//       //     audioUri: input.songUri,
-//       //     audioIpfsHash: input.songIpfsHash,
-//       //   },
-
-//       // });
-
-//       const creators = input.creators.map((creator) => {
-//         return {
-//           where: {
-//             walletAddress: creator.address,
-//           },
-//           create: {
-//             walletAddress: creator.address,
-//           },
-//         };
-//       });
-
-//       await ctx.ctx.prisma.songs.upsert({
-//         where: {
-//           lossyAudioIPFSHash: input.songIpfsHash,
-//         },
-//         create: {
-//           slug: `${input.songTitleSlug}-${nanoid(6)}`,
-//           title: input.songTitle,
-//           lossyAudioIPFSHash: input.songIpfsHash,
-//           lossyArtworkIPFSHash: input.candyMachineImageUrl,
-//           lossyAudioURL: input.songUri,
-//           candyMachines: {
-//             create: {
-//               candyMachineId: input.candyMachineId,
-//               ownerWalletAddress: input.creatorWalletAddress,
-//               startDate: input.startDate,
-//               endDate: input.endDate,
-//               slug: newSlug,
-//               description: input.description,
-//               candyMachineImageUrl: input.candyMachineImageUrl,
-//               dropName: input.dropName,
-//               audioUri: input.songUri,
-//               jsonIpfsHash: input.jsonIpfsHash,
-//               imageIpfsHash: input.imageIpfsHash,
-//               creators: {
-//                 connectOrCreate: creators,
-//               },
-//             },
-//           },
-//         },
-//         update: {
-//           candyMachines: {
-//             create: {
-//               candyMachineId: input.candyMachineId,
-//               ownerWalletAddress: input.creatorWalletAddress,
-//               startDate: input.startDate,
-//               endDate: input.endDate,
-//               slug: newSlug,
-//               description: input.description,
-//               candyMachineImageUrl: input.candyMachineImageUrl,
-//               dropName: input.dropName,
-//               audioUri: input.songUri,
-//               jsonIpfsHash: input.jsonIpfsHash,
-//               imageIpfsHash: input.imageIpfsHash,
-//               creators: {
-//                 connectOrCreate: creators,
-//               },
-//             },
-//           },
-//         },
-//         select: {
-//           candyMachines: true,
-//         },
-//       });
-//       return {
-//         slug: newSlug, // cm slug,
-//       };
-//     },
-//   })
-//   .mutation('update', {
-//     input: z.object({
-//       candyMachineId: z.string(),
-//       creatorWalletAddress: z.string().optional(),
-//       startDate: z.date().optional(),
-//       endDate: z.date().optional(),
-//       slug: z.string().optional(),
-//       description: z.string().optional(),
-//       candyMachineImageUrl: z.string().optional(),
-//       dropName: z.string().optional(),
-//       songIpfsHash: z.string().optional(),
-//       songUri: z.string().optional(),
-//       jsonIpfsHash: z.string().optional(),
-//       imageIpfsHash: z.string().optional(),
-//       creators: z
-//         .array(
-//           z.object({
-//             address: z.string(),
-//           })
-//         )
-//         .optional(),
-//     }),
-//     async resolve({ ctx, input}) {
-//       console.log({ input, ctx });
-//       const updatedCreators = input?.creators?.map((creator) => {
-//         return {
-//           where: {
-//             walletAddress: creator.address,
-//           },
-//           create: {
-//             walletAddress: creator.address,
-//           },
-//         };
-//       });
-//       const updated = await ctx.ctx.prisma.candyMachines.update({
-//         where: {
-//           candyMachineId: input.candyMachineId,
-//         },
-//         data: {
-//           creators: {
-//             set: [],
-//             connectOrCreate: updatedCreators,
-//           },
-//           startDate: input?.startDate,
-//           endDate: input.endDate,
-//           slug: input.slug,
-//           description: input.description,
-//           candyMachineImageUrl: input.candyMachineImageUrl,
-//           dropName: input.dropName,
-//           audioIpfsHash: input.songIpfsHash,
-//           audioUri: input.songUri,
-//           jsonIpfsHash: input.jsonIpfsHash,
-//           imageIpfsHash: input.imageIpfsHash,
-//         },
-//       });
-//       // console.log({ updated })
-//       return {
-//         ...updated,
-//       };
-//     },
-//   })
-//   .mutation('createOrUpdate', {
-//     input: z.object({
-//       candyMachineId: z.string(),
-//       creatorWalletAddress: z.string(),
-//       startDate: z.date(),
-//       endDate: z.date(),
-//       slug: z.string(),
-//       description: z.string(),
-//       candyMachineImageUrl: z.string(),
-//       dropName: z.string(),
-//       songIpfsHash: z.string(),
-//       songUri: z.string(),
-//       jsonIpfsHash: z.string(),
-//       imageIpfsHash: z.string(),
-//     }),
-//     async resolve({ ctx, input}) {
-//       const likedTrack = await ctx.ctx.prisma.candyMachines.upsert({
-//         where: {
-//           candyMachineId: input.candyMachineId,
-//         },
-//         create: {
-//           candyMachineId: input.candyMachineId,
-//           ownerWalletAddress: input.creatorWalletAddress,
-//           startDate: input.startDate,
-//           endDate: input.endDate,
-//           slug: input.slug,
-//           description: input.description,
-//           candyMachineImageUrl: input.candyMachineImageUrl,
-//           dropName: input.dropName,
-//           audioIpfsHash: input.songIpfsHash,
-//           audioUri: input.songUri,
-//           jsonIpfsHash: input.jsonIpfsHash,
-//           imageIpfsHash: input.imageIpfsHash,
-//         },
-//         update: {
-//           startDate: input.startDate,
-//           endDate: input.endDate,
-//           slug: input.slug,
-//           description: input.description,
-//           candyMachineImageUrl: input.candyMachineImageUrl,
-//           dropName: input.dropName,
-//           audioIpfsHash: input.songIpfsHash,
-//           audioUri: input.songUri,
-//           jsonIpfsHash: input.jsonIpfsHash,
-//           imageIpfsHash: input.imageIpfsHash,
-//         },
-//       });
-//       return {
-//         ...likedTrack,
-//       };
-//     },
-//   })
-//   .mutation('likeUnlikeDrop', {
-//     input: z.object({
-//       userWallet: z.string(),
-//       candyMachineId: z.string(),
-//       isLiked: z.boolean(),
-//     }),
-//     async resolve({ ctx, input}) {
-//       const likedDrop = await ctx.ctx.prisma.likedDrops.upsert({
-//         where: {
-//           dropAndLikedBy: {
-//             candyMachineId: input.candyMachineId,
-//             likedByWallet: input.userWallet,
-//           },
-//         },
-//         create: {
-//           likedByWallet: input.userWallet,
-//           candyMachineId: input.candyMachineId,
-//           isLiked: input.isLiked,
-//         },
-//         update: {
-//           isLiked: input.isLiked,
-//         },
-//       });
-//       return {
-//         ...likedDrop,
-//       };
-//     },
-//   });

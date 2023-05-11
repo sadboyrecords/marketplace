@@ -5,6 +5,10 @@ import { pinnedFilesRouter } from "@/server/api/routers/pinnedFiles";
 import { battleRouter } from "@/server/api/routers/battle";
 import { candyMachineRouter } from "./routers/candyMachine";
 import { songRouter } from "./routers/songs";
+import { playlistRouter } from "./routers/playlists";
+import { likesRouter } from "./routers/likes";
+import { artistRouter } from "./routers/artists";
+import { tokenRouter } from "./routers/tokens";
 /**
  * This is the primary router for your server.
  *
@@ -16,14 +20,18 @@ export const appRouter = createTRPCRouter({
   pinnedFiles: pinnedFilesRouter,
   battle: battleRouter,
   candyMachine: candyMachineRouter,
-   songs: songRouter,
-  // healthcheck: publicProcedure.query(() => 'yay!'), 
- 
-  // playlist: playlistRouter,
-  
+  songs: songRouter,
+  playlist: playlistRouter,
+  likes: likesRouter,
+  artist: artistRouter,
+  token: tokenRouter,
+  // healthcheck: publicProcedure.query(() => 'yay!'),
+
+  //
+
   // artist: artistRouter,
   // listing: listingRouter,
-  
+
   // token: tokenRouter,
   //
 });

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { toast } from "react-toastify";
 import { Toggle, ToggleItem } from "@tremor/react";
+import LineUp from "@/components/battleDrops/LineUp";
 
 function BattleDetails() {
   const today = new Date();
@@ -31,6 +32,8 @@ function BattleDetails() {
   );
 
   const activateBattle = api.battle.activateBattle.useMutation();
+
+  const display = api.battle.displayOnHome.useMutation();
   const mintingInprogress = !!(
     data?.battleContestants[0]?.candyMachineDraft?.status !== "DRAFT" ||
     data?.battleContestants[1]?.candyMachineDraft?.status !== "DRAFT"
@@ -52,13 +55,14 @@ function BattleDetails() {
     console.log("firing");
     try {
       if (!data?.id) return;
-      await api.battle.displayOnHome.useMutation().mutateAsync({
+      await display.mutateAsync({
         battleId: data?.id,
         displayOnHome: !data?.displayOnHomePage,
       });
       toast.success("Battle displayed on homepage successfully");
       await refetch();
     } catch (error) {
+      console.log(error);
       toast.error("Error displaying battle on homepage");
     }
   };
@@ -108,7 +112,7 @@ function BattleDetails() {
                   type="checkbox"
                   className="toggle-primary toggle toggle-sm"
                   onChange={handleDisplayOnHomePage}
-                  // checked={false}
+                  checked={data?.displayOnHomePage}
                 />
               </label>
             </div>
@@ -125,54 +129,7 @@ function BattleDetails() {
           </Button>
         )}
       </div>
-
-      <div className="flex h-full w-full flex-col  lg:flex-row lg:space-x-7">
-        {/* grid auto-cols-max grid-flow-col-dense  gap-4 md:grid-cols-3 */}
-        {/* grid-cols-1 md:grid-cols-3 */}
-        <div className=" w-full lg:h-auto lg:w-5/12 ">
-          <BattleCard index={0} battle={data} />
-        </div>
-
-        <div className="flex flex-col items-center justify-between">
-          <div className="flex flex-1 items-center">
-            <div className="w-40 text-center">
-              <Typography
-                className="font-bold"
-                size="display-xs"
-                color="primary"
-              >
-                VS
-              </Typography>
-              <Countdown
-                displayTimeBadge
-                fullWidth
-                fullSpread
-                // inProgress
-                startDate={data?.battleStartDate}
-                endDate={data?.battleEndDate}
-                startDateText="Starts In"
-                endDateText="Ends In"
-                textBefore
-              />
-            </div>
-          </div>
-          {data?.isActive && (
-            <div className="flex w-full flex-col items-center text-center">
-              <div className="flex items-center space-x-2">
-                <SolIcon className="h-4 w-4" />
-                <Typography size="display-xs" className=" font-semibold">
-                  200
-                </Typography>
-              </div>
-              <Typography size="body-xs">($4,000 USD)</Typography>
-            </div>
-          )}
-        </div>
-        <div className="w-full lg:h-auto lg:w-5/12 ">
-          {/* flex-auto */}
-          <BattleCard index={1} battle={data} />
-        </div>
-      </div>
+      {data && <LineUp data={data} />}
     </div>
   );
 }

@@ -1,64 +1,102 @@
+import { z } from "zod";
+import { publicProcedure, createTRPCRouter } from "@/server/api/trpc";
 
-
-import { createRouter } from './context';
-import { z } from 'zod';
-import { prisma } from 'server/db/client';
-import { router, publicProcedure } from 'server/trpc';
-
-export const artistRouter = router({
-  hello: publicProcedure
-    .input(z.string().nullish())
-    .query(async ({ input }) => {
-      return {
-        greeting: `Hello ${input ?? 'world'}`,
-      };
-    }),
-    getArtistBySlug: publicProcedure
+export const artistRouter = createTRPCRouter({
+  getArtistBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
-    .query(async ({ input }) => {
-      const artist = await prisma?.user?.findFirst({
+    .query(async ({ input, ctx }) => {
+      const artist = await ctx.prisma.user?.findFirst({
         where: {
           walletAddress: input.slug,
         },
         include: {
+          pinnedProfilePicture: {
+            select: {
+              path: true,
+              width: true,
+              height: true,
+              status: true,
+            },
+          },
+          creatorTokens: {
+            select: {
+              lossyArtworkURL: true,
+              lossyArtworkIPFSHash: true,
+              description: true,
+              pinnedImage: true,
+            },
+          },
         },
       });
       return {
         ...artist,
       };
     }),
-    getTopArtists: publicProcedure
+  getTopArtists: publicProcedure
     // .input(z.string().nullish())
-    .query(async ({ input }) => {
+    .query(async ({ ctx }) => {
       // get top artists
-      const topArtists = await prisma.user.findMany({
-        take: 20,
+      const topArtists = await ctx.prisma.user.findMany({
+        take: 8,
         include: {
-         songs: true,
+          followers: {
+            where: {
+              isFollowing: true,
+            },
+            select: {
+              followerAddress: true,
+            },
+          },
+          songs: {
+            select: {
+              lossyArtworkURL: true,
+              lossyArtworkIPFSHash: true,
+              pinnedImage: {
+                select: {
+                  width: true,
+                  height: true,
+                  status: true,
+                },
+              },
+            },
+          },
+          pinnedProfilePicture: true,
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       });
-      return { topArtists };
+      return topArtists;
     }),
-    getAllArtistsPaginated: publicProcedure
-    .input(z.object({
-      skip: z.number().optional(),
-      limit: z.number().min(1).max(100).nullish(),
-      cursor: z.string().nullish(),
-    }))
-    .query(async ({ input }) => {
+  getAllArtistsPaginated: publicProcedure
+    .input(
+      z.object({
+        skip: z.number().optional(),
+        limit: z.number().min(1).max(100).nullish(),
+        cursor: z.string().nullish(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
       const limit = input.limit ?? 40;
       const { cursor } = input;
-      const creators = await prisma.user.findMany({
+      const creators = await ctx.prisma.user.findMany({
         take: limit + 1,
         where: {
           songs: {
-            some: { }
-          }
+            some: {},
+          },
           // songs: ,
         },
         cursor: cursor ? { id: cursor } : undefined,
         include: {
-          pinnedProfilePicture: true,
+          pinnedProfilePicture: {
+            select: {
+              path: true,
+              width: true,
+              height: true,
+              status: true,
+            },
+          },
           creatorTokens: {
             select: {
               lossyArtworkURL: true,
@@ -72,7 +110,7 @@ export const artistRouter = router({
       let nextCursor: typeof cursor | undefined = undefined;
       if (creators.length > limit) {
         const nextItem = creators.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = nextItem?.id;
       }
 
       return {
@@ -81,84 +119,3 @@ export const artistRouter = router({
       };
     }),
 });
-
-export const artistRouterOld = createRouter()
-  .query('getArtistBySlug', {
-    input: z.object({ slug: z.string() }),
-    async resolve({ ctx, input }) {
-      const artist = await ctx?.prisma?.user?.findFirst({
-        where: {
-          walletAddress: input.slug,
-        },
-        include: {
-        },
-      });
-      return {
-        ...artist,
-      };
-    },
-  })
-  .query('getTopArtists', {
-    async resolve({ ctx }) {
-      // get top artists
-      const topArtists = await ctx.prisma.user.findMany({
-        take: 20,
-        include: {
-         songs: true,
-        },
-      });
-      return { topArtists };
-    },
-  })
-  .query('getAllArtistsPaginated', {
-    input: z.object({
-      skip: z.number().optional(),
-      limit: z.number().min(1).max(100).nullish(),
-      cursor: z.string().nullish(),
-    }),
-    async resolve({ ctx, input }) {
-      const limit = input.limit ?? 40;
-      const { cursor } = input;
-      const creators = await ctx.prisma.user.findMany({
-        take: limit + 1,
-        where: {
-          songs: {
-            some: { }
-          }
-          // songs: ,
-        },
-        cursor: cursor ? { id: cursor } : undefined,
-        // orderBy: {
-        //   name: 'asc',
-        // },
-        include: {
-          creatorTokens: {
-            select: {
-              lossyArtworkURL: true,
-              lossyArtworkIPFSHash: true,
-              description: true,
-            },
-          },
-          // rawArtistProfiles: true,
-
-          // rawProcessedTracks: {
-          //   select: {
-          //     lossyArtworkURL: true,
-          //     lossyArtworkIPFSHash: true,
-          //     description: true,
-          //   },
-          // },
-        },
-      });
-      let nextCursor: typeof cursor | undefined = undefined;
-      if (creators.length > limit) {
-        const nextItem = creators.pop();
-        nextCursor = nextItem!.id;
-      }
-
-      return {
-        creators,
-        nextCursor,
-      };
-    },
-  });

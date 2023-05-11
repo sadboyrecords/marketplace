@@ -5,12 +5,12 @@ import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
 import UsersIcon from "@heroicons/react/24/outline/UsersIcon";
 import MusicalNoteIcon from "@heroicons/react/24/outline/MusicalNoteIcon";
 import NewspaperIcon from "@heroicons/react/24/outline/NewspaperIcon";
-import HeartIcon from "@heroicons/react/24/outline/HeartIcon";
-import FireIcon from "@heroicons/react/24/outline/FireIcon";
-import DeviceTabletIcon from "@heroicons/react/24/outline/DeviceTabletIcon";
-import QueueListIcon from "@heroicons/react/24/solid/QueueListIcon";
+// import HeartIcon from "@heroicons/react/24/outline/HeartIcon";
+// import FireIcon from "@heroicons/react/24/outline/FireIcon";
+// import DeviceTabletIcon from "@heroicons/react/24/outline/DeviceTabletIcon";
+// import QueueListIcon from "@heroicons/react/24/solid/QueueListIcon";
 import InformationCircleIcon from "@heroicons/react/24/solid/InformationCircleIcon";
-import ShieldCheckIcon from "@heroicons/react/24/solid/ShieldCheckIcon";
+// import ShieldCheckIcon from "@heroicons/react/24/solid/ShieldCheckIcon";
 import { ToastContainer } from "react-toastify";
 import Image from "next/image";
 import Header from "@/components/headersNav/Header";
@@ -19,16 +19,17 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import {
   routes,
-  hashRoutes,
-  tabMenuRoutes,
-  addresses,
+  // hashRoutes,
+  // tabMenuRoutes,
+  // addresses,
 } from "@/utils/constants";
 import { useTheme } from "next-themes";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSession } from "next-auth/react";
+import NewPlaylistButton from "../buttons/NewPlaylist";
 // import { useWallet } from '@solana/wallet-adapter-react';
 // import { trpc } from 'utils/trpc';
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -62,20 +63,20 @@ const navigation = [
     hidden: false,
   },
   //   { name: 'Collections', href: '#', icon: FolderIcon, current: false },
-  {
-    name: "Drops",
-    href: routes.drops,
-    icon: FireIcon,
-    current: false,
-    // hidden: process.env.NEXT_PUBLIC_ENV === 'prod',
-  },
-  {
-    name: "Listings",
-    href: routes.listings,
-    icon: QueueListIcon,
-    current: false,
-    // hidden: process.env.NEXT_PUBLIC_ENV === 'prod',
-  },
+  // {
+  //   name: "Drops",
+  //   href: routes.drops,
+  //   icon: FireIcon,
+  //   current: false,
+  //   // hidden: process.env.NEXT_PUBLIC_ENV === 'prod',
+  // },
+  // {
+  //   name: "Listings",
+  //   href: routes.listings,
+  //   icon: QueueListIcon,
+  //   current: false,
+  //   // hidden: process.env.NEXT_PUBLIC_ENV === 'prod',
+  // },
   // { name: 'Favourites', href: '#', icon: StarIcon, current: false },
 ];
 
@@ -91,79 +92,63 @@ function NavSection() {
   const { publicKey } = useWallet();
   //   const { data: user } = trpc.user.adminUser.useQuery();
   //   console.log({ user });
-  const userLibrary = [
-    {
-      name: "Created Playlists",
-      href: `${routes.userProfile(publicKey?.toBase58() || "")}#${
-        hashRoutes.userProfilesHashRouteNames[
-          tabMenuRoutes.userProfileTabPages.CREATED_PLAYLISTS
-        ]
-      }`,
-      icon: NewspaperIcon,
-      current: false,
-    },
-    {
-      name: "Liked Playlists",
-      href: `${routes.userProfile(publicKey?.toBase58() || "")}#${
-        hashRoutes.userProfilesHashRouteNames[
-          tabMenuRoutes.userProfileTabPages.LIKED_PLAYLISTS
-        ]
-      }`,
-      icon: HeartIcon,
-      current: false,
-    },
-    {
-      name: "Liked Songs",
-      href: `${routes.userProfile(publicKey?.toBase58() || "")}#${
-        hashRoutes.userProfilesHashRouteNames[
-          tabMenuRoutes.userProfileTabPages.LIKED_TRACKS
-        ]
-      }`,
-      icon: MusicalNoteIcon,
-      current: false,
-    },
-    {
-      name: "Owned Nfts",
-      href: `${routes.userTokens(publicKey?.toBase58() || "")}`,
-      icon: DeviceTabletIcon,
-      current: false,
-    },
-    {
-      name: "Drafts",
-      href: `${routes.userDrafts(publicKey?.toBase58() || "")}`,
-      icon: InformationCircleIcon,
-      current: false,
-      hidden: !addresses.allowedWallets.find(
-        (a) => a === publicKey?.toBase58()
-      ),
-    },
-    {
-      name: "Admin",
-      href: `${routes.admin}`,
-      icon: ShieldCheckIcon,
-      current: false,
-      hidden: !user?.isAdmin,
-    },
-  ];
+  // const userLibrary = [
+  //   // {
+  //   //   name: "Created Playlists",
+  //   //   href: `${routes.userProfile(publicKey?.toBase58() || "")}#${
+  //   //     hashRoutes.userProfilesHashRouteNames[
+  //   //       tabMenuRoutes.userProfileTabPages.CREATED_PLAYLISTS
+  //   //     ]
+  //   //   }`,
+  //   //   icon: NewspaperIcon,
+  //   //   current: false,
+  //   // },
+  //   // {
+  //   //   name: "Liked Playlists",
+  //   //   href: `${routes.userProfile(publicKey?.toBase58() || "")}#${
+  //   //     hashRoutes.userProfilesHashRouteNames[
+  //   //       tabMenuRoutes.userProfileTabPages.LIKED_PLAYLISTS
+  //   //     ]
+  //   //   }`,
+  //   //   icon: HeartIcon,
+  //   //   current: false,
+  //   // },
+  //   // {
+  //   //   name: "Liked Songs",
+  //   //   href: `${routes.userProfile(publicKey?.toBase58() || "")}#${
+  //   //     hashRoutes.userProfilesHashRouteNames[
+  //   //       tabMenuRoutes.userProfileTabPages.LIKED_TRACKS
+  //   //     ]
+  //   //   }`,
+  //   //   icon: MusicalNoteIcon,
+  //   //   current: false,
+  //   // },
+  //   // {
+  //   //   name: "Owned Nfts",
+  //   //   href: `${routes.userTokens(publicKey?.toBase58() || "")}`,
+  //   //   icon: DeviceTabletIcon,
+  //   //   current: false,
+  //   // },
+  //   {
+  //     name: "Drafts",
+  //     href: `${routes.userDrafts(publicKey?.toBase58() || "")}`,
+  //     icon: InformationCircleIcon,
+  //     current: false,
+  //     hidden: !addresses.allowedWallets.find(
+  //       (a) => a === publicKey?.toBase58()
+  //     ),
+  //   },
+  //   // {
+  //   //   name: "Admin",
+  //   //   href: `${routes.admin}`,
+  //   //   icon: ShieldCheckIcon,
+  //   //   current: false,
+  //   //   hidden: !user?.isAdmin,
+  //   // },
+  // ];
 
-  const adminSection = [
-    {
-      name: "Admin Home",
-      href: `${routes.admin}`,
-      icon: ShieldCheckIcon,
-      current: false,
-      hidden: !user?.isAdmin,
-    },
-  ];
-  {
-    /* Your Library - Likes, playlist 
-                Discover - Creators, Playlists, Songs, Collections, Drops  
-                Launch new drop
-                - 
-              Home, artstis, playlists, songs, tokens, drops, Launch drop */
-  }
   return (
-    <nav className=" flex-1 space-y-2 px-2 pb-4">
+    <nav className=" flex-1 space-y-3 px-2 pb-4">
       {/* mx-auto */}
       {navigation.map((item) => (
         <Link
@@ -177,7 +162,7 @@ function NavSection() {
           )}
         >
           <item.icon
-            className={`mr-4 h-5 w-5 flex-shrink-0  ${
+            className={`mr-6 h-7 w-7 flex-shrink-0  ${
               router.asPath === item.href
                 ? "text-primary"
                 : "text-neutral-content"
@@ -189,15 +174,18 @@ function NavSection() {
               router.asPath === item.href ? "primary" : "neutral-content"
             }`}
             size="body-sm"
-            className="hidden xl:block"
+            className="block md:hidden xl:block"
           >
             {item.name}
           </Typography>
         </Link>
       ))}
-      {publicKey && (
+      {/* {publicKey && (
         <div>
-          <Typography size="body-sm" className="mt-5 font-extrabold">
+          <Typography
+            size="body-sm"
+            className="mt-5 hidden font-extrabold xl:block"
+          >
             Your Library
           </Typography>
           <div className="mb-20">
@@ -215,7 +203,7 @@ function NavSection() {
                   )}
                 >
                   <item.icon
-                    className={`mr-4 h-5 w-5 flex-shrink-0  ${
+                    className={`mr-7 h-7 w-7 flex-shrink-0  ${
                       router.asPath === item.href
                         ? "text-primary"
                         : "text-neutral-content"
@@ -236,49 +224,10 @@ function NavSection() {
               ))}
           </div>
         </div>
-      )}
-      {user && user?.isAdmin && (
-        <div>
-          <Typography size="body-sm" className="mt-5 font-extrabold">
-            Admin Section
-          </Typography>
-          <div className="mb-20">
-            {adminSection
-              .filter((f) => !f.hidden)
-              .map((item) => (
-                <Link key={item.name} href={`${item.href}`}>
-                  <a
-                    className={classNames(
-                      router.asPath === item.href
-                        ? "text-primary"
-                        : "text-neutral-content hover:text-primary",
-                      "group flex items-center rounded-md px-2 py-3 text-sm font-medium"
-                    )}
-                  >
-                    <item.icon
-                      className={`mr-4 h-5 w-5 flex-shrink-0  ${
-                        router.asPath === item.href
-                          ? "text-primary"
-                          : "text-neutral-content"
-                      }`}
-                      aria-hidden="true"
-                    />
-                    <Typography
-                      color={`${
-                        router.asPath === item.href
-                          ? "primary"
-                          : "neutral-content"
-                      }`}
-                      size="body-sm"
-                    >
-                      {item.name}
-                    </Typography>
-                  </a>
-                </Link>
-              ))}
-          </div>
-        </div>
-      )}
+      )} */}
+      <div className="mt-32 flex justify-center">
+        <NewPlaylistButton isNav />
+      </div>
     </nav>
   );
 }
@@ -318,7 +267,7 @@ export default function MainLayout({ children }: LayoutProps) {
               <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
             </Transition.Child>
 
-            <div className="fixed inset-0 z-40 flex">
+            <div className="fixed inset-0 z-10 flex">
               <Transition.Child
                 as={Fragment}
                 enter="transition ease-in-out duration-300 transform"
@@ -352,7 +301,7 @@ export default function MainLayout({ children }: LayoutProps) {
                       </button>
                     </div>
                   </Transition.Child>
-                  <div className="flex flex-shrink-0 items-center px-4">
+                  <div className="flex items-center px-1  sm:px-4">
                     <Link href="/">
                       <Image
                         alt="logo"
@@ -364,6 +313,7 @@ export default function MainLayout({ children }: LayoutProps) {
                         }
                         width={60}
                         height={60}
+                        // fill
                       />
                     </Link>
                   </div>
@@ -400,10 +350,10 @@ export default function MainLayout({ children }: LayoutProps) {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="z-40  hidden md:fixed md:inset-y-0 md:flex md:w-14 xl:w-60 xl:flex-col">
+        <div className="z-10  hidden md:fixed md:inset-y-0 md:flex md:w-14 xl:w-60 xl:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-grow flex-col overflow-y-auto border-r-2 border-base-300/60 border-opacity-20 bg-base-100 pt-5">
-            <div className="flex flex-shrink-0 items-center px-4">
+            <div className="flex flex-shrink-0 items-center px-1 xl:px-4">
               <Link href="/">
                 <Image
                   alt="logo"
@@ -426,10 +376,11 @@ export default function MainLayout({ children }: LayoutProps) {
           {/* header */}
           <Header setSidebarOpen={setSidebarOpen} />
 
-          <main>
-            <div className="mx-auto mb-28  max-w-7xl px-4 py-6 sm:px-6 md:px-8">
-              {children}
-            </div>
+          <main className="mb-28">
+            {children}
+            {/* <div className="mx-auto mb-28  max-w-7xl px-4 py-6 sm:px-6 md:px-8">
+              
+            </div> */}
           </main>
         </div>
       </div>

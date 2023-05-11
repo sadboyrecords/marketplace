@@ -14,6 +14,15 @@ import { type MintCounterBorsh } from "@/components/borsh/mintCounter";
 import { type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import { type Session } from "next-auth";
+import { type NextPage } from "next";
+import { type ReactElement, type ReactNode } from "react";
+
+export type NextPageWithLayout<
+  TProps = Record<string, unknown>,
+  TInitialProps = TProps
+> = NextPage<TProps, TInitialProps> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
 
 export interface AppSession extends Session {
   walletAddress?: string;
@@ -30,11 +39,35 @@ export interface AppSession extends Session {
 }
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
+export type PartialSongType = {
+  id: string;
+  lossyAudioURL: string;
+  lossyAudioIPFSHash?: string;
+  lossyArtworkURL?: string;
+  lossyArtworkIPFSHash?: string;
+  pinnedImage?: {
+    path: string;
+    status: string;
+    width: number;
+    height: number;
+  };
+  candyMachines?: { candyMachineId?: string; slug?: string }[];
+  tokens?: { mintAddress?: string }[];
+  title: string;
+  creators: {
+    walletAddress: string;
+    name?: string;
+    firstName?: string;
+  }[];
+};
 export type CandyMachinesByOwnerType =
   RouterOutput["candyMachine"]["getByOwner"];
-// export type SongType = RouterOutput['songs']['getSongsByToken'];
-
+export type SongType = RouterOutput["songs"]["getSongInfo"] | PartialSongType;
 export type SongDetailType = RouterOutput["songs"]["getSongDetails"];
+export type BattleType = RouterOutput["battle"]["getBattleById"];
+export type BattleTypeSummary = RouterOutput["battle"]["getBattleByIdSummary"];
+export type PlaylistType = RouterOutput["playlist"]["getFeatured"];
+export type ArtistType = RouterOutput["artist"]["getArtistBySlug"];
 
 export type ITrack = SongDetailType;
 
@@ -153,6 +186,7 @@ export type GuardsAndEligibilityType = {
   mintLimit?: number; // total amount that can be minted by a single user
   remainingLimit?: number; // total amount that is left to be minted by a single user (assuming they have purchased other nfts)
   isEligible?: boolean;
+  maxPurchaseQuantity?: number;
   insufficientFunds?: boolean;
   insufficientSPLTokens?: boolean;
   inEligibleReasons?: string[];
@@ -261,8 +295,8 @@ export type CandyMachineUpdateType = {
 
 export interface IPlaylistItem {
   // track: Prisma.RawProcessedTracksGroupByOutputType; // ITrack;
-  track: ITrack;
-  currentTrack: Prisma.SongsGroupByOutputType | null;
+  track: SongType;
+  currentTrack: SongType | null;
   active?: boolean;
   onClick?: () => void;
 }

@@ -24,10 +24,10 @@ export const globalMeta = {
 
 export const routes = {
   home: "/",
-  userProfile: (slug: string) => `/users/${slug}`,
-  userTokens: (slug: string) => `/users/${slug}/owned`,
-  userDrafts: (slug: string) => `/users/${slug}/drafts`,
-  artistProfile: (slug: string) => `/users/${slug}`,
+  userProfile: (slug: string) => `/user/${slug}`,
+  userTokens: (slug: string) => `/user/${slug}/owned`,
+  userDrafts: (slug: string) => `/user/${slug}/drafts`,
+  artistProfile: (slug: string) => `/user/${slug}`,
   playlists: "/playlist",
   artists: "/creators",
   upcomingDrops: "/upcoming-drops",

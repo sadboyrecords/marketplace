@@ -1,29 +1,53 @@
 import React from "react";
 import Button from "@/components/buttons/Button";
 import { PlayIcon, PauseIcon } from "@heroicons/react/20/solid";
-// import usePlayer from 'hooks/usePlayer';
-// import { type inferRouterOutputs } from '@trpc/server';
-// import { type AppRouter } from '@/server/api/root';
-// import type { SongDetailType } from 'utils/types';
+import { useDispatch, useSelector } from "react-redux";
+import type { SongType } from "@/utils/types";
+import {
+  selectCurrentSong,
+  setCurrentSong,
+  selectIsPlaying,
+  setPlaylist,
+} from "@/lib/slices/audioSlice";
 
-// type RouterOutput = inferRouterOutputs<AppRouter>;
-// { song }: { song: SongDetailType }
-function PlayButton() {
-  //   const { isPlaying, currentToken, handlePlayPause } = usePlayer();
+type Props = {
+  song: SongType;
+  playlistName?: string;
+  tracks?: SongType[];
+  disabled?: boolean;
+};
+function PlayButton({ song, playlistName, tracks, disabled }: Props) {
+  console.log({ song });
+  const dispatch = useDispatch();
+  const currentSong = useSelector(selectCurrentSong);
+  const isPlaying = useSelector(selectIsPlaying);
+
+  const handlePlay = () => {
+    if (tracks && playlistName) {
+      dispatch(setPlaylist({ tracks, playlistName, currentTrack: song }));
+      dispatch(setCurrentSong(song));
+    } else {
+      dispatch(setCurrentSong(song));
+    }
+  };
+
   return (
     <Button
       variant="ghost"
-      className="px-0 py-1 lg:py-3"
-      // disabled
-      // className="hover:scale-110 text-primary-400 z-10"
-      //   onClick={() => handlePlayPause(song)}
+      className="z-10 px-0 py-1 text-primary-400 hover:scale-110 lg:py-3"
+      disabled={disabled}
+      onClick={handlePlay}
     >
-      {/* {currentToken?.id === song?.id && isPlaying ? (
-        <PauseIcon className="text-primary hover:text-primary-focus h-6 w-6" />
+      {currentSong?.id === song?.id && isPlaying ? (
+        <PauseIcon className="h-6 w-6 text-primary hover:text-primary-focus" />
       ) : (
-        <PlayIcon className="text-primary hover:text-primary-focus h-6 w-6" />
-      )} */}
-      <PlayIcon className="h-6 w-6 text-primary hover:text-primary-focus" />
+        <PlayIcon
+          className={`h-6 w-6 ${
+            disabled ? "text-neutral-content" : "text-primary"
+          } hover:text-primary-focus" `}
+        />
+      )}
+      {/* <PlayIcon className="h-6 w-6 text-primary hover:text-primary-focus" /> */}
     </Button>
   );
 }

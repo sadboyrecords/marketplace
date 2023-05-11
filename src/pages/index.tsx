@@ -1,9 +1,11 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { signIn, signOut, useSession } from "next-auth/react";
+// import { signIn, signOut, useSession } from "next-auth/react";
 
-import { api } from "@/utils/api";
+// import { api } from "@/utils/api";
 import DropHead from "@/components/battleDrops/DropHead";
+import RecentlyAdded from "@/components/homePage/RecentSongs";
+import RecentCreators from "@/components/homePage/RecentCreators";
 
 const Home: NextPage = () => {
   return (
@@ -14,6 +16,10 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <DropHead />
+      <div className="mt-20 flex flex-col space-y-14">
+        <RecentlyAdded />
+        <RecentCreators />
+      </div>
     </>
   );
 };

@@ -117,9 +117,7 @@ function Countdown({
         </>
       ) : (
         <>
-          <Typography
-            className={`text-white ${centeredText ? "text-center" : ""} mb-3`}
-          >
+          <Typography className={` ${centeredText ? "text-center" : ""} mb-3`}>
             {countDownText}
           </Typography>
           <div

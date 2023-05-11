@@ -1,40 +1,57 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
-import { z } from 'zod';
-import {
-  publicProcedure,
-  createTRPCRouter,
-} from "@/server/api/trpc";
-
+import { z } from "zod";
+import { publicProcedure, createTRPCRouter } from "@/server/api/trpc";
 
 export const songRouter = createTRPCRouter({
-  getRecentTracks: publicProcedure.query(async ({ ctx}) => {
+  getRecentTracks: publicProcedure.query(async ({ ctx }) => {
     // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
     const recentSongs = await ctx.prisma.songs.findMany({
       take: 8,
       where: {
         lossyAudioURL: {
-          not: '',
-          
+          not: "",
         },
         isDuplicate: false,
       },
-      include: {
-        pinnedImage: true,
-        tokens: true,
-        creators: true,
-        likes: true,
+      select: {
+        id: true,
+        artistNames: true,
+        title: true,
+        lossyArtworkIPFSHash: true,
+        lossyArtworkURL: true,
+        lossyAudioURL: true,
+        lossyAudioIPFSHash: true,
+        pinnedImage: {
+          select: {
+            width: true,
+            height: true,
+            path: true,
+            status: true,
+          },
+        },
+        creators: {
+          select: {
+            name: true,
+            walletAddress: true,
+            firstName: true,
+          },
+        },
+        tokens: {
+          select: {
+            mintAddress: true,
+          },
+        },
         candyMachines: {
           select: {
             candyMachineId: true,
             slug: true,
-          }
-        }
-        
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
     const data = await Promise.allSettled(
@@ -43,16 +60,19 @@ export const songRouter = createTRPCRouter({
         return { response, song };
       })
     );
- 
+
     type songType = typeof recentSongs;
 
     const filteredSongs = (
       data.filter(
-        (s) => s.status === 'fulfilled'
+        (s) => s.status === "fulfilled"
       ) as PromiseFulfilledResult<any>[]
-    ).map((m) => m?.value).filter((d) => d?.response?.status === 200).map((d) => d?.song);
+    )
+      .map((m) => m?.value)
+      .filter((d) => d?.response?.status === 200)
+      .map((d) => d?.song);
 
-    return filteredSongs.slice(0, 4) as songType;
+    return filteredSongs.slice(0, 8) as songType;
   }),
   getAllSongsPaginated: publicProcedure
     .input(
@@ -69,14 +89,14 @@ export const songRouter = createTRPCRouter({
         take: limit + 1,
         where: {
           lossyAudioURL: {
-            not: '',
+            not: "",
           },
           isDuplicate: false,
         },
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           // title: 'asc',
-          updatedAt: "desc"
+          updatedAt: "desc",
         },
         include: {
           _count: true,
@@ -87,27 +107,72 @@ export const songRouter = createTRPCRouter({
             select: {
               candyMachineId: true,
               slug: true,
-            }
-          }
+            },
+          },
         },
       });
       type songType = typeof songs;
-    
+
       // const filteredSongs = (
       //   data.filter(
       //     (s) => s.status === 'fulfilled'
       //   ) as PromiseFulfilledResult<any>[]
       // ).map((m) => m?.value).filter((d) => d?.response?.status === 200).map((d) => d?.song);
-      
+
       let nextCursor: typeof cursor | undefined = undefined;
       if (songs.length > limit) {
         const nextItem = songs.pop();
         nextCursor = nextItem?.id;
       }
       return {
-        songs,  //filteredSongs as songType,
+        songs, //filteredSongs as songType,
         nextCursor,
       };
+    }),
+  getSongInfo: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const song = await ctx.prisma.songs.findUnique({
+        where: {
+          id: input.id,
+        },
+        select: {
+          id: true,
+          artistNames: true,
+          title: true,
+          lossyArtworkIPFSHash: true,
+          lossyArtworkURL: true,
+          lossyAudioURL: true,
+          lossyAudioIPFSHash: true,
+          pinnedImage: {
+            select: {
+              width: true,
+              height: true,
+              path: true,
+              status: true,
+            },
+          },
+          creators: {
+            select: {
+              name: true,
+              walletAddress: true,
+              firstName: true,
+            },
+          },
+          tokens: {
+            select: {
+              mintAddress: true,
+            },
+          },
+          candyMachines: {
+            select: {
+              candyMachineId: true,
+              slug: true,
+            },
+          },
+        },
+      });
+      return song;
     }),
   getSongDetails: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -120,12 +185,13 @@ export const songRouter = createTRPCRouter({
         include: {
           creators: true,
           tokens: true,
+          pinnedImage: true,
           candyMachines: {
             select: {
               candyMachineId: true,
               slug: true,
-            }
-          }
+            },
+          },
         },
       });
       return song;
@@ -138,7 +204,7 @@ export const songRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       if (!input.publicKey) {
-        throw new Error('No public key provided');
+        throw new Error("No public key provided");
       }
       const songs = await ctx.prisma.songs.findMany({
         where: {
@@ -148,7 +214,7 @@ export const songRouter = createTRPCRouter({
             },
           },
           lossyAudioURL: {
-            not: '',
+            not: "",
           },
           isDuplicate: false,
         },
@@ -174,7 +240,7 @@ export const songRouter = createTRPCRouter({
       const song = await ctx.prisma.songs.findFirst({
         where: {
           lossyAudioURL: {
-            not: '',
+            not: "",
           },
           isDuplicate: false,
           tokens: {
@@ -194,7 +260,7 @@ export const songRouter = createTRPCRouter({
         ...song,
       };
     }),
-    getSongsByUriHash: publicProcedure
+  getSongsByUriHash: publicProcedure
     .input(
       z.object({
         // mintAddress: z.string(),
@@ -204,29 +270,57 @@ export const songRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       if (!input.uri && !input.hash) {
-        throw new Error('No uri or hash provided');
+        throw new Error("No uri or hash provided");
       }
       const song = await ctx.prisma.songs.findFirst({
         where: {
           OR: [
             {
-              lossyAudioURL: input.uri
+              lossyAudioURL: input.uri,
             },
             {
-              lossyAudioIPFSHash: input.hash
-            }
-          ]
+              lossyAudioIPFSHash: input.hash,
+            },
+          ],
         },
-        include: {
-          creators: true,
-          tokens: true,
-          likes: true,
+        select: {
+          id: true,
+          artistNames: true,
+          title: true,
+          lossyArtworkIPFSHash: true,
+          lossyArtworkURL: true,
+          lossyAudioURL: true,
+          lossyAudioIPFSHash: true,
+          pinnedImage: {
+            select: {
+              width: true,
+              height: true,
+              path: true,
+              status: true,
+            },
+          },
+          creators: {
+            select: {
+              name: true,
+              walletAddress: true,
+              firstName: true,
+            },
+          },
+          tokens: {
+            select: {
+              mintAddress: true,
+            },
+          },
+          candyMachines: {
+            select: {
+              candyMachineId: true,
+              slug: true,
+            },
+          },
         },
       });
 
-      return {
-        ...song,
-      };
+      return song;
     }),
   getSuggestedSongs: publicProcedure
     .input(
@@ -246,26 +340,50 @@ export const songRouter = createTRPCRouter({
             notIn: input.skipIds,
           },
           lossyAudioURL: {
-            not: '',
+            not: "",
           },
           isDuplicate: false,
         },
         take: limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
-          title: 'asc',
+          title: "asc",
         },
-        include: {
+        select: {
+          id: true,
           _count: true,
-          tokens: true,
-          creators: true,
-          likes: true,
+          artistNames: true,
+          title: true,
+          lossyArtworkIPFSHash: true,
+          lossyArtworkURL: true,
+          lossyAudioURL: true,
+          lossyAudioIPFSHash: true,
+          pinnedImage: {
+            select: {
+              width: true,
+              height: true,
+              path: true,
+              status: true,
+            },
+          },
+          creators: {
+            select: {
+              name: true,
+              walletAddress: true,
+              firstName: true,
+            },
+          },
+          tokens: {
+            select: {
+              mintAddress: true,
+            },
+          },
           candyMachines: {
             select: {
               candyMachineId: true,
               slug: true,
-            }
-          }
+            },
+          },
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;
@@ -292,7 +410,7 @@ export const songRouter = createTRPCRouter({
         !ctx.session ||
         ctx.session?.user?.walletAddress !== input.userWallet
       ) {
-        throw new Error('Not logged in/Not authorized');
+        throw new Error("Not logged in/Not authorized");
       }
       const likedTrack = await ctx.prisma.likedTracks.upsert({
         where: {

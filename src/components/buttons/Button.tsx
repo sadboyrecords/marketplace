@@ -12,13 +12,11 @@ type ButtonProps = {
   className?: string;
   disabled?: boolean;
   type?: "submit" | "button" | "reset";
-  onClick?: () =>
-    | Promise<unknown>
-    | (React.MouseEventHandler<HTMLButtonElement> &
-        React.MouseEventHandler<HTMLAnchorElement>);
-  //   ref: React.
-  click?: () => void;
-  click2?: () => Promise<void>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement> &
+    React.MouseEventHandler<HTMLAnchorElement>;
+  // //   ref: React.
+  // click?: () => void;
+  // click2?: () => Promise<void>;
   // () => Promise<void>
 };
 

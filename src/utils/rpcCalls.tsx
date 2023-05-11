@@ -76,7 +76,7 @@ export const getSolUsdPrice = async () => {
   const data = (await response.json()) as {
     data: { price: number };
   };
-  console.log({ data });
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   return data?.data?.price;
 };

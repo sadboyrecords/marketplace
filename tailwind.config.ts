@@ -7,6 +7,7 @@ export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      visibility: ["group-hover"],
       colors: {
         title: "hsl(var(--title))",
         "border-gray": "hsl(var(--border-gray))",
@@ -115,7 +116,7 @@ export default {
           neutral: "#1E2025",
           "neutral-content": "#98A2B3",
           disabled: "#7e7e7e",
-          "base-100": "#000000", //#120d18
+          "base-100": "#120d18", // "#000000", //#120d18
           "base-800": "#e11d48",
           "base-disabled": "#7e7e7e",
           "base-content": "#F2F4F7", //#f8f7f8

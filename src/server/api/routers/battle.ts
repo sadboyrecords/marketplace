@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   publicProcedure,
   protectedProcedure,
-  protectedAdminProcedure
+  protectedAdminProcedure,
 } from "@/server/api/trpc";
 import { type IMint } from "@/utils/types";
 
@@ -39,7 +39,55 @@ export const battleRouter = createTRPCRouter({
               },
               candyMachineDraft: {
                 include: {
-                  drop: true,
+                  drop: {
+                    include: {
+                      pinnedImage: {
+                        select: {
+                          width: true,
+                          height: true,
+                          path: true,
+                          status: true,
+                        },
+                      },
+                      song: {
+                        select: {
+                          id: true,
+                          artistNames: true,
+                          title: true,
+                          lossyArtworkIPFSHash: true,
+                          lossyArtworkURL: true,
+                          lossyAudioURL: true,
+                          lossyAudioIPFSHash: true,
+                          pinnedImage: {
+                            select: {
+                              width: true,
+                              height: true,
+                              path: true,
+                              status: true,
+                            },
+                          },
+                          creators: {
+                            select: {
+                              name: true,
+                              walletAddress: true,
+                              firstName: true,
+                            },
+                          },
+                          tokens: {
+                            select: {
+                              mintAddress: true,
+                            },
+                          },
+                          candyMachines: {
+                            select: {
+                              candyMachineId: true,
+                              slug: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -47,6 +95,173 @@ export const battleRouter = createTRPCRouter({
         },
       });
     }),
+  getBattleByIdSummary: publicProcedure
+    .input(z.object({ battleId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.prisma.battle.findUnique({
+        where: {
+          id: input.battleId,
+        },
+        select: {
+          id: true,
+          displayOnHomePage: true,
+          battleName: true,
+          isActive: true,
+          battleContestants: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  firstName: true,
+                  description: true,
+                  walletAddress: true,
+                },
+              },
+              candyMachineDraft: {
+                include: {
+                  drop: {
+                    include: {
+                      pinnedImage: {
+                        select: {
+                          width: true,
+                          height: true,
+                          path: true,
+                          status: true,
+                        },
+                      },
+                      song: {
+                        select: {
+                          id: true,
+                          artistNames: true,
+                          title: true,
+                          lossyArtworkIPFSHash: true,
+                          lossyArtworkURL: true,
+                          lossyAudioURL: true,
+                          lossyAudioIPFSHash: true,
+                          pinnedImage: {
+                            select: {
+                              width: true,
+                              height: true,
+                              path: true,
+                              status: true,
+                            },
+                          },
+                          creators: {
+                            select: {
+                              name: true,
+                              walletAddress: true,
+                              firstName: true,
+                            },
+                          },
+                          tokens: {
+                            select: {
+                              mintAddress: true,
+                            },
+                          },
+                          candyMachines: {
+                            select: {
+                              candyMachineId: true,
+                              slug: true,
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          battleEndDate: true,
+          battleStartDate: true,
+          battlePrice: true,
+        },
+      });
+    }),
+  getHomePageBattle: publicProcedure.query(async ({ ctx }) => {
+    return ctx.prisma.battle.findFirst({
+      where: {
+        displayOnHomePage: true,
+        isActive: true,
+      },
+      select: {
+        id: true,
+        displayOnHomePage: true,
+        battleName: true,
+        isActive: true,
+        battleContestants: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                firstName: true,
+                description: true,
+                walletAddress: true,
+              },
+            },
+            candyMachineDraft: {
+              include: {
+                drop: {
+                  include: {
+                    pinnedImage: {
+                      select: {
+                        width: true,
+                        height: true,
+                        path: true,
+                        status: true,
+                      },
+                    },
+                    song: {
+                      select: {
+                        id: true,
+                        artistNames: true,
+                        title: true,
+                        lossyArtworkIPFSHash: true,
+                        lossyArtworkURL: true,
+                        lossyAudioURL: true,
+                        lossyAudioIPFSHash: true,
+                        pinnedImage: {
+                          select: {
+                            width: true,
+                            height: true,
+                            path: true,
+                          },
+                        },
+                        creators: {
+                          select: {
+                            name: true,
+                            walletAddress: true,
+                            firstName: true,
+                          },
+                        },
+                        tokens: {
+                          select: {
+                            mintAddress: true,
+                          },
+                        },
+                        candyMachines: {
+                          select: {
+                            candyMachineId: true,
+                            slug: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        battleEndDate: true,
+        battleStartDate: true,
+        battlePrice: true,
+      },
+      orderBy: {
+        order: "asc",
+      },
+    });
+  }),
   createBattle: protectedProcedure
     .input(
       z.object({
@@ -229,7 +444,10 @@ export const battleRouter = createTRPCRouter({
       }
       const battle = await ctx.prisma.$transaction(async (tx) => {
         const b = await tx.battle.findUnique({ where: { id: input.battleId } });
-        if (!b?.createdByWallet || b?.createdByWallet !== ctx.session.walletAddress) {
+        if (
+          !b?.createdByWallet ||
+          b?.createdByWallet !== ctx.session.walletAddress
+        ) {
           throw new Error("Battle not found");
         }
         const createdBattle = await tx.battle.update({
@@ -240,7 +458,7 @@ export const battleRouter = createTRPCRouter({
             isLive: false,
             createdBy: {
               connect: {
-                walletAddress: ctx.session.walletAddress ,
+                walletAddress: ctx.session.walletAddress,
               },
             },
             displayOnHomePage: false,
@@ -327,38 +545,38 @@ export const battleRouter = createTRPCRouter({
                 },
                 data: {
                   primaryArtistName: input.contestantTwo.name,
-                candyMachineDraft: {
-                  update: {
-                    currentStep: "CREATED",
-                    status: "DRAFT",
-                    formSubmission:
-                      (input.contestantTwo?.dropData as object) || {},
-                    startDate: input.battleStartDate,
-                    endDate: input.battleEndDate,
-                    ownerWalletAddress: ctx.session.walletAddress,
-                    audioUri: input.contestantTwo?.dropData?.audioUri,
-                    audioIpfsHash: input.contestantTwo?.dropData?.audioHash,
-                    candyMachineImageUrl:
-                      input.contestantTwo?.dropData?.imageUri,
-                    imageIpfsHash: input.contestantTwo?.dropData?.imageHash,
-                    description: input.contestantTwo?.dropData?.description,
-                    dropName: input.contestantTwo?.dropData?.collectionName,
-                    lowestPrice: input.battlePrice,
-                  },
-                },
-                user: {
-                  connectOrCreate: {
-                    where: {
-                      walletAddress: input.contestantTwo.walletAddress,
-                    },
-                    create: {
-                      name: input.contestantTwo.name,
-                      description: input.contestantTwo.bio,
-                      walletAddress: input.contestantTwo.walletAddress,
+                  candyMachineDraft: {
+                    update: {
+                      currentStep: "CREATED",
+                      status: "DRAFT",
+                      formSubmission:
+                        (input.contestantTwo?.dropData as object) || {},
+                      startDate: input.battleStartDate,
+                      endDate: input.battleEndDate,
+                      ownerWalletAddress: ctx.session.walletAddress,
+                      audioUri: input.contestantTwo?.dropData?.audioUri,
+                      audioIpfsHash: input.contestantTwo?.dropData?.audioHash,
+                      candyMachineImageUrl:
+                        input.contestantTwo?.dropData?.imageUri,
+                      imageIpfsHash: input.contestantTwo?.dropData?.imageHash,
+                      description: input.contestantTwo?.dropData?.description,
+                      dropName: input.contestantTwo?.dropData?.collectionName,
+                      lowestPrice: input.battlePrice,
                     },
                   },
+                  user: {
+                    connectOrCreate: {
+                      where: {
+                        walletAddress: input.contestantTwo.walletAddress,
+                      },
+                      create: {
+                        name: input.contestantTwo.name,
+                        description: input.contestantTwo.bio,
+                        walletAddress: input.contestantTwo.walletAddress,
+                      },
+                    },
+                  },
                 },
-                }
               },
             },
           },
@@ -382,86 +600,92 @@ export const battleRouter = createTRPCRouter({
       return battle;
     }),
   activateBattle: protectedProcedure
-  .input(
-    z.object({
-      battleId: z.string(),
-    }),
-  )
-  .mutation(async ({ ctx, input}) => {
-    const battle = await ctx.prisma.$transaction(async (tx) => {
-      const b = await tx.battle.findUnique({ where: { id: input.battleId } });
-      if (!b?.createdByWallet || b?.createdByWallet !== ctx.session.walletAddress) {
-        throw new Error("Battle not found");
-      }
-      const updateBattle = await tx.battle.update({
-        where: {
-          id: input.battleId,
-        },
-        data: {
-          isActive: true,
-        },
-        include: {
-          battleContestants: {
-            include: {
-              candyMachineDraft: true,
-              candymachine: true,
-              user: {
-                select: {
-                  name: true,
-                  walletAddress: true,
-                  profilePictureHash: true,
+    .input(
+      z.object({
+        battleId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const battle = await ctx.prisma.$transaction(async (tx) => {
+        const b = await tx.battle.findUnique({ where: { id: input.battleId } });
+        if (
+          !b?.createdByWallet ||
+          b?.createdByWallet !== ctx.session.walletAddress
+        ) {
+          throw new Error("Battle not found");
+        }
+        const updateBattle = await tx.battle.update({
+          where: {
+            id: input.battleId,
+          },
+          data: {
+            isActive: true,
+          },
+          include: {
+            battleContestants: {
+              include: {
+                candyMachineDraft: true,
+                candymachine: true,
+                user: {
+                  select: {
+                    name: true,
+                    walletAddress: true,
+                    profilePictureHash: true,
+                  },
                 },
               },
             },
           },
-        },
-      });
+        });
 
-      return updateBattle;
-    })
-    return battle;
-  }),
+        return updateBattle;
+      });
+      return battle;
+    }),
   displayOnHome: protectedProcedure
-  .input(
-    z.object({
-      battleId: z.string(),
-      displayOnHome: z.boolean(),
-    }),
-  )
-  .mutation(async ({ ctx, input}) => {
-    const battle = await ctx.prisma.$transaction(async (tx) => {
-      const b = await tx.battle.findUnique({ where: { id: input.battleId } });
-      if (!b?.createdByWallet || b?.createdByWallet !== ctx.session.walletAddress) {
-        throw new Error("Battle not found");
-      }
-      const updateBattle = await tx.battle.update({
-        where: {
-          id: input.battleId,
-        },
-        data: {
-          displayOnHomePage: input.displayOnHome,
-        },
-        include: {
-          battleContestants: {
-            include: {
-              candyMachineDraft: true,
-              candymachine: true,
-              user: {
-                select: {
-                  name: true,
-                  walletAddress: true,
-                  profilePictureHash: true,
+    .input(
+      z.object({
+        battleId: z.string(),
+        displayOnHome: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const battle = await ctx.prisma.$transaction(async (tx) => {
+        const b = await tx.battle.findUnique({ where: { id: input.battleId } });
+        if (
+          !b?.createdByWallet ||
+          b?.createdByWallet !== ctx.session.walletAddress
+        ) {
+          throw new Error("Battle not found");
+        }
+        const updateBattle = await tx.battle.update({
+          where: {
+            id: input.battleId,
+          },
+          data: {
+            displayOnHomePage: input.displayOnHome,
+          },
+          include: {
+            battleContestants: {
+              include: {
+                candyMachineDraft: true,
+                candymachine: true,
+                user: {
+                  select: {
+                    name: true,
+                    walletAddress: true,
+                    profilePictureHash: true,
+                  },
                 },
               },
             },
           },
-        },
-      });
+        });
 
-      return updateBattle;
-    })
-    return battle;
-  }),
+        return updateBattle;
+      });
+      return battle;
+    }),
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
   }),

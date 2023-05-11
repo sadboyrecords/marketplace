@@ -67,7 +67,9 @@ function Header({
 
   return (
     <>
-      <div className=" sticky top-0 z-10 bg-base-100 px-4 ">
+      {/* sticky top-0  */}
+      <div className="sticky top-0 z-10  bg-gradient-to-b from-black px-4">
+        {/* bg-base-100 */}
         <div className="mx-auto flex h-20 max-w-7xl">
           {/* */}
           <button
@@ -112,7 +114,8 @@ function Header({
                 <button
                   onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                   type="button"
-                  className="rounded-full bg-base-100 p-1 text-gray-400 hover:text-gray-500 "
+                  className="rounded-full  p-1 text-gray-600  backdrop-blur hover:text-gray-800/60 "
+                  // bg-white/20
                 >
                   {theme === "light" ? (
                     <MoonIcon className="h-6 w-6" aria-hidden="true" />

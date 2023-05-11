@@ -1,42 +1,33 @@
-import { createRouter } from './context';
-import { z } from 'zod';
-import { prisma } from 'server/db/client';
-import { router, publicProcedure, protectedProcedure } from 'server/trpc';
+import { z } from "zod";
 import type {
   Sft,
   SftWithToken,
   Nft,
   NftWithToken,
-} from '@metaplex-foundation/js';
-import { getHashAndUriFromNFT } from 'utils/helpers';
-import { nanoid } from 'nanoid';
+} from "@metaplex-foundation/js";
+import S3 from "aws-sdk/clients/s3";
 import {
-  nftAudioPath,
-  nftImagePath,
-  filebaseEndpoints,
-  hashArray,
-  nftINonIpfsImagePath,
-} from 'utils/helpers';
-import axios from 'axios';
-import sharp from 'sharp';
-import S3 from 'aws-sdk/clients/s3';
+  publicProcedure,
+  createTRPCRouter,
+  protectedProcedure,
+} from "@/server/api/trpc";
 
 export const s3 = new S3({
-  apiVersion: '2006-03-01',
+  apiVersion: "2006-03-01",
   accessKeyId: process.env.NEXT_FILEBASE_KEY,
   secretAccessKey: process.env.NEXT_FILEBASE_SECRET,
-  region: 'us-east-1',
-  endpoint: 'https://s3.filebase.com',
-  signatureVersion: 'v4',
+  region: "us-east-1",
+  endpoint: "https://s3.filebase.com",
+  signatureVersion: "v4",
   s3ForcePathStyle: true,
 });
 
-export const tokenRouter = router({
+export const tokenRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
-    const tokens = await prisma.tokens.findMany({
+    const tokens = await ctx.prisma.tokens.findMany({
       take: 100,
       where: {
-        platformId: 'nina',
+        platformId: "nina",
       },
       include: {
         creators: true,
@@ -47,11 +38,11 @@ export const tokenRouter = router({
     };
   }),
   getTopTracks: publicProcedure.query(async ({ ctx }) => {
-    // const tokens = await ctx.prisma.raw_nfts.findMany();
-    const topNfts = await prisma.songs.findMany({
+    // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
+    const topNfts = await ctx.prisma.songs.findMany({
       take: 12,
       where: {
-        platformId: 'nina',
+        platformId: "nina",
       },
       include: {
         creators: true,
@@ -64,8 +55,8 @@ export const tokenRouter = router({
   getCollectionDetails: publicProcedure
     .input(z.object({ contractAddress: z.string() }))
     .query(async ({ ctx, input }) => {
-      // const tokens = await ctx.prisma.raw_nfts.findMany();
-      const topNfts = await prisma?.tokens?.findFirst?.({
+      // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
+      const topNfts = await ctx.prisma?.tokens?.findFirst?.({
         where: {
           mintAddress: {
             contains: input.contractAddress,
@@ -80,12 +71,12 @@ export const tokenRouter = router({
       };
     }),
   getSpotlightToken: publicProcedure.query(async ({ ctx }) => {
-    // const tokens = await ctx.prisma.raw_nfts.findMany();
-    const spotlight = await prisma.tokens.findFirst({
+    // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
+    const spotlight = await ctx.prisma.tokens.findFirst({
       take: 1,
       where: {
         chain: {
-          startsWith: 'solana',
+          startsWith: "solana",
         },
       },
       include: {
@@ -107,16 +98,16 @@ export const tokenRouter = router({
     .query(async ({ ctx, input }) => {
       const limit = input.limit ?? 12;
       const { cursor } = input;
-      const collections = await prisma.tokens.findMany({
+      const collections = await ctx.prisma.tokens.findMany({
         take: limit + 1,
         where: {
           platformId: {
-            equals: 'nina',
+            equals: "nina",
           },
         },
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
-          title: 'asc',
+          title: "asc",
         },
         include: {
           creators: true,
@@ -142,7 +133,7 @@ export const tokenRouter = router({
     )
     .query(async ({ ctx, input }) => {
       console.log({ input });
-      return await prisma.tokens.findFirst({
+      return await ctx.prisma.tokens.findFirst({
         where: {
           mintAddress: input.mintAddress,
         },
@@ -155,14 +146,14 @@ export const tokenRouter = router({
         nft: z.custom<Sft | Nft | SftWithToken | NftWithToken>().optional(),
       })
     )
-    .query(async ({ ctx, input }) => {
+    .query(({ ctx, input }) => {
       try {
         console.log({ input });
         const nft = input.nft;
         if (!nft) {
           return null;
         }
-        return ""
+        return "";
         // const nftJson = nft.json;
         // console.log({ nftJson });
         // const { audioHash, audioUrl, imageHash, imageUrl } =
@@ -277,7 +268,7 @@ export const tokenRouter = router({
         // //     OR: [{ lossyAudioURL: audioUrl }, { lossyAudioIPFSHash: ipfsHash }],
         // //   },
         // // });
-        // const tokenInfo: any = await prisma.$transaction(async (tx) => {
+        // const tokenInfo: any = await ctx.prisma.$transaction(async (tx) => {
         //   const found = await tx.songs.findFirst({
         //     where: {
         //       OR: [
@@ -287,7 +278,7 @@ export const tokenRouter = router({
         //     },
         //   });
         //   if (found) {
-        //     const data = await prisma.tokens.upsert({
+        //     const data = await ctx.prisma.tokens.upsert({
         //       where: {
         //         mintAddress: input.mintAddress,
         //       },
@@ -404,7 +395,7 @@ export const tokenRouter = router({
         //     return data;
         //   }
         //   if (!found) {
-        //     // const data = await prisma.tokens.upsert({
+        //     // const data = await ctx.prisma.tokens.upsert({
         //     //   where: {
         //     //     mintAddress: input.mintAddress,
         //     //   },
@@ -719,9 +710,9 @@ export const tokenRouter = router({
     )
     .query(async ({ ctx, input }) => {
       if (!input.publicKey) {
-        throw new Error('No public key provided');
+        throw new Error("No public key provided");
       }
-      const tokens = await prisma.tokens.findMany({
+      const tokens = await ctx.prisma.tokens.findMany({
         where: {
           creators: {
             every: {
@@ -751,19 +742,18 @@ export const tokenRouter = router({
         });
       return uniqueSongs;
     }),
-  findManyWithNoHash: protectedProcedure
-    .query(async ({ ctx }) => {
-      // await prisma.tokens.updateMany({
-      //   where: {
-      //     tokenUri: {
-      //       contains: 'arweave.net',
-      //     }
-      //   },
-      //   data: {
-      //     lossyArtworkIPFSHash: null,
-      //   }
-      // })
-    //   const found = await prisma.tokens.findFirst({ 
+  findManyWithNoHash: protectedProcedure.query(async ({ ctx }) => {
+    // await ctx.prisma.tokens.updateMany({
+    //   where: {
+    //     tokenUri: {
+    //       contains: 'arweave.net',
+    //     }
+    //   },
+    //   data: {
+    //     lossyArtworkIPFSHash: null,
+    //   }
+    // })
+    //   const found = await ctx.prisma.tokens.findFirst({
     //     where: {
     //      audioIpfsHash:{
     //       startsWith: "/"
@@ -778,7 +768,7 @@ export const tokenRouter = router({
     //   if (!newAudioHash && !newImageHash) {
     //     return ""
     //   }
-    //    await prisma.tokens.update({
+    //    await ctx.prisma.tokens.update({
     //     where: {
     //       id: found?.id
     //     },
@@ -790,41 +780,40 @@ export const tokenRouter = router({
     //  } catch (error) {
     //   console.log({ error})
     //  }
-    
-      // await prisma.pinnedFiles.update({ 
-      //   where: {
-      //     ipfsHash: "/bafkreibtnhaumsgwmtjjywiqsgsvhneq7kjrd37nlf4fhlcirv55dbh7vm"
-      //   },
-      //   data: {
-      //     ipfsHash: newHash
-      //   }
-      // })
-      return await prisma.tokens.findMany({
-        where: {
-          AND:[
-            {
-              OR: [
-                {
-                  lossyArtworkIPFSHash: null,
-                },
-                {
-                  audioIpfsHash: null,
-                }
-              ],
-              audioUri: {
-                not: "undefined",
-              }
-            }
-          ],
-         
-        },
-        select: {
-          id: true,
-          mintAddress: true,
-        },
-        take: 100,
-      });
-    }),
+
+    // await ctx.prisma.pinnedFiles.update({
+    //   where: {
+    //     ipfsHash: "/bafkreibtnhaumsgwmtjjywiqsgsvhneq7kjrd37nlf4fhlcirv55dbh7vm"
+    //   },
+    //   data: {
+    //     ipfsHash: newHash
+    //   }
+    // })
+    return await ctx.prisma.tokens.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              {
+                lossyArtworkIPFSHash: null,
+              },
+              {
+                audioIpfsHash: null,
+              },
+            ],
+            audioUri: {
+              not: "undefined",
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        mintAddress: true,
+      },
+      take: 100,
+    });
+  }),
   likeUnlikeTrack: publicProcedure
     .input(
       z.object({
@@ -834,7 +823,7 @@ export const tokenRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const likedTrack = await prisma.likedTracks.upsert({
+      const likedTrack = await ctx.prisma.likedTracks.upsert({
         where: {
           liked_tracks_track_id_walletAddress_unique: {
             trackId: input.trackId,
@@ -867,7 +856,7 @@ export const tokenRouter = router({
 //   })
 //   .query('getAll', {
 //     async resolve({ ctx }) {
-//       const tokens = await ctx.prisma.tokens.findMany({
+//       const tokens = await ctx.ctx.prisma.tokens.findMany({
 //         take: 100,
 //         where: {
 //           platformId: 'nina',
@@ -883,8 +872,8 @@ export const tokenRouter = router({
 //   })
 //   .query('getTopTracks', {
 //     async resolve({ ctx }) {
-//       // const tokens = await ctx.prisma.raw_nfts.findMany();
-//       const topNfts = await ctx.prisma.songs.findMany({
+//       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
+//       const topNfts = await ctx.ctx.prisma.songs.findMany({
 //         take: 12,
 //         where: {
 //           platformId: 'nina',
@@ -901,7 +890,7 @@ export const tokenRouter = router({
 //   .query('getCollectionDetails', {
 //     input: z.object({ contractAddress: z.string() }),
 //     async resolve({ ctx, input }) {
-//       // const tokens = await ctx.prisma.raw_nfts.findMany();
+//       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
 //       const topNfts = await ctx.prisma?.tokens?.findFirst?.({
 //         where: {
 //           mintAddress: {
@@ -919,8 +908,8 @@ export const tokenRouter = router({
 //   })
 //   .query('getSpotlightToken', {
 //     async resolve({ ctx }) {
-//       // const tokens = await ctx.prisma.raw_nfts.findMany();
-//       const spotlight = await ctx.prisma.tokens.findFirst({
+//       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
+//       const spotlight = await ctx.ctx.prisma.tokens.findFirst({
 //         take: 1,
 //         where: {
 //           chain: {
@@ -945,7 +934,7 @@ export const tokenRouter = router({
 //     async resolve({ ctx, input }) {
 //       const limit = input.limit ?? 12;
 //       const { cursor } = input;
-//       const collections = await ctx.prisma.tokens.findMany({
+//       const collections = await ctx.ctx.prisma.tokens.findMany({
 //         take: limit + 1,
 //         where: {
 //           platformId: {
@@ -992,7 +981,7 @@ export const tokenRouter = router({
 //       if (!input.publicKey) {
 //         throw new Error('No public key provided');
 //       }
-//       const tokens = await ctx.prisma.tokens.findMany({
+//       const tokens = await ctx.ctx.prisma.tokens.findMany({
 //         where: {
 //           creators: {
 //             every: {
@@ -1032,7 +1021,7 @@ export const tokenRouter = router({
 //       isLiked: z.boolean(),
 //     }),
 //     async resolve({ ctx, input }) {
-//       const likedTrack = await ctx.prisma.likedTracks.upsert({
+//       const likedTrack = await ctx.ctx.prisma.likedTracks.upsert({
 //         where: {
 //           liked_tracks_track_id_walletAddress_unique: {
 //             trackId: input.trackId,

@@ -14,6 +14,9 @@ interface PropsTypes {
   path?: string;
   pinnedStatus?: string;
   fill?: boolean;
+  resizeWidth?: number;
+  sizes?: string;
+  publicImage?: boolean;
 }
 
 export default function ImageDisplay({
@@ -29,6 +32,9 @@ export default function ImageDisplay({
   fill,
   path,
   pinnedStatus,
+  resizeWidth,
+  sizes,
+  publicImage,
 }: PropsTypes) {
   // console.log({ url, hash });
   // console.log({ url, hash, pinnedStatus, path });
@@ -52,13 +58,20 @@ export default function ImageDisplay({
   return (
     <>
       {/* <div className="h-full w-full relative "> */}
-      {ipfsUrl(hash) ? (
+      {publicImage || ipfsUrl(hash) ? (
         <>
           <Image
             //   className="w-full md:w-72 block rounded-md "
             className={className}
             src={
-              ipfsUrl(hash, quality, path, pinnedStatus, width, height) ||
+              ipfsUrl(
+                hash,
+                quality,
+                path,
+                pinnedStatus,
+                resizeWidth || width,
+                height
+              ) ||
               url ||
               "/placeholder/music_placeholder.png"
             }
@@ -72,6 +85,7 @@ export default function ImageDisplay({
             quality={quality}
             priority
             fill={fill}
+            sizes={fill ? sizes || "(max-width: 768px) 100vw" : undefined}
             //   layout="responsive"
             // layout={layout}
             loader={

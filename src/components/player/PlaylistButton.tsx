@@ -1,31 +1,26 @@
 import { ListBulletIcon, PlayIcon, PauseIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Menu } from "@headlessui/react";
-import { usePlayerProvider } from "@/components/player/Provider";
 import Typography from "@/components/typography";
 import type { IPlaylistItem } from "@/utils/types";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import React from "react";
 import Button from "@/components/buttons/Button";
-import TokenLikes from "@/components/likes-plays/TokenLikes";
-import { getCreatorNames } from "@/utils/helpers";
+import GeneralLikes from "@/components/likes-plays/GeneralLikes";
+import { getCreatorNames, getTrackUrl } from "@/utils/helpers";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
+import { selectAudio, setCurrentSong } from "@/lib/slices/audioSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 // eslint-disable-next-line react/display-name
 const PlaylistItem = React.forwardRef<HTMLDivElement, IPlaylistItem>(
-  ({ track, active, currentTrack }, ref) => {
-    const { setIsPlaying, isPlaying, setCurrentToken } = usePlayerProvider();
-    const handlePlayPause = () => {
-      if (currentTrack?.id === track?.id) {
-        setIsPlaying(!isPlaying);
-      }
-      if (currentTrack?.id !== track?.id) {
-        setCurrentToken(track);
-        setIsPlaying(true);
-      }
-    };
-    const isPlayingThis = currentTrack && currentTrack?.id === track?.id;
+  ({ track, active }, ref) => {
+    const dispatch = useDispatch();
+    const { currentSong, isPlaying } = useSelector(selectAudio);
+    const isPlayingThis = currentSong && currentSong?.id === track?.id;
+
+    const trackUrl = getTrackUrl(track);
 
     return (
       <div
@@ -37,36 +32,43 @@ const PlaylistItem = React.forwardRef<HTMLDivElement, IPlaylistItem>(
         } flex items-center justify-between border-base-300 px-4 py-3`}
       >
         <div className="flex items-center space-x-6">
-          <div className="relative cursor-pointer" onClick={handlePlayPause}>
-            <ImageDisplay
-              url={track?.lossyArtworkURL}
-              hash={track?.lossyArtworkIPFSHash}
-              width={40}
-              quality={50}
-              alt={track?.title || "Track"}
-              className="block w-full rounded-md md:w-72 "
-              imgTagClassName="w-10 block rounded-md "
-            />
-            <div
-              className={` absolute left-1 top-[6px] mx-auto rounded-full bg-primary p-2 hover:bg-primary-focus  ${
-                isPlayingThis || active ? "block" : "hidden hover:block"
-              } `}
-            >
-              {isPlaying ? (
-                <PauseIcon className="h-3 w-3 text-white" />
-              ) : (
-                <PlayIcon className="h-3 w-3 text-white" />
-              )}
+          <div
+            className="relative cursor-pointer"
+            onClick={() => dispatch(setCurrentSong(track))}
+          >
+            <div className="relative h-16 w-16">
+              <ImageDisplay
+                url={track?.lossyArtworkURL || undefined}
+                hash={track?.lossyArtworkIPFSHash || null}
+                width={40}
+                quality={50}
+                alt={track?.title || "Track"}
+                className="block w-full rounded-md md:w-72 "
+                imgTagClassName="w-10 block rounded-md "
+                fill
+              />
+              <div
+                className={`absolute  bottom-0 left-0 right-0 top-0 m-auto flex items-center justify-center rounded-full p-2  text-center   ${
+                  isPlayingThis || active ? "block" : "!hover:block "
+                } `}
+              >
+                {isPlaying && isPlayingThis ? (
+                  <PauseIcon className="h-6 w-6 text-white" />
+                ) : (
+                  <PlayIcon
+                    className={`h-6 w-6 text-white ${
+                      isPlayingThis ? "" : "!hover:block hidden"
+                    }`}
+                  />
+                )}
+              </div>
             </div>
           </div>
           <div>
-            {track?.tokens?.length && track?.tokens?.length > 0 ? (
-              <Link
-                href={routes.tokenItemDetails(track?.tokens[0]?.mintAddress)}
-              >
+            {trackUrl ? (
+              <Link href={trackUrl || ""}>
                 <Typography
-                  ref={ref}
-                  variant="body2"
+                  size="body-sm"
                   className="cursor-pointer hover:text-primary"
                 >
                   {track?.title}
@@ -81,12 +83,10 @@ const PlaylistItem = React.forwardRef<HTMLDivElement, IPlaylistItem>(
                 <div key={creator.walletAddress}>
                   <Link href={routes.userProfile(creator.walletAddress)}>
                     <Typography
-                      ref={ref}
-                      variant="body2"
+                      size="body-sm"
                       className="cursor-pointer opacity-70 hover:text-primary"
                     >
-                      {/* {track?.rawArtists?.name} */}@
-                      {creator.walletAddress.slice(0, 3) + " "}
+                      @{creator?.name}
                     </Typography>
                   </Link>
                 </div>
@@ -96,15 +96,7 @@ const PlaylistItem = React.forwardRef<HTMLDivElement, IPlaylistItem>(
         </div>
 
         <div className="flex items-center space-x-3">
-          {/* <Typography variant="body2" className="">
-                {duration?.minutes}:{duration?.seconds}
-            </Typography> */}
-          {currentTrack && <TokenLikes track={track || null} hideNumber />}
-          {/* hideNumber */}
-
-          {/* <div className="btn btn-square btn-ghost btn-sm hover:bg-inherit">
-            <HeartIcon className="w-6 h-6 text-primary" />
-          </div> */}
+          {currentSong && <GeneralLikes songId={track?.id} hideNumber />}
         </div>
       </div>
     );
@@ -112,7 +104,8 @@ const PlaylistItem = React.forwardRef<HTMLDivElement, IPlaylistItem>(
 );
 
 function PlaylistButton() {
-  const { currentPlaylist, currentToken } = usePlayerProvider();
+  // const { currentPlaylist, currentSong } = usePlayerProvider();
+  const { playlist: currentPlaylist, currentSong } = useSelector(selectAudio);
   const ref = React.createRef<HTMLDivElement>();
   const [openMenu, setOpenMenu] = React.useState(false);
   const handleOpenMenu = () => {
@@ -124,17 +117,17 @@ function PlaylistButton() {
       <Menu as="div" className="inline-block text-left">
         {({ open }) => (
           <>
-            <Button onClick={handleOpenMenu}>
-              <ListBulletIcon className="h-6 w-6 text-primary hover:text-primary-focus" />
+            <Button variant="ghost" onClick={handleOpenMenu}>
+              <ListBulletIcon className="h-6 w-6 text-neutral-content hover:text-primary-focus" />
             </Button>
             {openMenu && (
               <div className="absolute bottom-20  right-0  mt-2 h-[800px] max-h-[80vh] w-screen origin-top-right divide-y divide-gray-100 overflow-auto rounded-md border border-base-300 bg-base-100  ring-1 ring-black ring-opacity-5 focus:outline-none sm:w-2/3 md:w-[573px]">
                 {/* bottom-14 shadow-lg */}
                 <div className="fixed z-30 flex w-screen items-center justify-between border border-base-300 bg-base-100 px-3 py-2 sm:w-2/3 md:w-[573px]">
-                  <Typography variant="h6">
-                    {currentPlaylist.PlaylistName}
+                  <Typography size="body" className="font-bold tracking-widest">
+                    {currentPlaylist?.playlistName}
                   </Typography>
-                  <Button onClick={handleOpenMenu}>
+                  <Button variant="ghost" onClick={handleOpenMenu}>
                     <XMarkIcon className="h-6 w-6 text-primary hover:text-primary-focus" />
                   </Button>
                 </div>
@@ -146,7 +139,7 @@ function PlaylistButton() {
                           <PlaylistItem
                             track={track}
                             active={active ? true : false}
-                            currentTrack={currentToken as any}
+                            currentTrack={currentSong || null}
                             ref={ref}
                             // onClick={handlePlayPause}
                           />

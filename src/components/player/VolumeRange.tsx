@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 type Props = {
   label: string | React.ReactNode;
@@ -12,7 +12,7 @@ type Props = {
   output?: string | React.ReactNode | number;
 };
 
-function PlayerRange({
+function VolumeRange({
   label,
   name,
   max,
@@ -26,7 +26,7 @@ function PlayerRange({
     backgroundSize: `${`${
       val > 0 ? (Number(val) / Number(rangeMax)) * 100 : 0
     }%`} 4px`,
-    backgroundPosition: 'left center',
+    backgroundPosition: "left center",
     backgroundRepeat: `no-repeat`,
   });
   return (
@@ -37,11 +37,11 @@ function PlayerRange({
 					range
 					range-primary
 					range-xs
-					w-full
-					h-3
-					p-0
 					ml-2
-					focus:outline-none focus:ring-0 focus:shadow-none"
+					h-3
+					w-full
+					p-0
+					focus:shadow-none focus:outline-none focus:ring-0"
         //  form-range bg-transparent h-6
         type="range"
         min={min}
@@ -55,4 +55,4 @@ function PlayerRange({
     </label>
   );
 }
-export default PlayerRange;
+export default VolumeRange;
