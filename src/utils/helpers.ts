@@ -5,7 +5,6 @@ import { imageDomains, routes } from "@/utils/constants";
 import { type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import type { PartialSongType, SongType } from "./types";
-import AWS from "aws-sdk";
 import axios from "axios";
 import { liveIpfsGateway, cdnUrl } from "@/utils/constants";
 import type { GuardFormType } from "./types";
@@ -77,16 +76,6 @@ export const getLowestSolpaymentFromGuard = (guards?: GuardFormType[]) => {
   }
   return price;
 };
-
-export const s3 = new AWS.S3({
-  // apiVersion: '2006-03-01',
-  accessKeyId: process.env.NEXT_PUBLIC_FILEBASE_KEY,
-  secretAccessKey: process.env.NEXT_PUBLIC_FILEBASE_SECRET,
-  region: "us-east-1",
-  endpoint: "https://s3.filebase.com",
-  s3ForcePathStyle: true,
-  signatureVersion: "v4",
-});
 
 export const nftImagePath = "nft/images/";
 export const nftINonIpfsImagePath = "nft/images/nonIpfs/";
