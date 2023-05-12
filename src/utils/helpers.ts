@@ -25,14 +25,13 @@ export function classNames(...classes: [string]) {
 export const getHashAndUriFromNFT = (
   nftData: Nft | NftWithToken | Sft | SftWithToken
 ) => {
-  // const nftJson = nftData.json;
-  let audioUrl: string | undefined = nftData?.json?.properties?.files[0]?.uri;
-  const audioFile = nftData?.json?.properties?.files?.filter((f: unknown) =>
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  let audioUrl: string | undefined = nftData.json?.properties?.files?.[0]?.uri;
+  const audioFile = nftData?.json?.properties?.files?.filter((f) =>
     f?.type?.includes("audio")
   );
   if (audioFile && audioFile?.length > 0) {
-    audioUrl = audioFile[0]?.uri || audioFile[0]?.url || "";
+    audioUrl =
+      audioFile[0]?.uri || (audioFile[0]?.url as string | undefined) || "";
   }
   const ipfsAudioHash = audioUrl?.split("/ipfs").pop(); //.replace(/^ipfs:\/\/|\//g, '')
   const imageIpfsHash = nftData.json?.image?.split("/ipfs").pop();

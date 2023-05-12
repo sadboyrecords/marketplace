@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -21,6 +23,7 @@ import {
   sol,
   toDateTime,
   PublicKey,
+  type Signer,
 } from "@metaplex-foundation/js";
 import {
   ExclamationCircleIcon,
@@ -30,6 +33,12 @@ import { ipfsPublicGateway } from "@/utils/constants";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { routes } from "@/utils/constants";
 import Link from "next/link";
+
+type CreatorInput = {
+  readonly address: PublicKey;
+  readonly share: number;
+  readonly authority?: Signer | undefined;
+};
 
 export function TitleContent({
   title,
@@ -212,7 +221,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
         sellerFeeBasisPoints: (formSubmission?.sellerFeeBasisPoints || 0) * 100,
         isCollection: true,
         tokenOwner: publicKey as PublicKey,
-        creators: creators as any,
+        creators: (creators as CreatorInput[]) || undefined,
         // updateAuthority: wallet.signMessage(),
       });
       const collectionAddress = result?.mintAddress?.toBase58();
@@ -325,7 +334,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       }));
 
       const result = await metaplex?.candyMachines().create({
-        creators: creators as any,
+        creators: creators as CreatorInput[],
         collection: {
           address: new PublicKey(data.collectionAddress),
           updateAuthority: metaplex.identity(),
@@ -487,7 +496,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
           return {
             address: split.walletAddress,
           };
-        }) as any,
+        }),
         price: price as number,
         items: formSubmission?.itemsAvailable,
         collectionAddress: data.collectionAddress as string,
@@ -929,8 +938,8 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
             <Button
               onClick={() =>
                 router.push(
-                  routes.battleDetails(data?.battleContestant?.battle?.id)
-                ) as any
+                  routes.battleDetails(data?.battleContestant?.battle?.id || "")
+                ) as unknown
               }
               // rounded="lg"
               className="flex"
@@ -939,7 +948,9 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
             </Button>
             <Button
               onClick={() =>
-                router.push(routes.dropDetails(data?.candyMachineSlug)) as any
+                router.push(
+                  routes.dropDetails(data?.candyMachineSlug || "")
+                ) as unknown
               }
               // rounded="lg"
               className="flex"

@@ -12,11 +12,11 @@
   }
   ```
 */
-import React from 'react';
-import { Dialog } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
+import React from "react";
+import { Dialog } from "@headlessui/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
-import Button from '../Button';
+import Button from "@/components/buttons/Button";
 
 // import Typog
 
@@ -43,7 +43,7 @@ export default function FormContainer({
   const handleCancel = (
     e:
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
-      | React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+      | React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.preventDefault();
     setOpen(false);
@@ -82,13 +82,13 @@ export default function FormContainer({
 
       {/* Action buttons */}
       {/* bottom-0 left-0 w-screen max-w-2xl absolute*/}
-      <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6  bg-base-100  mt-4">
+      <div className="mt-4 flex-shrink-0 border-t border-gray-200 bg-base-100 px-4  py-5  sm:px-6">
         <div className="flex justify-end space-x-3">
           <Button variant="outlined" color="neutral" onClick={handleCancel}>
             Cancel
           </Button>
           <Button loading={submitLoading}>
-            {submitButtonLabel || 'Create'}
+            {submitButtonLabel || "Create"}
           </Button>
         </div>
       </div>

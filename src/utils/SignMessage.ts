@@ -34,6 +34,6 @@ export class SigninMessage {
     const msgUint8 = new TextEncoder().encode(msg);
     const pubKeyUint8 = bs58.decode(this.publicKey);
 
-    return nacl.sign.detached.verify(msgUint8, signatureUint8, pubKeyUint8) as boolean;
+    return nacl.sign.detached.verify(msgUint8, signatureUint8, pubKeyUint8);
   }
 }

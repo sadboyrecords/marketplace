@@ -225,6 +225,7 @@ export const battleRouter = createTRPCRouter({
                             width: true,
                             height: true,
                             path: true,
+                            status: true,
                           },
                         },
                         creators: {

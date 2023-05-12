@@ -1,6 +1,5 @@
 import Typography from "@/components/typography";
 import Countdown from "@/components/countdown/Countdown";
-import Image from "next/image";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
 import { api } from "@/utils/api";
 import LineUp from "@/components/battleDrops/LineUp";

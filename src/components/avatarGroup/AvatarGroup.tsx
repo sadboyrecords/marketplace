@@ -1,5 +1,3 @@
-import React from "react";
-import Typography from "@/components/typography";
 import Link from "next/link";
 import Avatar from "@/components/avatar/Avatar";
 

@@ -98,13 +98,18 @@ function AvataterNav() {
           <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-border-gray rounded-md bg-base-100 shadow-lg ring-1 ring-border-gray ring-opacity-5 focus:outline-none">
             <div className="flex items-center space-x-3 px-2 py-4">
               <Avatar
+                src={data?.profilePictureImage || undefined}
                 username={(data?.walletAddress as string) || "user"}
                 alt="User profile menu dropdown"
                 widthNumber={40}
                 heightNumber={40}
-                // fill
+                fill
                 loading={isLoading}
                 type="circle"
+                imageHash={data?.profilePictureHash || undefined}
+                path={data?.pinnedProfilePicture?.path}
+                sizes="50px"
+                pinnedStatus={data?.pinnedProfilePicture?.status}
               />
               <div className="items-center">
                 <Typography size="body" className=" font-semibold">
@@ -166,28 +171,6 @@ function AvataterNav() {
                     )} */}
                     Profile
                   </Link>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    className={`${
-                      active ? "bg-primary-500 text-white" : "text-base-content"
-                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                  >
-                    {/* {active ? (
-                      <EditActiveIcon
-                        className="mr-2 h-5 w-5"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <EditInactiveIcon
-                        className="mr-2 h-5 w-5"
-                        aria-hidden="true"
-                      />
-                    )} */}
-                    My Favs
-                  </button>
                 )}
               </Menu.Item>
             </div>

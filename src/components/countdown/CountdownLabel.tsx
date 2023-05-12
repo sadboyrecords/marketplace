@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
 import { useState, useEffect, useMemo } from "react";
 import Typography from "@/components/typography";
 import { SolIcon } from "@/components/iconComponents";

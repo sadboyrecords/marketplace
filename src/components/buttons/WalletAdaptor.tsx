@@ -48,7 +48,7 @@ export default function WalletAdaptor() {
     const data = new TextEncoder().encode(message.prepare());
     const signature = await signMessage(data);
     const signatureBase58 = base58.encode(signature);
-    console.log({ signatureBase58, message });
+    // console.log({ signatureBase58, message });
     //   // const message = "Sign to provide access to app";
     //   console.log({ account });
     //   // const { message } = await apiPost("api/auth/request-message", account);

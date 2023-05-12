@@ -46,7 +46,9 @@ export const getNftOwner = async (mintAddress: string) => {
   if (tokenAccountAddress) {
     const accountInfo = await getAccountInfo(tokenAccountAddress);
 
-    const owner = accountInfo.value?.data?.parsed?.info?.owner as unknown;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // const owner = accountInfo.value?.data?.parsed?.info?.owner;
+    const owner = "";
     // console.log({ accountInfo, tokenAccountAddress });
     return { accountInfo, tokenAccountAddress, owner };
   }

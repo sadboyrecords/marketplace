@@ -10,7 +10,7 @@ import {
   type DefaultCandyGuardSettings,
 } from "@metaplex-foundation/js";
 import { type AccountInfo, type PublicKey } from "@solana/web3.js";
-import { type MintCounterBorsh } from "@/components/borsh/mintCounter";
+// import { type MintCounterBorsh } from "@/components/borsh/mintCounter";
 import { type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import { type Session } from "next-auth";
@@ -151,7 +151,7 @@ export type MintLimitLogics = {
   settings: MintLimitGuardSettings;
   pda?: Pda;
   accountInfo?: AccountInfo<Buffer>;
-  mintCounter?: MintCounterBorsh; //MintCounter;
+  // mintCounter?: MintCounterBorsh; //MintCounter;
 };
 
 export type AllGuardsType = {

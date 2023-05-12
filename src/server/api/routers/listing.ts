@@ -1,9 +1,12 @@
-import { createRouter } from './context';
-import { z } from 'zod';
-import { prisma } from 'server/db/client';
-import { router, publicProcedure, protectedProcedure } from 'server/trpc';
+import { z } from "zod";
 
-export const listingRouter = router({
+import {
+  createTRPCRouter,
+  publicProcedure,
+  protectedProcedure,
+} from "@/server/api/trpc";
+
+export const listingRouter = createTRPCRouter({
   getActiveTokenListing: publicProcedure
     .input(
       z.object({
@@ -16,10 +19,10 @@ export const listingRouter = router({
       // if (input.owner !== ctx.session?.user?.walletAddress) {
       //   throw new Error('Unauthorized');
       // }
-      const listing = await prisma?.listing.findFirst({
+      const listing = await ctx.prisma.listing.findFirst({
         where: {
           tokenMintAddress: input.mintAddress,
-          status: 'LISTED',
+          status: "LISTED",
         },
       });
       return listing;
@@ -34,13 +37,13 @@ export const listingRouter = router({
       // if (input.owner !== ctx.session?.user?.walletAddress) {
       //   throw new Error('Unauthorized');
       // }
-      if (!ctx.user) {
+      if (!ctx.session.user) {
         return null;
       }
-      const listing = await prisma?.listing.findMany({
+      const listing = await ctx.prisma.listing.findMany({
         where: {
           sellerWalletAddress: input.user,
-          status: 'LISTED',
+          status: "LISTED",
         },
       });
       return listing;
@@ -53,13 +56,13 @@ export const listingRouter = router({
         cursor: z.string().nullish(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const limit = input.limit ?? 6;
       const { cursor } = input;
-      const listings = await prisma.listing.findMany({
+      const listings = await ctx.prisma.listing.findMany({
         take: limit + 1,
         where: {
-          status: 'LISTED',
+          status: "LISTED",
           OR: [
             {
               startDate: {
@@ -105,15 +108,15 @@ export const listingRouter = router({
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           // title: 'asc',
-          createdAt: 'asc',
+          createdAt: "asc",
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (listings.length > limit) {
         const nextItem = listings.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = nextItem?.id;
       }
-      const count = await prisma.listing.count({
+      const count = await ctx.prisma.listing.count({
         where: {
           OR: [
             {
@@ -148,13 +151,13 @@ export const listingRouter = router({
         isLive: z.boolean().optional(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const limit = input.limit ?? 6;
       const { cursor } = input;
-      const listings = await prisma.listing.findMany({
+      const listings = await ctx.prisma.listing.findMany({
         take: limit + 1,
         where: {
-          status: 'LISTED',
+          status: "LISTED",
           OR: input.isLive
             ? [
                 {
@@ -219,15 +222,15 @@ export const listingRouter = router({
         cursor: cursor ? { id: cursor } : undefined,
         orderBy: {
           // title: 'asc',
-          createdAt: 'asc',
+          createdAt: "asc",
         },
       });
       let nextCursor: typeof cursor | undefined = undefined;
       if (listings.length > limit) {
         const nextItem = listings.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = nextItem?.id;
       }
-      const count = await prisma.listing.count({
+      const count = await ctx.prisma.listing.count({
         where: {
           OR: [
             {
@@ -263,17 +266,17 @@ export const listingRouter = router({
         receiptAddress: z.string(),
         freeSellerTradeState: z.string().optional(),
         price: z.number(),
-        status: z.enum(['LISTED', 'SOLD', 'CANCELLED', 'EXPIRED']),
-        currency: z.enum(['USD', 'SOL']).optional(),
+        status: z.enum(["LISTED", "SOLD", "CANCELLED", "EXPIRED"]),
+        currency: z.enum(["USD", "SOL"]).optional(),
         // songUrl: z.string(),
         // metadataUrl: z.string(),
-        listingType: z.enum(['AUCTION', 'FIXED']),
+        listingType: z.enum(["AUCTION", "FIXED"]),
         auctionHouseAddress: z.string(),
         auctioneerAuthority: z.string().optional(),
       })
     )
-    .mutation(async ({ input }) => {
-      const listing = await prisma?.listing.upsert({
+    .mutation(async ({ input, ctx }) => {
+      const listing = await ctx.prisma.listing.upsert({
         where: {
           receiptAddress: input.receiptAddress,
         },
@@ -295,14 +298,14 @@ export const listingRouter = router({
         endDate: z.date().optional(),
         receiptAddress: z.string(),
         price: z.number().optional(),
-        status: z.enum(['LISTED', 'SOLD', 'CANCELLED', 'EXPIRED']),
+        status: z.enum(["LISTED", "SOLD", "CANCELLED", "EXPIRED"]),
         songUrl: z.string().optional(),
         metadataUrl: z.string().optional(),
-        listingType: z.enum(['AUCTION', 'FIXED']).optional(),
+        listingType: z.enum(["AUCTION", "FIXED"]).optional(),
       })
     )
-    .mutation(async ({ input }) => {
-      const listing = await prisma?.listing.update({
+    .mutation(async ({ input, ctx }) => {
+      const listing = await ctx.prisma.listing.update({
         where: {
           receiptAddress: input.receiptAddress,
         },
@@ -315,75 +318,3 @@ export const listingRouter = router({
       };
     }),
 });
-
-export const listingRouterOld = createRouter()
-  .query('getActiveTokenListing', {
-    input: z.object({ mintAddress: z.string() }),
-    async resolve({ input, ctx }) {
-      const listing = await ctx.prisma?.listing.findFirst({
-        where: {
-          tokenMintAddress: input.mintAddress,
-          status: 'LISTED',
-        },
-      });
-      return listing;
-    },
-  })
-  .mutation('createListing', {
-    input: z.object({
-      startDate: z.date().optional(),
-      endDate: z.date().optional(),
-      tokenMintAddress: z.string(),
-      sellerWalletAddress: z.string(),
-      receiptAddress: z.string(),
-      freeSellerTradeState: z.string().optional(),
-      price: z.number(),
-      status: z.enum(['LISTED', 'SOLD', 'CANCELLED', 'EXPIRED']),
-      currency: z.enum(['USD', 'SOL']).optional(),
-      songUrl: z.string(),
-      metadataUrl: z.string(),
-      listingType: z.enum(['AUCTION', 'FIXED']),
-      auctionHouseAddress: z.string(),
-    }),
-    async resolve({ input, ctx }) {
-      const listing = await ctx.prisma?.listing.upsert({
-        where: {
-          receiptAddress: input.receiptAddress,
-        },
-        create: {
-          ...input,
-        },
-        update: {
-          ...input,
-        },
-      });
-      return {
-        ...listing,
-      };
-    },
-  })
-  .mutation('updateListing', {
-    input: z.object({
-      startDate: z.date().optional(),
-      endDate: z.date().optional(),
-      receiptAddress: z.string(),
-      price: z.number().optional(),
-      status: z.enum(['LISTED', 'SOLD', 'CANCELLED', 'EXPIRED']),
-      songUrl: z.string().optional(),
-      metadataUrl: z.string().optional(),
-      listingType: z.enum(['AUCTION', 'FIXED']).optional(),
-    }),
-    async resolve({ input, ctx }) {
-      const listing = await ctx.prisma?.listing.update({
-        where: {
-          receiptAddress: input.receiptAddress,
-        },
-        data: {
-          ...input,
-        },
-      });
-      return {
-        ...listing,
-      };
-    },
-  });

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
 import React, { createContext, useContext, useMemo, useCallback } from "react";
@@ -769,12 +771,24 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
         console.log({ output });
         const nfts = await Promise.all(
           output.map(({ context }) => {
-            console.log({ context });
+            // console.log({ context });
+            // context: {
+            //   tokenAddress: PublicKey | undefined;
+            //   mintSigner: {
+            //     publicKey: PublicKey;
+            //   };
+            // }
+            const c = context as {
+              tokenAddress: PublicKey | undefined;
+              mintSigner: {
+                publicKey: PublicKey;
+              };
+            };
             return mx
               .nfts()
               .findByMint({
-                mintAddress: context?.mintSigner.publicKey,
-                tokenAddress: context?.tokenAddress,
+                mintAddress: c?.mintSigner?.publicKey,
+                tokenAddress: c?.tokenAddress,
               })
               .catch((e) => null);
           })

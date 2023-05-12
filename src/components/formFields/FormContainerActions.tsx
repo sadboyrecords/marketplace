@@ -13,7 +13,7 @@
   ```
 */
 
-import Button from '@/components/Button';
+import Button from "@/components/buttons/Button";
 
 // import Typog
 
@@ -37,7 +37,7 @@ export default function FormContainer({
   const handleCancel = (
     e:
       | React.MouseEvent<HTMLButtonElement, MouseEvent>
-      | React.MouseEvent<HTMLAnchorElement, MouseEvent>,
+      | React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.preventDefault();
     setOpen(false);
@@ -45,13 +45,13 @@ export default function FormContainer({
 
   return (
     <form className="relative" onSubmit={handleSubmit}>
-      <div className="flex-shrink-0 border-t border-gray-200 px-4 py-5 sm:px-6  bg-base-100  mt-4">
+      <div className="mt-4 flex-shrink-0 border-t border-gray-200 bg-base-100 px-4  py-5  sm:px-6">
         <div className="flex justify-end space-x-3">
           <Button variant="outlined" color="neutral" onClick={handleCancel}>
             Cancel
           </Button>
           <Button loading={submitLoading}>
-            {submitButtonLabel || 'Create'}
+            {submitButtonLabel || "Create"}
           </Button>
         </div>
       </div>

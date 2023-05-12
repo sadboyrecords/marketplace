@@ -4,8 +4,7 @@ import { useRouter } from "next/router";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { api } from "@/utils/api";
 import { useEffect, useState, useRef, useMemo } from "react";
-import Icon from "@/components/icons";
-import { usePlayerProvider } from "@/components/player/Provider";
+// import Icon from "@/components/icons";
 import Button from "@/components/buttons/Button";
 import CountdownLabel from "@/components/countdown/CountdownLabel";
 import TextLoader from "@/components/loaders/TextLoader";
@@ -17,8 +16,8 @@ import AvatarGroup from "@/components/avatarGroup";
 import linkifyStr from "linkify-string";
 import { liveIpfsGateway } from "@/utils/constants";
 import DropLikes from "@/components/likes-plays/DropLikes";
-import DropMintButton from "@/components/dropMintButton";
-import type { IFullCredits, SongType } from "@/utils/types";
+// import DropMintButton from "@/components/dropMintButton";
+import type { IFullCredits } from "@/utils/types";
 import SongCredits from "@/components/songCredits";
 import dynamic from "next/dynamic";
 import { type inferRouterOutputs } from "@trpc/server";
@@ -62,7 +61,6 @@ function DropDetails() {
   const { slug } = router.query;
   const { publicKey } = useWallet();
   const { data: session } = useSession();
-  const { currentToken, isPlaying, handlePlayPause } = usePlayerProvider();
   const { data: drop, isLoading } = api.candyMachine.getBySlug.useQuery(
     {
       slug: slug as unknown as string,

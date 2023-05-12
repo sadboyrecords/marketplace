@@ -1,27 +1,8 @@
-import { Fragment } from "react";
-import { Menu, Transition } from "@headlessui/react";
 import { Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
-// import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
-// import Avatar from "components/Avatar";
-// import SearchBar from 'components/SearchBar';
-import dynamic from "next/dynamic";
-import { routes } from "@/utils/constants";
-import Link from "next/link";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
-// import { useDarkMode } from "providers/DarkMode";
-import { useWallet } from "@solana/wallet-adapter-react";
-// import { trpc } from "utils/trpc";
-// import useHandleAuth from "hooks/useHandleAuth";
-// import { ipfsUrl } from 'utils/helpers';
 import { useTheme } from "next-themes";
-
-import { useRouter } from "next/router";
 import React from "react";
 import WalletAdaptor from "@/components/buttons/WalletAdaptor";
-
-// const WalletButton = dynamic(() => import("components/WalletButton"), {
-//   ssr: false,
-// });
 
 function Header({
   setSidebarOpen,
@@ -32,38 +13,6 @@ function Header({
   const [mounted, setMounted] = React.useState(false);
 
   React.useMemo(() => setMounted(true), []);
-
-  //   const { connectingWallet } = useHandleAuth();
-  //   const { publicKey, disconnect } = useWallet();
-
-  //   const { data: userTRPC } = trpc.user.getUser.useQuery(
-  //     {
-  //       publicKey: publicKey?.toBase58() || "",
-  //     },
-  //     {
-  //       enabled: !!publicKey,
-  //     }
-  //   );
-
-  //   const handleModeChange = () => {
-  //     setDarkMode(!darkMode);
-  //   };
-
-  const router = useRouter();
-  //   const handleLogout = async () => {
-  //     await fetch(`/api/auth`);
-  //     await disconnect();
-  //     router.reload();
-  //   };
-
-  //   const userNavigation = [
-  //     {
-  //       name: "Your Profile",
-  //       href: routes.userProfile(publicKey?.toBase58() || ""),
-  //     },
-  //     //   { name: 'Settings', href: '#' },
-  //     { name: "Sign out", href: "#", onClick: handleLogout },
-  //   ];
 
   return (
     <>

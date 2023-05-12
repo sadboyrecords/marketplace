@@ -106,12 +106,12 @@ function CandyMachineForm({
       />
       <div className="flex-col space-y-4">
         <div>
-          <Typography variant="h6">Launches</Typography>
+          <Typography size="display-xs">Launches</Typography>
           <FormFieldDescription>
             You can have different phases of your drop. For example, you can
-            have an "Early Bird" phase, give early bird users a discounted
-            price. Then you can have a public sale that is available to anyone
-            to pay a different price{" "}
+            have an &quot;Early Bird&quot; phase, give early bird users a
+            discounted price. Then you can have a public sale that is available
+            to anyone to pay a different price{" "}
           </FormFieldDescription>
         </div>
         {guardFields.length > 0 &&
@@ -316,11 +316,9 @@ function CandyMachineForm({
               <div>
                 <Button
                   type="button"
-                  rounded="lg"
-                  color="ghost"
+                  variant="ghost"
                   className="space-x-1 px-2 text-xs"
                   disabled={guardFields.length === 1}
-                  variant="link"
                   onClick={() => removeGuards(index)}
                 >
                   Delete this launch
@@ -331,10 +329,8 @@ function CandyMachineForm({
         <div>
           <Button
             type="button"
-            rounded="lg"
-            color="ghost"
+            variant="ghost"
             className="space-x-1 px-2 text-xs"
-            variant="outline"
             onClick={() => {
               appendGuards({
                 label: "",
@@ -433,10 +429,8 @@ function CandyMachineForm({
           <div>
             <Button
               type="button"
-              rounded="lg"
-              color="ghost"
+              variant="outlined"
               className="space-x-1 px-2 text-xs"
-              variant="outline"
               onClick={() => {
                 append({
                   walletAddress: "",

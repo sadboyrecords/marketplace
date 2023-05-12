@@ -4,14 +4,12 @@ import {
   toDateTime,
   sol,
   PublicKey,
-} from '@metaplex-foundation/js';
-import type { FindNftsByOwnerOutput } from '@metaplex-foundation/js';
+} from "@metaplex-foundation/js";
+import type { FindNftsByOwnerOutput } from "@metaplex-foundation/js";
 
-import { Connection, clusterApiUrl, Keypair } from '@solana/web3.js';
-import type {
-  CreatorInput,
-} from '@metaplex-foundation/js';
-import { addresses } from "@/utils/constants"
+import { Connection, clusterApiUrl, Keypair } from "@solana/web3.js";
+import type { CreatorInput } from "@metaplex-foundation/js";
+import { addresses } from "@/utils/constants";
 
 // const metaplex = new Metaplex(connection);
 
@@ -79,69 +77,70 @@ type IInsetItemsToCandy = {
 // const auctionHouseAddress = '85mJJtUVk4chbs4vXoKu9rmxmvHaGwPJFJCJ5DjFoJPB';
 
 export const connection = new Connection(
-  clusterApiUrl(process.env.NEXT_PUBLIC_SOLANA_NETWORK as any)
+  ""
+  // clusterApiUrl(process.env.NEXT_PUBLIC_SOLANA_NETWORK)
 );
 
-export const checkNftOwner = ({ userNfts, nftDetails }:{ userNfts: any[], nftDetails: any}) => {
-  const isOwner = userNfts.find(
-    (nft) => nft.mintAddress.toBase58() === nftDetails.address.toBase58()
-  );
-  return isOwner;
-}
+// export const checkNftOwner = ({ userNfts, nftDetails }:{ userNfts: any[], nftDetails: any}) => {
+//   const isOwner = userNfts.find(
+//     (nft) => nft.mintAddress.toBase58() === nftDetails.address.toBase58()
+//   );
+//   return isOwner;
+// }
 
-export const getUserNfts = async ({ metaplex, publicKey }: IMxFields) => {
-  try {
-    const nftData = await metaplex.nfts().findAllByOwner({
-      owner: publicKey,
-      
-    });
-    const newArray = [] as any;
-    if (nftData.length > 0) {
-      for (const item of nftData) {
-        const result = await fetch(item.uri);
-        const data = await result.json();
-        const filtered = data?.properties?.files?.filter(
-          (f: any) => f.type === 'audio/mp3'
-        );
-        if (data?.properties?.category === 'audio' || filtered?.length > 0) {
-          const nftIndex = newArray.findIndex(function (n: any) {
-            // @ts-ignore
-            return n.mintAddress.toBase58() === item.mintAddress.toBase58();
-          });
-          if (nftIndex === -1) {
-            newArray.push({ ...item, metaData: data });
-          }
-          if (nftIndex > -1) {
-            newArray[nftIndex] = { ...item, metaData: data };
-          }
-        }
-      }
-      return newArray as FindNftsByOwnerOutput;
-    } 
-    return newArray ;
-  } catch (error) {
-    console.log({ error });
-    throw new Error(error as any);
-  }
-};
+// export const getUserNfts = async ({ metaplex, publicKey }: IMxFields) => {
+//   try {
+//     const nftData = await metaplex.nfts().findAllByOwner({
+//       owner: publicKey,
 
-export const getNftDetails = async ({ metaplex, mintAddress, tokenOwner }: { metaplex: Metaplex, mintAddress: PublicKey, tokenOwner?: PublicKey }) => {
-  console.log({ tokenOwner: tokenOwner?.toBase58()})
-  try {
-    const nftInfo = await metaplex.nfts().findByMint({
-      mintAddress,
-      tokenOwner,
-      loadJsonMetadata: true,
-    })
-  //  const token= await metaplex.tokens().findTokenByAddress({ address: mintAddress })
-  //  console.log({ token})
-    return nftInfo;
-  } catch (error) {
-    console.log({ error })
-    throw new Error(error as any);
-  }
+//     });
+//     const newArray = [] as any;
+//     if (nftData.length > 0) {
+//       for (const item of nftData) {
+//         const result = await fetch(item.uri);
+//         const data = await result.json();
+//         const filtered = data?.properties?.files?.filter(
+//           (f: any) => f.type === 'audio/mp3'
+//         );
+//         if (data?.properties?.category === 'audio' || filtered?.length > 0) {
+//           const nftIndex = newArray.findIndex(function (n: any) {
+//             // @ts-ignore
+//             return n.mintAddress.toBase58() === item.mintAddress.toBase58();
+//           });
+//           if (nftIndex === -1) {
+//             newArray.push({ ...item, metaData: data });
+//           }
+//           if (nftIndex > -1) {
+//             newArray[nftIndex] = { ...item, metaData: data };
+//           }
+//         }
+//       }
+//       return newArray as FindNftsByOwnerOutput;
+//     }
+//     return newArray ;
+//   } catch (error) {
+//     console.log({ error });
+//     throw new Error(error as any);
+//   }
+// };
 
-};
+// export const getNftDetails = async ({ metaplex, mintAddress, tokenOwner }: { metaplex: Metaplex, mintAddress: PublicKey, tokenOwner?: PublicKey }) => {
+//   console.log({ tokenOwner: tokenOwner?.toBase58()})
+//   try {
+//     const nftInfo = await metaplex.nfts().findByMint({
+//       mintAddress,
+//       tokenOwner,
+//       loadJsonMetadata: true,
+//     })
+//   //  const token= await metaplex.tokens().findTokenByAddress({ address: mintAddress })
+//   //  console.log({ token})
+//     return nftInfo;
+//   } catch (error) {
+//     console.log({ error })
+//     throw new Error(error as unknown);
+//   }
+
+// };
 
 export const getMyCollections = async ({ metaplex, publicKey }: IMxFields) => {
   try {
@@ -151,7 +150,7 @@ export const getMyCollections = async ({ metaplex, publicKey }: IMxFields) => {
     return myNfts;
   } catch (error) {
     console.log({ error });
-    throw new Error(error as any);
+    // throw new Error(error as any);
   }
 };
 
@@ -172,7 +171,7 @@ export const createCollection = async ({
     });
     return result;
   } catch (error) {
-    throw new Error(error as any);
+    // throw new Error(error as any);
   }
 };
 // collection mintAddress, creators (address share), sellerFeeBasisPoints
@@ -207,7 +206,7 @@ export const createCandyMachine = async (input: ICandy) => {
       creators,
       authority: authority || metaplex.identity(),
       itemSettings: {
-        type: 'configLines',
+        type: "configLines",
         prefixName,
         nameLength: 10, // number of characters in the name
         prefixUri,
@@ -235,7 +234,7 @@ export const createCandyMachine = async (input: ICandy) => {
     return candyMachine;
   } catch (error) {
     console.log({ error });
-    throw new Error(error as any);
+    // throw new Error(error as any);
   }
 };
 
@@ -251,12 +250,18 @@ export const InsertItemsToCandy = async (input: IInsetItemsToCandy) => {
     return inserted;
   } catch (error) {
     console.log({ error });
-    throw new Error(error as any);
+    // throw new Error(error as unknown as any);
   }
 };
 
 /* AUCTION HOUSE FUNCTIONS */
-export const getAuctionHouse = async ({ metaplex, houseAddress }: { metaplex: Metaplex, houseAddress?: string }) => {
+export const getAuctionHouse = async ({
+  metaplex,
+  houseAddress,
+}: {
+  metaplex: Metaplex;
+  houseAddress?: string;
+}) => {
   try {
     const auctionHouse = await metaplex.auctionHouse().findByAddress({
       address: new PublicKey(houseAddress || addresses.auctionHouse),
@@ -264,29 +269,34 @@ export const getAuctionHouse = async ({ metaplex, houseAddress }: { metaplex: Me
     });
     return auctionHouse;
   } catch (error) {
-    console.log({ getAuctionHouseError: error })
-    throw new Error(error as any);
+    console.log({ getAuctionHouseError: error });
+    // throw new Error(error);
   }
-
 };
 
-export const getListingDetails = async ({ metaplex, auctionHouseAddress, receiptAddress }: { metaplex: Metaplex, auctionHouseAddress: string, receiptAddress: string }) => {
+export const getListingDetails = async ({
+  metaplex,
+  auctionHouseAddress,
+  receiptAddress,
+}: {
+  metaplex: Metaplex;
+  auctionHouseAddress: string;
+  receiptAddress: string;
+}) => {
   try {
     const auctionHouse = await metaplex.auctionHouse().findByAddress({
       address: new PublicKey(auctionHouseAddress),
     });
-    const listing = await metaplex.auctionHouse().
-    findListingByReceipt({
+    const listing = await metaplex.auctionHouse().findListingByReceipt({
       auctionHouse,
       receiptAddress: new PublicKey(receiptAddress),
       loadJsonMetadata: true,
     });
     return listing;
   } catch (error) {
-    console.log({ error })
-    throw new Error(error as any);
+    console.log({ error });
+    // throw new Error(error as any);
   }
-
 };
 
 // const futureCandymachineWithgroups = async () => {

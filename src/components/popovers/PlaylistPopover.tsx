@@ -42,7 +42,6 @@ const PlaylistPopover = ({
             await removeTrackFromPlaylistMutation.mutateAsync({
               playlistId: playlistId || "",
               trackId: songId,
-              walletAddress: publicKey || "",
             });
             updatePlaylist?.();
           } catch (error) {
@@ -61,7 +60,6 @@ const PlaylistPopover = ({
             await addTrackToPlaylistMutation.mutateAsync({
               playlistId: playlistId || "",
               trackId: songId,
-              walletAddress: publicKey || "",
             });
             updatePlaylist?.();
           } catch (error) {
@@ -80,7 +78,6 @@ const PlaylistPopover = ({
         toast.loading("Adding to playlist...");
         await addTrackToPlaylistMutation.mutateAsync({
           playlistId,
-          walletAddress: publicKey || "",
           trackId: songId,
         });
         toast.dismiss();
