@@ -5,22 +5,21 @@ import type {
   Nft,
   NftWithToken,
 } from "@metaplex-foundation/js";
-import S3 from "aws-sdk/clients/s3";
 import {
   publicProcedure,
   createTRPCRouter,
   protectedProcedure,
 } from "@/server/api/trpc";
 
-export const s3 = new S3({
-  apiVersion: "2006-03-01",
-  accessKeyId: process.env.NEXT_FILEBASE_KEY,
-  secretAccessKey: process.env.NEXT_FILEBASE_SECRET,
-  region: "us-east-1",
-  endpoint: "https://s3.filebase.com",
-  signatureVersion: "v4",
-  s3ForcePathStyle: true,
-});
+// export const s3 = new S3({
+//   apiVersion: "2006-03-01",
+//   accessKeyId: process.env.NEXT_FILEBASE_KEY,
+//   secretAccessKey: process.env.NEXT_FILEBASE_SECRET,
+//   region: "us-east-1",
+//   endpoint: "https://s3.filebase.com",
+//   signatureVersion: "v4",
+//   s3ForcePathStyle: true,
+// });
 
 export const tokenRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
