@@ -1,3 +1,110 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type='number']::-webkit-inner-spin-button,
+input[type='number'] {
+      -webkit-appearance: none;
+      margin: 0;
+      -moz-appearance: textfield !important;
+  }
+}
+
+
+/* React DatePicker overrides
+.react-datepicker {
+    @apply border-2 border-base-content rounded-xl font-sans bg-red-900 text-base-content;
+}
+ */
+
+ .nifty-datepicker .react-datepicker {
+    @apply bg-base-100 border-2 border-base-100 rounded-xl font-sans  text-base-content;
+}
+.nifty-datepicker .react-datepicker__day-names {
+    @apply font-bold;
+}
+.nifty-datepicker .react-datepicker__navigation {
+    @apply top-[8px];
+}
+
+/*
+.nifty-datepicker .react-datepicker__navigation--next--with-time {
+	@apply text-purple-700 border-2;
+} 
+ */
+
+.nifty-datepicker .react-datepicker__header {
+    @apply bg-base-100 border-b border-b-base-300 text-base-content;
+}
+.nifty-datepicker .react-datepicker__day--selected {
+    @apply bg-primary font-bold;
+}
+.nifty-datepicker .react-datepicker__day--selected:hover {
+    @apply bg-primary font-bold;
+}
+.nifty-datepicker .react-datepicker__day--keyboard-selected {
+    @apply bg-primary text-base-content;
+}
+.nifty-datepicker .react-datepicker__day--keyboard-selected:hover {
+    @apply bg-primary text-base-content;
+}
+.nifty-datepicker .react-datepicker__triangle {
+    @apply hidden;
+}
+
+.nifty-datepicker .react-datepicker__month-container {
+	@apply bg-base-100;
+} 
+
+.nifty-datepicker .react-datepicker__day {
+	@apply text-base-content;
+} 
+
+.nifty-datepicker .react-datepicker__day:hover {
+	@apply text-base-content bg-primary;
+} 
+
+.nifty-datepicker .react-datepicker__day--disabled {
+	@apply text-neutral-content;
+} 
+
+.nifty-datepicker .react-datepicker__current-month  {
+	@apply text-base-content;
+} 
+
+.nifty-datepicker .react-datepicker__day-name {
+	@apply text-base-content;
+} 
+
+.nifty-datepicker .react-datepicker-time__input {
+	@apply  text-red-700;
+}
+
+.nifty-datepicker .react-datepicker-time__caption {
+	@apply  text-red-700;
+} 
+
+.nifty-datepicker .react-datepicker__time-container {
+	@apply  bg-base-100 text-base-content;
+} 
+
+.nifty-datepicker .react-datepicker-time__header {
+	@apply  text-base-content text-sm w-full py-3;
+} 
+
+.nifty-datepicker .react-datepicker__time-list-item {
+	@apply bg-base-100 text-base-content;
+} 
+
+.nifty-datepicker .react-datepicker__time-list-item:hover {
+	@apply bg-primary text-base-content;
+} 
+/*
+.nifty-datepicker .react-datepicker__close-icon {
+	@apply bg-primary text-base-content;
+} 
+*/
+
+
