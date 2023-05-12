@@ -11,7 +11,7 @@ import { prisma } from "@/server/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { SigninMessage } from "@/utils/SignMessage";
 import { getCsrfToken } from "next-auth/react";
-import { type NextApiRequest, } from "next";
+import { type NextApiRequest } from "next";
 import { adminWallets } from "@/utils/constants";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -48,10 +48,10 @@ declare module "next-auth" {
 // NextAuthOptions
 export function authOptions(req: NextApiRequest): NextAuthOptions {
   const providers = [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID || "eee",
-      clientSecret: env.DISCORD_CLIENT_SECRET || "eee",
-    }),
+    // DiscordProvider({
+    //   clientId: env.DISCORD_CLIENT_ID || "eee",
+    //   clientSecret: env.DISCORD_CLIENT_SECRET || "eee",
+    // }),
     CredentialsProvider({
       id: "solana-auth",
       name: "Solana",
@@ -67,7 +67,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
           type: "text",
         },
       },
-      
+
       async authorize(credentials) {
         // console.log("----AUTHORIZING----")
         try {
@@ -77,28 +77,30 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
             JSON.parse(credentials?.message || "{}")
           );
           // console.log({ body: req.body, stringy: JSON.stringify(req.body)})
-      
+
           const nextAuthUrl = new URL(process.env.NEXTAUTH_URL || "");
           // console.log({ nextAuthUrl, signinMessage })
           if (signinMessage.domain !== nextAuthUrl.host) {
             return null;
           }
-          // console.log("chcking csrf", { 
+          // console.log("chcking csrf", {
           //   header: req.headers, body: req.body, cookies: req.cookies })
 
-          const csrfToken = await getCsrfToken({ req: { headers: req.headers }  })
+          const csrfToken = await getCsrfToken({
+            req: { headers: req.headers },
+          });
           //  {...req, body: JSON.stringify(req.body)},
           // console.log("----SIGNING IN----")
           // console.log({ csrfToken, signinMessage })
           if (signinMessage.nonce !== csrfToken) {
-            console.log("csrf failed")
+            console.log("csrf failed");
             return null;
           }
 
           const validationResult = signinMessage.validate(
             credentials?.signature || ""
           );
-          console.log({ validationResult })
+          console.log({ validationResult });
 
           if (!validationResult)
             throw new Error("Could not validate the signed message");
@@ -111,9 +113,8 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
           return null;
         }
       },
-      
     }),
-    
+
     /**
      * ...add more providers here.
      *
@@ -152,7 +153,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
         }
         return token;
       },
-      session: ({ session,token }) => {
+      session: ({ session, token }) => {
         // console.log({ session, user, token });
         // session
         let isAdmin = false;
@@ -167,7 +168,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
             ...session.user,
             walletAddress: token.sub,
             isAdmin,
-          }
+          },
           // user: {
           //   ...session.user,
           //   id: user.id,
@@ -175,18 +176,16 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
           // },
         };
       },
-      
     },
     adapter: PrismaAdapter(prisma),
     providers,
-    debug: true, 
+    debug: true,
     secret: process.env.NEXTAUTH_SECRET,
     session: {
       strategy: "jwt",
     },
   };
 }
-
 
 /**
  * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.

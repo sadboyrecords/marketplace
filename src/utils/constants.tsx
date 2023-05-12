@@ -83,7 +83,11 @@ export const externalUrls = {
     }`,
 };
 
-export const adminWallets = ["A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"];
+export const adminWallets = [
+  "A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf",
+  "ESoydi4GMD3o4KU7Mm1Fn5RoY4kKf2VyDWJzGMBBXg4c",
+  "5SBznwYE5GxtcoQjwsthjN9jrb7xuXJCufJmLvVBeR6B", // sadboy wallet
+];
 
 export const addresses = {
   allowedWallets: [
