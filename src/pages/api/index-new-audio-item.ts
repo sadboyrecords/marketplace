@@ -19,17 +19,29 @@ import sharp from "sharp";
 import axios from "axios";
 import { getHashAndUriFromNFT } from "@/utils/helpers";
 import crypto from "crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import S3 from "aws-sdk/clients/s3";
-
-export const s3 = new S3({
+// export const s3 = new S3({
+//   apiVersion: "2006-03-01",
+//   accessKeyId: process.env.NEXT_FILEBASE_KEY,
+//   secretAccessKey: process.env.NEXT_FILEBASE_SECRET,
+//   region: "us-east-1",
+//   endpoint: "https://s3.filebase.com",
+//   signatureVersion: "v4",
+//   s3ForcePathStyle: true,
+// });
+export const client = new S3Client({
   apiVersion: "2006-03-01",
-  accessKeyId: process.env.NEXT_FILEBASE_KEY,
-  secretAccessKey: process.env.NEXT_FILEBASE_SECRET,
+  credentials: {
+    accessKeyId: process.env.NEXT_FILEBASE_KEY as string,
+    secretAccessKey: process.env.NEXT_FILEBASE_SECRET as string,
+  },
   region: "us-east-1",
   endpoint: "https://s3.filebase.com",
-  signatureVersion: "v4",
-  s3ForcePathStyle: true,
+  forcePathStyle: true,
+  // signatureVersion: "v4",
+  // s3ForcePathStyle: true,
 });
 
 export const hashArray = (url: string) => {
@@ -204,11 +216,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       const params = {
         Bucket: process.env.NEXT_FILEBASE_BUCKET_NAME,
         Key: key,
-        ContentType: type,
-        Expires: 60,
+        // ContentType: type,
+        // Expires: 60,
       };
       console.log("upload------");
-      const url = s3.getSignedUrl("putObject", params);
+      // const url = s3.getSignedUrl("putObject", params);
+      const command = new PutObjectCommand(params);
+      const url = await getSignedUrl(client, command, { expiresIn: 3600 });
       const { headers } = await axios.put(url, imageData, {
         headers: {
           "Content-Type": type,
@@ -233,11 +247,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
       const params = {
         Bucket: process.env.NEXT_FILEBASE_BUCKET_NAME,
         Key: key,
-        ContentType: type,
-        Expires: 60,
+        // ContentType: type,
+        // Expires: 60,
       };
       console.log("upload--AUDIO----");
-      const url = s3.getSignedUrl("putObject", params);
+      // const url = s3.getSignedUrl("putObject", params);
+      const command = new PutObjectCommand(params);
+      const url = await getSignedUrl(client, command, { expiresIn: 3600 });
       const { headers } = await axios.put(url, audioData, {
         headers: {
           "Content-Type": type,
