@@ -342,7 +342,7 @@ export const candyMachineRouter = createTRPCRouter({
         ...cm,
       };
     }),
-  getDraftById: protectedProcedure
+  getDraftById: protectedAdminProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
@@ -351,9 +351,9 @@ export const candyMachineRouter = createTRPCRouter({
           id: {
             equals: input.id,
           },
-          ownerWalletAddress: {
-            equals: ctx.session.walletAddress,
-          },
+          // ownerWalletAddress: {
+          //   equals: ctx.session.walletAddress,
+          // },
         },
         include: {
           battleContestant: {

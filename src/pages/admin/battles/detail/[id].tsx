@@ -15,6 +15,7 @@ import { routes } from "@/utils/constants";
 import { toast } from "react-toastify";
 import { Toggle, ToggleItem } from "@tremor/react";
 import LineUp from "@/components/battleDrops/LineUp";
+import { useSession } from "next-auth/react";
 
 function BattleDetails() {
   const today = new Date();
@@ -22,6 +23,7 @@ function BattleDetails() {
   twoWeeksLater.setDate(today.getDate() - 14);
 
   const { publicKey } = useWallet();
+  const { data: session } = useSession();
   const router = useRouter();
   const { id } = router.query;
   const { data, isLoading, refetch } = api.battle.getBattleById.useQuery(
@@ -85,9 +87,12 @@ function BattleDetails() {
       </div>
     );
   }
+  console.log({ data });
 
   if (
-    (data?.createdByWallet !== publicKey?.toBase58() || !publicKey) &&
+    ((data?.createdByWallet !== publicKey?.toBase58() &&
+      !session?.user.isAdmin) ||
+      !publicKey) &&
     !data?.isActive
   ) {
     return (

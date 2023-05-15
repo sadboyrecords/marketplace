@@ -1,19 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { z } from 'zod';
+import { z } from "zod";
 // import { prisma } from 'server/db/client';
 
-import { liveIpfsGateway } from '@/utils/constants';
-import {
-  filebaseEndpoints,
-} from '@/utils/helpers';
-import axios from 'axios';
+import { ipfsPublicGateway } from "@/utils/constants";
+import { filebaseEndpoints } from "@/utils/helpers";
+import axios from "axios";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 
 interface Pin {
   pin: {
@@ -41,14 +36,15 @@ export const pinnedFilesRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const pinsData = await axios({
-        method: 'get',
+        method: "get",
         url: `${filebaseEndpoints.getPins}?cid=${input.ipfsHash}`,
         headers: {
-          Authorization:
-            `Bearer ${process.env.NEXT_FILEBASE_NIFTYBUCKET_TOKEN??''}`,
+          Authorization: `Bearer ${
+            process.env.NEXT_FILEBASE_NIFTYBUCKET_TOKEN ?? ""
+          }`,
         },
       });
-      const pins: PinsResult = await pinsData.data ;
+      const pins: PinsResult = await pinsData.data;
       const foundPin: Pin | undefined = pins?.results?.find(
         (p: Pin) => p.pin.cid === input.ipfsHash
       );
@@ -62,22 +58,22 @@ export const pinnedFilesRouter = createTRPCRouter({
           path: input.path,
           width: input.width,
           height: input.height,
-          status: foundPin?.status === 'pinned' ? 'PINNED' : 'IN_PROGRESS',
-          type: 'IMAGE',
-          pinnedToFileBase: foundPin?.status === 'pinned' ? true : false,
-          originalUrl: `${liveIpfsGateway}${input.ipfsHash}`,
+          status: foundPin?.status === "pinned" ? "PINNED" : "IN_PROGRESS",
+          type: "IMAGE",
+          pinnedToFileBase: foundPin?.status === "pinned" ? true : false,
+          originalUrl: `${ipfsPublicGateway}${input.ipfsHash}`,
         },
         update: {
           path: foundPin?.pin?.name,
           height: input.height,
           width: input.width,
-          status: foundPin?.status === 'pinned' ? 'PINNED' : 'IN_PROGRESS',
-          pinnedToFileBase: foundPin?.status === 'pinned' ? true : false,
-          originalUrl: `${liveIpfsGateway}${input.ipfsHash}`,
+          status: foundPin?.status === "pinned" ? "PINNED" : "IN_PROGRESS",
+          pinnedToFileBase: foundPin?.status === "pinned" ? true : false,
+          originalUrl: `${ipfsPublicGateway}${input.ipfsHash}`,
         },
       });
     }),
-    createUpdateAudio: protectedProcedure
+  createUpdateAudio: protectedProcedure
     .input(
       z.object({
         ipfsHash: z.string(),
@@ -86,11 +82,12 @@ export const pinnedFilesRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const pinsData = await axios({
-        method: 'get',
+        method: "get",
         url: `${filebaseEndpoints.getPins}?cid=${input.ipfsHash}`,
         headers: {
-          Authorization:
-            `Bearer ${process.env.NEXT_FILEBASE_NIFTYBUCKET_TOKEN??''}`,
+          Authorization: `Bearer ${
+            process.env.NEXT_FILEBASE_NIFTYBUCKET_TOKEN ?? ""
+          }`,
         },
       });
       const pins = await pinsData.data;
@@ -105,13 +102,13 @@ export const pinnedFilesRouter = createTRPCRouter({
         create: {
           ipfsHash: input.ipfsHash,
           path: input.path,
-          status: foundPin?.status === 'pinned' ? 'PINNED' : 'IN_PROGRESS',
-          type: 'AUDIO',
-          originalUrl: `${liveIpfsGateway}${input.ipfsHash}`,
+          status: foundPin?.status === "pinned" ? "PINNED" : "IN_PROGRESS",
+          type: "AUDIO",
+          originalUrl: `${ipfsPublicGateway}${input.ipfsHash}`,
         },
         update: {
-          status: foundPin?.status === 'pinned' ? 'PINNED' : 'IN_PROGRESS',
-          originalUrl: `${liveIpfsGateway}${input.ipfsHash}`,
+          status: foundPin?.status === "pinned" ? "PINNED" : "IN_PROGRESS",
+          originalUrl: `${ipfsPublicGateway}${input.ipfsHash}`,
         },
       });
     }),

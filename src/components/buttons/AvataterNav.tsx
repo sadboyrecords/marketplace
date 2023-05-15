@@ -182,7 +182,7 @@ function AvataterNav() {
                 >
                   Admin Panel
                 </Typography>
-                <Menu.Item>
+                {/* <Menu.Item>
                   {({ active }) => (
                     <Link
                       href={routes.admin}
@@ -194,11 +194,10 @@ function AvataterNav() {
                       // eslint-disable-next-line @typescript-eslint/no-misused-promises
                       // onClick={handleLogout}
                     >
-                      {/* <ShieldCheckIcon className="h-5 w-5" /> */}
                       Admin Home
                     </Link>
                   )}
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item>
                   {({ active }) => (
                     <Link

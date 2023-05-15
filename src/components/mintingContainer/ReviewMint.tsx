@@ -29,7 +29,7 @@ import {
   ExclamationCircleIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/solid";
-import { ipfsPublicGateway } from "@/utils/constants";
+import { ipfsPublicGateway, liveIpfsGateway } from "@/utils/constants";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { routes } from "@/utils/constants";
 import Link from "next/link";
@@ -738,6 +738,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
     }
   }, [data]);
 
+  console.log({ formSubmission });
   if (!formSubmission || isLoading) {
     return <>Loading...</>;
   }
@@ -763,7 +764,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
           width={100}
           className="h-full w-full rounded-xl"
           quality={80}
-          url={formSubmission?.imageUri}
+          url={liveIpfsGateway + (formSubmission?.imageHash || "")} //formSubmission?.imageUri
           alt="Drop Image"
           hash={null}
           imgTagClassName="rounded-xl w-full h-full"
@@ -772,7 +773,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       <div>
         <audio
           controls
-          src={formSubmission?.audioUri}
+          src={liveIpfsGateway + (formSubmission?.audioHash || "")} //formSubmission?.audioUri
           // alt=""
           className="h-[3.75rem] w-[12.5rem]"
         />
