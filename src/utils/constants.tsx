@@ -31,7 +31,7 @@ export const routes = {
   playlists: "/playlist",
   artists: "/creators",
   upcomingDrops: "/upcoming-drops",
-  editBattle: (id: string) => `/battles/edit/${id}`,
+  editBattle: (id: string) => `/admin/battles/edit/${id}`,
   collectionDetails: (tokenAddress: string) => `/tokens/${tokenAddress}`,
   tokenItemDetails: (mintAddress: string) => `/nft-details/${mintAddress}`,
   collections: "/collections",
@@ -115,11 +115,11 @@ export const pinata = {
   contentUrl: "https://gateway.pinata.cloud/ipfs/",
 };
 
-export const ipfsPublicGateway = "https://ipfs.io/ipfs/";
+export const ipfsPublicGateway = "https://ipfs.io/ipfs/"; // use for storage
 
 export const ipfsPrivateGateway = "https://reamp.mypinata.cloud/ipfs/";
 
-export const liveIpfsGateway = "https://ipfs.io/ipfs/"; //'https://niftytunes.myfilebase.com/ipfs/';
+export const liveIpfsGateway = "https://niftytunes.myfilebase.com/ipfs/"; //"https://ipfs.io/ipfs/"; //
 
 export const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL || "";
 // export const liveIpfsGateway = 'https://niftytunes.myfilebase.com/ipfs/';

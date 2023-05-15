@@ -17,10 +17,11 @@ type Props = {
   disabled?: boolean;
 };
 function PlayButton({ song, playlistName, tracks, disabled }: Props) {
-  console.log({ song });
+  // console.log({ song });
   const dispatch = useDispatch();
   const currentSong = useSelector(selectCurrentSong);
   const isPlaying = useSelector(selectIsPlaying);
+  // console.log({ currentSong });
 
   const handlePlay = () => {
     if (tracks && playlistName) {

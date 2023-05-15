@@ -18,7 +18,12 @@ import { routes } from "@/utils/constants";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { toast } from "react-toastify";
 import confetti from "canvas-confetti";
-import type { BattleType, BattleTypeSummary, SongType } from "@/utils/types";
+import type {
+  BattleType,
+  BattleTypeSummary,
+  SongType,
+  IMint,
+} from "@/utils/types";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
@@ -55,11 +60,23 @@ function BattleCard({ index, battle, totalPot }: BattleCardProps) {
     battle?.battleContestants[index]?.candyMachineDraft?.candyMachineId;
 
   const candyMachine = candyMachines?.[candyMachineId || ""];
-  const song = battle?.battleContestants[index]?.candyMachineDraft?.drop?.song;
+  const formSubmission = battle?.battleContestants[index]?.candyMachineDraft
+    .formSubmission as IMint | undefined;
+  const song =
+    battle?.battleContestants[index]?.candyMachineDraft?.drop?.song ||
+    ({
+      id: formSubmission?.audioHash,
+      lossyArtworkIPFSHash: formSubmission?.imageHash,
+      lossyAudioIPFSHash: formSubmission?.audioHash,
+      lossyAudioURL: formSubmission?.audioUri,
+      lossyArtworkURL: formSubmission?.imageUri,
+      title: formSubmission?.trackTitle,
+      creators: formSubmission?.walletSplits,
+    } as SongType);
   const tracks = battle?.battleContestants
     .filter((b) => b.candyMachineDraft?.drop && b.candyMachineDraft?.drop?.song)
     .map((b) => b.candyMachineDraft.drop?.song);
-  console.log({ tracks });
+  // console.log({ tracks });
   const drop = battle?.battleContestants[index]?.candyMachineDraft?.drop;
 
   const handleIncrease = () => {
@@ -135,6 +152,7 @@ function BattleCard({ index, battle, totalPot }: BattleCardProps) {
   //   };
   //   void getSolPrice();
   // }, []);
+  console.log({ battle });
 
   return (
     <div className="mx-auto flex h-full max-w-xl flex-col  space-y-4 lg:mx-0">
@@ -326,7 +344,11 @@ function BattleCard({ index, battle, totalPot }: BattleCardProps) {
       {!battle?.isActive && (
         <div className="flex items-center justify-between space-x-2">
           {draft?.status === "DRAFT" && (
-            <div className="badge-info badge">Draft</div>
+            <div className="badge-info badge">
+              Draft
+              {!formSubmission?.walletSplits[0]?.walletAddress &&
+                " - Incomplete"}
+            </div>
           )}
           {draft?.status === "PENDING" && (
             <div className="badge-info badge">In Progress</div>
@@ -336,7 +358,10 @@ function BattleCard({ index, battle, totalPot }: BattleCardProps) {
           )}
 
           <Link href={routes.battleDropDrafts(draft?.id as string) || "#"}>
-            <Button variant="ghost">
+            <Button
+              variant="ghost"
+              disabled={!formSubmission?.walletSplits[0]?.walletAddress}
+            >
               {" "}
               Review {draft?.status !== "LAUNCHED" && "& Mint"}{" "}
             </Button>

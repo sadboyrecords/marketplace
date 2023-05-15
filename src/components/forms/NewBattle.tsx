@@ -96,6 +96,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
   });
   const router = useRouter();
   const id = router.query.id as string | undefined;
+  console.log({ id });
 
   const { data: battle, isLoading } = api.battle.getBattleById.useQuery(
     { battleId: id || "" },
@@ -485,7 +486,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
     }
   }, [battle, editedState, setValue]);
 
-  React.useMemo(() => {
+  React.useEffect(() => {
     if (!isEditing) {
       setValue("firstContestant.walletSplits", defaultWalletSplits);
       setValue("secondContestant.walletSplits", defaultWalletSplits);
