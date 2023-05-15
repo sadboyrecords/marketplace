@@ -20,7 +20,7 @@ function UserSongs({ walletAddress }: Props) {
         enabled: !!walletAddress,
       }
     );
-  console.log({ playlists });
+
   if (isLoading)
     return (
       <MarginLayout>

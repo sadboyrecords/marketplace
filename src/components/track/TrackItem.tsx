@@ -103,9 +103,10 @@ function TrackItem({
 
   return (
     <div
-      className={`flex items-center justify-between border-b border-base-300 px-4 py-6`}
+      className={`flex flex-wrap items-center justify-between gap-8 border-b border-base-300 px-4 py-6`}
     >
-      <div className="flex flex-wrap items-center space-x-6">
+      <div className="flex flex-1 items-center space-x-6">
+        {/* Image */}
         <div className="flex  items-center gap-2">
           {/* <button
             className="flex cursor-pointer flex-row justify-center space-x-8"
@@ -133,6 +134,7 @@ function TrackItem({
               )}
             </div>
           </button> */}
+          {/* Image play */}
           <div
             className="group relative h-24 w-24 cursor-pointer rounded-xl "
             onClick={handlePlay}
@@ -172,20 +174,20 @@ function TrackItem({
             )}
           </div>
         </div>
-
-        <div>
+        {/* track title + artist names */}
+        <div className=" min-w-[10rem] flex-1 ">
           {getTrackUrl(track) ? (
             <Link href={getTrackUrl(track) || ""}>
               <Typography
                 // ref={ref}
                 size="body"
-                className="cursor-pointer truncate hover:text-primary"
+                className="cursor-pointer hover:text-primary"
               >
                 {track?.title.slice(0, 20)}
               </Typography>
             </Link>
           ) : (
-            <Typography>{track?.title}</Typography>
+            <Typography className="truncate">{track?.title}</Typography>
           )}
 
           {getCreatorNames(track).map((c) => (
@@ -199,7 +201,7 @@ function TrackItem({
           ))}
         </div>
       </div>
-
+      {/* like + add button  */}
       <div className="flex items-center">
         <GeneralLikes songId={track?.id} hideNumber />
         {isCreator &&

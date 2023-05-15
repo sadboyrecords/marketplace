@@ -37,7 +37,12 @@ export const artistRouter = createTRPCRouter({
     .query(async ({ ctx }) => {
       // get top artists
       const topArtists = await ctx.prisma.user.findMany({
-        take: 8,
+        where: {
+          songs: {
+            some: {},
+          },
+        },
+        take: 12,
         include: {
           followers: {
             where: {

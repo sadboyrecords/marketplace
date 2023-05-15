@@ -180,7 +180,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
               originalImageUrl={user?.profileBannerImage || undefined}
             />
           ) : (
-            <div className="h-full w-full">
+            <div className="relative h-full w-full">
               {user?.profileBannerImage ? (
                 <ImageDisplay
                   width={500}
@@ -200,6 +200,8 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                   quality={80}
                   src={"/placeholder/banners/vector.jpg"}
                   fill
+                  sizes="10vw"
+                  priority
                   className="object-cover brightness-75"
                   //    translate(0px, -146.922px)
                 />

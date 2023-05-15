@@ -4,11 +4,13 @@ import TrackItem from "@/components/track/TrackItem";
 import { getCreatorname } from "@/utils/helpers";
 import { abbreviateNumber } from "@/utils/helpers";
 import Avatar from "@/components/avatar/Avatar";
+import { routes } from "@/utils/constants";
+import Link from "next/link";
 
 function RecentCreators() {
   const { data, isLoading } = api.artist.getTopArtists.useQuery();
 
-  console.log({ data });
+  // console.log({ data });
 
   return (
     <div className="">
@@ -27,18 +29,20 @@ function RecentCreators() {
         )}
         {data?.map((a) => (
           <div key={a.id} className="w-48">
-            <Avatar
-              heightNumber={150}
-              widthNumber={150}
-              fill={false}
-              className="w-full"
-              alt={""}
-              username={""}
-              type="squircle"
-              path={a?.pinnedProfilePicture?.path}
-              pinnedStatus={a?.pinnedProfilePicture?.status}
-              imageHash={a?.profilePictureHash || undefined}
-            />
+            <Link href={routes.userProfile(a.walletAddress)}>
+              <Avatar
+                heightNumber={150}
+                widthNumber={150}
+                fill={false}
+                className="w-full"
+                alt={""}
+                username={""}
+                type="squircle"
+                path={a?.pinnedProfilePicture?.path}
+                pinnedStatus={a?.pinnedProfilePicture?.status}
+                imageHash={a?.profilePictureHash || undefined}
+              />
+            </Link>
             {/* <div className=" relative w-48">
               <ImageDisplay
                 url={
@@ -62,13 +66,15 @@ function RecentCreators() {
                 imgTagClassName="!w-full !h-full  rounded-md "
               />
             </div> */}
-            <Typography className="mt-2 overflow-scroll font-bold">
-              @
-              {getCreatorname({
-                name: a?.name || a?.firstName || undefined,
-                walletAddress: a?.walletAddress,
-              })}
-            </Typography>
+            <Link href={routes.userProfile(a.walletAddress)}>
+              <Typography className="mt-2 overflow-scroll font-bold">
+                @
+                {getCreatorname({
+                  name: a?.name || a?.firstName || undefined,
+                  walletAddress: a?.walletAddress,
+                })}
+              </Typography>
+            </Link>
             <Typography size="body-xs" className="">
               {a.songs.length} Song{a.songs.length > 1 && "s"} •{" "}
               {abbreviateNumber(a.followers?.length)} Followers

@@ -41,6 +41,10 @@ function GeneralLikes({
   const [liking, setLiking] = useState(false);
 
   const handleLikeUnlike = async () => {
+    if (!publicKey) {
+      toast.warn("Please sign in.");
+      return;
+    }
     if (!songId) {
       toast.error("There is an error");
       return;
@@ -59,8 +63,8 @@ function GeneralLikes({
       toast.error("Sorry something went wrong");
     }
   };
-  const utils = api.useContext();
-  const publicKeyString = publicKey?.toBase58() || null;
+  // const utils = api.useContext();
+  // const publicKeyString = publicKey?.toBase58() || null;
 
   //   const { data: userLikes } = api.candyMachine.getLikesByUser.useQuery(
   //     {
