@@ -177,7 +177,6 @@ export const songRouter = createTRPCRouter({
   getSongDetails: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      console.log({ input, ctx });
       const song = await ctx.prisma.songs.findUnique({
         where: {
           id: input.id,

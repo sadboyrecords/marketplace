@@ -147,7 +147,6 @@ export const tokenRouter = createTRPCRouter({
     )
     .query(({ ctx, input }) => {
       try {
-        console.log({ input });
         const nft = input.nft;
         if (!nft) {
           return null;
