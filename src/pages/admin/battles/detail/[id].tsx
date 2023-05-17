@@ -89,12 +89,7 @@ function BattleDetails() {
   }
   console.log({ data });
 
-  if (
-    ((data?.createdByWallet !== publicKey?.toBase58() &&
-      !session?.user.isAdmin) ||
-      !publicKey) &&
-    !data?.isActive
-  ) {
+  if ((!session?.user.isAdmin || !publicKey) && !data?.isActive) {
     return (
       <div className="flex flex-col space-y-4">
         <Typography> You do not have access to view this battle</Typography>

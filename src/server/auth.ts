@@ -4,7 +4,7 @@ import {
   type NextAuthOptions,
   type DefaultSession,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+// import DiscordProvider from "next-auth/providers/discord";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "@/env.mjs";
 import { prisma } from "@/server/db";
@@ -13,6 +13,7 @@ import { SigninMessage } from "@/utils/SignMessage";
 import { getCsrfToken } from "next-auth/react";
 import { type NextApiRequest } from "next";
 import { adminWallets } from "@/utils/constants";
+import { Magic } from "@magic-sdk/admin";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -45,6 +46,7 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 
+// const magic = new Magic(process.env.MAGIC_SK);
 // NextAuthOptions
 export function authOptions(req: NextApiRequest): NextAuthOptions {
   const providers = [
@@ -55,6 +57,68 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
     CredentialsProvider({
       id: "solana-auth",
       name: "Solana",
+      type: "credentials",
+      // callbackUrl: 'http://localhost:3000/api/auth/callback/my-custom-provider',
+      credentials: {
+        message: {
+          label: "Message",
+          type: "text",
+        },
+        signature: {
+          label: "Signature",
+          type: "text",
+        },
+      },
+
+      async authorize(credentials) {
+        // console.log("----AUTHORIZING----")
+        try {
+          // console.log({ credentials, message: credentials?.message})
+          const signinMessage = new SigninMessage(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            JSON.parse(credentials?.message || "{}")
+          );
+          // console.log({ body: req.body, stringy: JSON.stringify(req.body)})
+
+          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL || "");
+          // console.log({ nextAuthUrl, signinMessage })
+          if (signinMessage.domain !== nextAuthUrl.host) {
+            return null;
+          }
+          // console.log("chcking csrf", {
+          //   header: req.headers, body: req.body, cookies: req.cookies })
+
+          const csrfToken = await getCsrfToken({
+            req: { headers: req.headers },
+          });
+          //  {...req, body: JSON.stringify(req.body)},
+          // console.log("----SIGNING IN----")
+          // console.log({ csrfToken, signinMessage })
+          if (signinMessage.nonce !== csrfToken) {
+            console.log("csrf failed");
+            return null;
+          }
+
+          const validationResult = signinMessage.validate(
+            credentials?.signature || ""
+          );
+          console.log({ validationResult });
+
+          if (!validationResult)
+            throw new Error("Could not validate the signed message");
+
+          return {
+            id: signinMessage.publicKey as string,
+            walletAddress: signinMessage.publicKey as string,
+          };
+        } catch (e) {
+          return null;
+        }
+      },
+    }),
+    CredentialsProvider({
+      id: "magic-link",
+      name: "Magic Link",
       type: "credentials",
       // callbackUrl: 'http://localhost:3000/api/auth/callback/my-custom-provider',
       credentials: {

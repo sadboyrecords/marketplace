@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import MarginLayout from "@/components/layouts/MarginLayout";
 import dynamic from "next/dynamic";
 import { type AppType } from "next/app";
+
 // import { type Session } from "next-auth";
 import { type AppSession, type NextPageWithLayout } from "@/utils/types";
 
