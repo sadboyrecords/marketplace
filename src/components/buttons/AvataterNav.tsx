@@ -120,33 +120,32 @@ function AvataterNav() {
                       5
                     )}...${data?.walletAddress.slice(-4)}`}
                 </Typography>
-                {(data?.name || data?.firstName) && (
-                  <div
-                    className={`${
-                      copied ? "tooltip-open tooltip tooltip-bottom" : ""
-                    }  cursor-pointer`}
-                    data-tip="Copied"
-                    onClick={handleCopy}
+                <div
+                  className={`${
+                    copied ? "tooltip-open tooltip tooltip-bottom" : ""
+                  }  cursor-pointer`}
+                  data-tip="Copied"
+                  onClick={handleCopy}
+                >
+                  <Typography
+                    type="div"
+                    size="body-xs"
+                    color="neutral-gray"
+                    className="flex"
                   >
-                    <Typography
-                      type="div"
-                      size="body-xs"
-                      color="neutral-gray"
-                      className="flex"
-                    >
-                      {`${data?.walletAddress?.slice(
-                        0,
-                        5
-                      )}...${data?.walletAddress.slice(-4)}`}
-                      <CopyIcon className="ml-1 h-4 w-4" />
-                      <div className="ml-2 flex items-center space-x-1">
-                        {" "}
-                        (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
-                        {walletBalance} )
-                      </div>
-                    </Typography>
-                  </div>
-                )}
+                    {`${data?.walletAddress?.slice(
+                      0,
+                      5
+                    )}...${data?.walletAddress.slice(-4)}`}
+
+                    <CopyIcon className="ml-1 h-4 w-4" />
+                    <div className="ml-2 flex items-center space-x-1">
+                      {" "}
+                      (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
+                      {walletBalance} )
+                    </div>
+                  </Typography>
+                </div>
               </div>
             </div>
             <div className="px-1 py-1 ">
