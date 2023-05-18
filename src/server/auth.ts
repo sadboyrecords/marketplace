@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
@@ -6,7 +8,6 @@ import {
 } from "next-auth";
 // import DiscordProvider from "next-auth/providers/discord";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { env } from "@/env.mjs";
 import { prisma } from "@/server/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { SigninMessage } from "@/utils/SignMessage";
@@ -14,6 +15,7 @@ import { getCsrfToken } from "next-auth/react";
 import { type NextApiRequest } from "next";
 import { adminWallets } from "@/utils/constants";
 import { Magic } from "@magic-sdk/admin";
+import { authProviderNames } from "@/utils/constants";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -29,6 +31,7 @@ declare module "next-auth" {
       walletAddress?: string;
       isAdmin?: boolean;
       isSuperAdmin?: boolean;
+      provider?: string;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -46,7 +49,8 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  */
 
-// const magic = new Magic(process.env.MAGIC_SK);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+const magic: Magic = new Magic(process.env.MAGIC_SK, {});
 // NextAuthOptions
 export function authOptions(req: NextApiRequest): NextAuthOptions {
   const providers = [
@@ -55,7 +59,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
     //   clientSecret: env.DISCORD_CLIENT_SECRET || "eee",
     // }),
     CredentialsProvider({
-      id: "solana-auth",
+      id: authProviderNames.solana,
       name: "Solana",
       type: "credentials",
       // callbackUrl: 'http://localhost:3000/api/auth/callback/my-custom-provider',
@@ -117,62 +121,39 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       },
     }),
     CredentialsProvider({
-      id: "magic-link",
+      id: authProviderNames.magic,
       name: "Magic Link",
       type: "credentials",
-      // callbackUrl: 'http://localhost:3000/api/auth/callback/my-custom-provider',
       credentials: {
-        message: {
-          label: "Message",
-          type: "text",
-        },
-        signature: {
-          label: "Signature",
-          type: "text",
-        },
+        didToken: { label: "DID Token", type: "text" },
       },
 
       async authorize(credentials) {
         // console.log("----AUTHORIZING----")
         try {
-          // console.log({ credentials, message: credentials?.message})
-          const signinMessage = new SigninMessage(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            JSON.parse(credentials?.message || "{}")
+          magic.token.validate(credentials?.didToken || "");
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const metadata = await magic.users.getMetadataByToken(
+            credentials?.didToken || ""
           );
-          // console.log({ body: req.body, stringy: JSON.stringify(req.body)})
+          // const publicAddress = magic.token.getPublicAddress(
+          //   credentials?.didToken || ""
+          // );
+          // console.log({ publicAddress, metadata });
+          // magic.users.
+          //  magic.token.
 
-          const nextAuthUrl = new URL(process.env.NEXTAUTH_URL || "");
-          // console.log({ nextAuthUrl, signinMessage })
-          if (signinMessage.domain !== nextAuthUrl.host) {
-            return null;
-          }
-          // console.log("chcking csrf", {
-          //   header: req.headers, body: req.body, cookies: req.cookies })
-
-          const csrfToken = await getCsrfToken({
-            req: { headers: req.headers },
-          });
-          //  {...req, body: JSON.stringify(req.body)},
-          // console.log("----SIGNING IN----")
-          // console.log({ csrfToken, signinMessage })
-          if (signinMessage.nonce !== csrfToken) {
-            console.log("csrf failed");
-            return null;
-          }
-
-          const validationResult = signinMessage.validate(
-            credentials?.signature || ""
-          );
-          console.log({ validationResult });
-
-          if (!validationResult)
-            throw new Error("Could not validate the signed message");
-
-          return {
-            id: signinMessage.publicKey as string,
-            walletAddress: signinMessage.publicKey as string,
+          const data = {
+            id: metadata.publicAddress as string,
+            walletAddress: metadata.publicAddress as string,
+            email: metadata.email as string | null | undefined,
+            wallets: metadata.wallets,
+            phoneNumber: metadata.phoneNumber as string | null | undefined,
+            provider: authProviderNames.magic,
+            issuer: metadata.issuer,
           };
+
+          return data;
         } catch (e) {
           return null;
         }
@@ -197,6 +178,11 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
 
   return {
     callbacks: {
+      // signIn: async ({ user, account }) => {
+      //   console.log({ user, account });
+      //   return true;
+      // },
+
       //  signIn({ user, account, profile, email, credentials }) {
       //   console.log({ user, account, profile, email, credentials})
       //   return true
@@ -210,35 +196,58 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       //   //   // return '/unauthorized'
       //   // }
       // },
-      jwt({ token, user }) {
-        // console.log({ token, user });
-        if (user) {
-          token.user = user;
-        }
-        return token;
-      },
-      session: ({ session, token }) => {
-        // console.log({ session, user, token });
-        // session
+      // async jwt({ token, user, profile }) {
+      //   console.log({ token, user, profile });
+      //   if (user) {
+      //     console.log("jwt user---", user);
+      //     token.user = user;
+      //     // token.provider = user.provider as string;
+      //   }
+      //   return Promise.resolve(token); //token
+      // },
+      jwt: ({ token, user }) => {
+        console.log("JWT===", { token, user });
+        user && (token.user = user);
         let isAdmin = false;
         if (token.sub && adminWallets.includes(token.sub)) {
           isAdmin = true;
         }
-        return {
+        token.isAdmin = isAdmin;
+        return token;
+      },
+      session: ({ session, token, user }) => {
+        console.log({ session, token, user });
+        // session
+        // let isAdmin = false;
+        // if (token.sub && adminWallets.includes(token.sub)) {
+        //   isAdmin = true;
+        // }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // session.user = token?.user;
+        session = {
           ...session,
-          walletAddress: token.sub,
-          isAdmin,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           user: {
-            ...session.user,
-            walletAddress: token.sub,
-            isAdmin,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            ...token?.user,
+            isAdmin: token?.isAdmin,
           },
-          // user: {
-          //   ...session.user,
-          //   id: user.id,
-          //   // walletAddress: token.sub
-          // },
         };
+        return session;
+        // return {
+        //   ...session,
+        //   // ...token.,
+        //   // walletAddress: token.sub,
+        //   isAdmin,
+        //   user: {
+        //     ...session.user,
+        //     // ...(token.user as any),
+        //     walletAddress: token.sub,
+        //     isAdmin,
+        //   },
+        // };
       },
     },
     adapter: PrismaAdapter(prisma),

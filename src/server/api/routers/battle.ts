@@ -289,17 +289,17 @@ export const battleRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       console.log({ session: ctx.session });
-      if (!ctx.session || !ctx.session.walletAddress) {
+      if (!ctx.session || !ctx.session.user.walletAddress) {
         throw new Error("No wallet address found in session");
       }
       const battle = await ctx.prisma.$transaction(async (tx) => {
         const createdBattle = await tx.battle.create({
           data: {
             isLive: false,
-            // createdByWallet: ctx.session.walletAddress as string,
+            // createdByWallet: ctx.session.user.walletAddress as string,
             createdBy: {
               connect: {
-                walletAddress: ctx.session.walletAddress as string,
+                walletAddress: ctx.session.user.walletAddress as string,
               },
             },
             displayOnHomePage: false,
@@ -322,7 +322,8 @@ export const battleRouter = createTRPCRouter({
                       (input.contestantOne?.dropData as object) || {},
                     startDate: input.battleStartDate,
                     endDate: input.battleEndDate,
-                    ownerWalletAddress: ctx.session.walletAddress as string,
+                    ownerWalletAddress: ctx.session.user
+                      .walletAddress as string,
                     audioUri: input.contestantOne?.dropData?.audioUri,
                     audioIpfsHash: input.contestantOne?.dropData?.audioHash,
                     candyMachineImageUrl:
@@ -366,7 +367,8 @@ export const battleRouter = createTRPCRouter({
                       (input.contestantTwo?.dropData as object) || {},
                     startDate: input.battleStartDate,
                     endDate: input.battleEndDate,
-                    ownerWalletAddress: ctx.session.walletAddress as string,
+                    ownerWalletAddress: ctx.session.user
+                      .walletAddress as string,
                     audioUri: input.contestantTwo?.dropData?.audioUri,
                     audioIpfsHash: input.contestantTwo?.dropData?.audioHash,
                     candyMachineImageUrl:
@@ -440,14 +442,14 @@ export const battleRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       console.log({ session: ctx.session });
-      if (!ctx.session || !ctx.session.walletAddress) {
+      if (!ctx.session || !ctx.session.user.walletAddress) {
         throw new Error("No wallet address found in session");
       }
       const battle = await ctx.prisma.$transaction(async (tx) => {
         const b = await tx.battle.findUnique({ where: { id: input.battleId } });
         if (
           !b?.createdByWallet ||
-          b?.createdByWallet !== ctx.session.walletAddress
+          b?.createdByWallet !== ctx.session.user.walletAddress
         ) {
           throw new Error("Battle not found");
         }
@@ -459,7 +461,7 @@ export const battleRouter = createTRPCRouter({
             isLive: false,
             createdBy: {
               connect: {
-                walletAddress: ctx.session.walletAddress,
+                walletAddress: ctx.session.user.walletAddress,
               },
             },
             displayOnHomePage: false,
@@ -486,7 +488,7 @@ export const battleRouter = createTRPCRouter({
                         (input.contestantOne?.dropData as object) || {},
                       startDate: input.battleStartDate,
                       endDate: input.battleEndDate,
-                      ownerWalletAddress: ctx.session.walletAddress,
+                      ownerWalletAddress: ctx.session.user.walletAddress,
                       audioUri: input.contestantOne?.dropData?.audioUri,
                       audioIpfsHash: input.contestantOne?.dropData?.audioHash,
                       candyMachineImageUrl:
@@ -554,7 +556,7 @@ export const battleRouter = createTRPCRouter({
                         (input.contestantTwo?.dropData as object) || {},
                       startDate: input.battleStartDate,
                       endDate: input.battleEndDate,
-                      ownerWalletAddress: ctx.session.walletAddress,
+                      ownerWalletAddress: ctx.session.user.walletAddress,
                       audioUri: input.contestantTwo?.dropData?.audioUri,
                       audioIpfsHash: input.contestantTwo?.dropData?.audioHash,
                       candyMachineImageUrl:
@@ -611,7 +613,7 @@ export const battleRouter = createTRPCRouter({
         const b = await tx.battle.findUnique({ where: { id: input.battleId } });
         if (
           !b?.createdByWallet ||
-          b?.createdByWallet !== ctx.session.walletAddress
+          b?.createdByWallet !== ctx.session.user.walletAddress
         ) {
           throw new Error("Battle not found");
         }
@@ -655,7 +657,7 @@ export const battleRouter = createTRPCRouter({
         const b = await tx.battle.findUnique({ where: { id: input.battleId } });
         if (
           !b?.createdByWallet ||
-          b?.createdByWallet !== ctx.session.walletAddress
+          b?.createdByWallet !== ctx.session.user.walletAddress
         ) {
           throw new Error("Battle not found");
         }

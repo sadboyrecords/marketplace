@@ -2,25 +2,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { api } from "@/utils/api";
-import Image from "next/image";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
 import Typography from "@/components/typography";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { Pencil } from "@/components/iconComponents";
 // import { usePlayerProvider } from '@/components/Player/Provider';
 import { toast } from "react-toastify";
 import TrackItem from "@/components/track/TrackItem";
-import { PlayIcon, PauseIcon } from "@heroicons/react/24/solid";
 import { routes } from "@/utils/constants";
 import Button from "@/components/buttons/Button";
-import { ipfsUrl } from "@/utils/helpers";
 import PlayButton from "@/components/likes-plays/PlayButton";
 import type { SongType } from "@/utils/types";
 import PlaylistCard from "@/components/playlist/PlaylistCard";
 import Input from "@/components/formFields/Input";
 import TextArea from "@/components/formFields/TextArea";
 import { useForm } from "react-hook-form";
+import { useSession } from "next-auth/react";
 
 type FormData = {
   name: string;
@@ -51,11 +48,12 @@ function PlaylistDetails() {
   const playlistPublicMutation =
     api.playlist.updatePrivatePublicPlaylist.useMutation();
   const likePlaylistMutation = api.playlist.likeUnlikePlaylist.useMutation();
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
+  const { data: session } = useSession();
   const userData = api.user.getUser.useQuery(
-    { publicKey: publicKey?.toBase58() || "" },
+    { publicKey: session?.user?.walletAddress || "" },
     {
-      enabled: !!publicKey,
+      enabled: !!session?.user?.walletAddress,
     }
   );
 
@@ -67,7 +65,7 @@ function PlaylistDetails() {
   } = api.playlist.byId.useQuery(
     {
       playlistId: playlistId || "",
-      currentUserAddress: publicKey?.toBase58(),
+      currentUserAddress: session?.user?.walletAddress,
     },
     {
       enabled: !!playlistId,
@@ -88,7 +86,7 @@ function PlaylistDetails() {
       setIsLiking(true);
       await likePlaylistMutation.mutateAsync({
         playlistId: playlist?.id || "",
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
         isLiked: !isLiked,
       });
 
@@ -124,12 +122,12 @@ function PlaylistDetails() {
       setIsDeleting(true);
       await deleteMutation.mutateAsync({
         playlistId: playlistId,
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
       });
       toast.success("Playlist deleted");
 
       void router.push(
-        publicKey ? routes.userProfile(publicKey?.toBase58() || "") : "/"
+        session ? routes.userProfile(session?.user?.walletAddress || "") : "/"
       );
     } catch (e) {
       toast.error("Couldn't delete playlist");
@@ -146,7 +144,7 @@ function PlaylistDetails() {
       await updatePlaylistMutation.mutateAsync({
         playlistId: playlist?.id,
         playlistName: data?.name,
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
         playlistDescription: data?.description,
       });
       await refetch();
@@ -163,7 +161,7 @@ function PlaylistDetails() {
     // setIsPublic(e.target.checked);
     console.log({ public: e.target.checked });
     const res = await playlistPublicMutation.mutateAsync({
-      walletAddress: publicKey?.toBase58() || "",
+      walletAddress: session?.user?.walletAddress || "",
       playlistId: playlist?.id || "",
       isPublic: e.target.checked,
     });

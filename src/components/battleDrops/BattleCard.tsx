@@ -152,7 +152,6 @@ function BattleCard({ index, battle, totalPot }: BattleCardProps) {
   //   };
   //   void getSolPrice();
   // }, []);
-  console.log({ battle });
 
   return (
     <div className="mx-auto flex h-full max-w-xl flex-col  space-y-4 lg:mx-0">
@@ -307,9 +306,9 @@ function BattleCard({ index, battle, totalPot }: BattleCardProps) {
                       </div>
 
                       <Button
-                        disabled={
-                          !candyMachine?.guardsAndEligibility?.[0]?.isEligible
-                        }
+                        // disabled={
+                        //   !candyMachine?.guardsAndEligibility?.[0]?.isEligible
+                        // }
                         onClick={handleMint}
                         // loading={isMinting}
                         // rounded="lg"

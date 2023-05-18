@@ -1,15 +1,27 @@
 // import { useEffect } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 require("@solana/wallet-adapter-react-ui/styles.css");
+import { useWallet } from "@solana/wallet-adapter-react";
+
 import base58 from "bs58";
-import React, { useEffect } from "react";
+import React from "react";
 import Button from "@/components/buttons/Button";
 import { SigninMessage } from "@/utils/SignMessage";
-import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
+import { selectAuthModal, open, close } from "@/lib/slices/appSlice";
+import { useSelector, useDispatch } from "react-redux";
+
+const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
+  ssr: false,
+});
+const DynamicAuthMethods = dynamic(
+  () => import("@/components/auth/DynamicAuthMethods"),
+  {
+    ssr: false,
+  }
+);
 
 const AvataterNav = dynamic(() => import("@/components/buttons/AvataterNav"), {
   ssr: false,
@@ -18,8 +30,10 @@ const AvataterNav = dynamic(() => import("@/components/buttons/AvataterNav"), {
 export default function WalletAdaptor() {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { publicKey, signMessage, disconnect, connected } = useWallet();
-  // console.log({ publicKey: publicKey?.toBase58(), connected });
-  const { setVisible, visible } = useWalletModal();
+
+  const dispatch = useDispatch();
+
+  const authModal = useSelector(selectAuthModal);
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
@@ -31,7 +45,7 @@ export default function WalletAdaptor() {
 
   const handleSignIn = React.useCallback(async () => {
     if (!publicKey) {
-      setVisible(true);
+      dispatch(open());
       return;
     }
     try {
@@ -59,6 +73,7 @@ export default function WalletAdaptor() {
         redirect: false,
         callbackUrl: window.location.href,
       });
+      dispatch(close());
       if (!res) {
         console.log("NO RES");
         await disconnect();
@@ -96,12 +111,19 @@ export default function WalletAdaptor() {
     // }
     // connected,
   }, [connected, handleSignIn, status]);
-  // console.log({ session, status, connected });
 
   return (
     <>
+      <GenericModal
+        closeModal={() => dispatch(close())}
+        title="Log In/Sign Up"
+        isOpen={authModal}
+      >
+        {/* <WalletMultiButton /> */}
+        <DynamicAuthMethods />
+      </GenericModal>
       {!session && !loading && (
-        <Button loading={loading} size="sm" onClick={() => setVisible(true)}>
+        <Button loading={loading} size="sm" onClick={() => dispatch(open())}>
           Sign In
         </Button>
       )}

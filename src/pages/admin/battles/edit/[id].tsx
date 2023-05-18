@@ -1,13 +1,8 @@
-import React from "react";
-// import MintingContainer from '@/components/MintingContainer';
-// import { addresses } from "@/utils/constants";
-import { useWallet } from "@solana/wallet-adapter-react";
 import NewBattle from "@/components/forms/NewBattle";
 import Typography from "@/components/typography";
 import { useSession } from "next-auth/react";
 
 function BattleDetails() {
-  const { publicKey } = useWallet();
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -22,7 +17,7 @@ function BattleDetails() {
     );
   }
 
-  if (!session || !publicKey) {
+  if (!session || !session?.user?.walletAddress) {
     return (
       <div>
         <Typography size="body" color="neutral-content">

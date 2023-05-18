@@ -2,7 +2,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/require-await */
-import React, { createContext, useContext, useMemo, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
 import {
   type CandyMachine,
   Metaplex,
@@ -20,6 +26,8 @@ import {
   toDateTime,
   type IdentitySigner,
   type UpdateCandyMachineOutput,
+  keypairIdentity,
+  derivedIdentity,
 } from "@metaplex-foundation/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
@@ -32,6 +40,12 @@ import {
 import { LAMPORTS_PER_SOL, type Signer } from "@solana/web3.js";
 import { api } from "@/utils/api";
 import { getSolUsdPrice } from "@/utils/rpcCalls";
+import { useSession } from "next-auth/react";
+import * as web3 from "@solana/web3.js";
+import { selectPublicAddress } from "@/lib/slices/appSlice";
+import { useSelector } from "react-redux";
+import { authProviderNames } from "@/utils/constants";
+import { magic } from "@/lib/magic";
 
 type MintType = {
   quantityString: number;
@@ -52,9 +66,11 @@ interface CandyMachineState {
 
 const MetaplexContext = createContext({
   metaplex: null as Metaplex | null,
+  // publicAddress: null as string | null | undefined,
+  // setPublicAddress: (_publicAddress: string | null) => {},
   walletBalance: null as number | null | undefined,
   solUsdPrice: null as number | null,
-  getUserBalance: async (): Promise<void> => undefined,
+  getUserBalance: async (_publicAddress?: string): Promise<void> => undefined,
   candyMachines: {} as Record<string, CandyMachineState> | null,
   fetchCandyMachineById: async (_id: string): Promise<void> => undefined,
   mint: async (_input: MintType): Promise<MintResponseType | undefined> =>
@@ -107,6 +123,8 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
     CandyMachineState
   > | null>({});
 
+  const { data: session } = useSession();
+
   // const [candyMachineId, setCandyMachineId] = React.useState<string>();
   // const [currentSlug, setCurrentSlug] = React.useState<string>();
 
@@ -122,17 +140,44 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
   //   remaining: 0,
   //   redeemed: 0,
   // });
+  const publicAddress = useSelector(selectPublicAddress);
 
-  const getUserBalance = async () => {
-    if (!wallet?.publicKey) return;
-    const userBalanceLamport = await mx.connection.getBalance(
-      wallet?.publicKey
-    );
+  const getUserBalance = async (publicAddress?: string) => {
+    // if (!wallet?.publicKey) return;
+    if (!session || !session.user.walletAddress) return;
+
+    // const userBalanceLamport = await mx.connection.getBalance(
+    //   wallet?.publicKey
+    // );
+    // connection.getBalance(pubKey).then((bal) => setBalance(bal / 1000000000));
+    let userBalanceLamport = 0;
+    if (!publicAddress) {
+      userBalanceLamport = await connection.getBalance(
+        new web3.PublicKey(session.user.walletAddress)
+      );
+    }
+    if (publicAddress) {
+      userBalanceLamport = await connection.getBalance(
+        new web3.PublicKey(publicAddress)
+      );
+    }
+    // const pubKey = new web3.PublicKey(
+    //   "DTQfkPeZ9TN6ZEhhA99LSBAUAW4FRs6tSbUXhCkcVspU"
+    // );
+    // const userBalanceLamport = await connection.getBalance(pubKey);
     const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
 
     setWalletBalance(Number(userBalance.toFixed(2)));
     // return userBalance;
   };
+  // const getMagic = async () => {
+  //   const metadata = await magic.user.getMetadata();
+  //   console.log("-----metadata----", metadata);
+  // };
+  useEffect(() => {
+    // void getMagic();
+    // const userBalance = await mx.rpc().getBalance()
+  }, []);
 
   const checkEligibility = async (
     guard: DefaultCandyGuardSettings,
@@ -680,6 +725,49 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
   //   }
   // };
 
+  async function signTransaction(
+    tx: web3.Transaction
+  ): Promise<web3.Transaction> {
+    if (!magic) return tx;
+    const serializeConfig = {
+      requireAllSignatures: false,
+      verifySignatures: true,
+    };
+    const signedTransaction = await magic.solana.signTransaction(
+      tx,
+      serializeConfig
+    );
+
+    const transaction = web3.Transaction.from(
+      signedTransaction?.rawTransaction
+    );
+    console.log({ signedTransaction, transaction });
+    // const signature = await connection.sendRawTransaction(tx.serialize(),{
+
+    // });
+    // console.log({ signature });
+    //               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
+
+    // add missing signers from original transaction to the newly created one
+    const missingSigners = transaction.signatures
+      .filter((s) => !s?.signature)
+      .map((s) => s.publicKey);
+    console.log({ missingSigners, tx });
+    missingSigners.forEach((publicKey) => {
+      console.log({ publicKey, keybase: publicKey.toBase58() });
+      const signature = tx?.signatures.find((s) => {
+        console.log({ s });
+        return publicKey.equals(s.publicKey);
+      });
+
+      console.log({ signature });
+      if (signature) transaction.addSignature(publicKey, signature?.signature!);
+    });
+
+    return transaction;
+    // return signedTransaction
+  }
+
   const mint = React.useCallback(
     async ({ quantityString, label, candyMachineId }: MintType) => {
       // if (!guardsAndEligibility[opts.groupLabel || 'default'])
@@ -710,9 +798,12 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
         //     })
         //   );
         // }
+        console.log("--minting--");
+        // mx.connection.
+        const mxs = Metaplex.make(connection); //.use(keypairIdentity()); //.use(walletAdapterIdentity(wallet))
         const transactionBuilders = await Promise.all(
           new Array(quantityString).fill(0).map(() =>
-            mx
+            mxs
               .candyMachines()
               .builders()
               .mint({
@@ -728,20 +819,108 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
               })
           )
         );
+        console.log({ transactionBuilders });
 
-        const mints = transactionBuilders.map((tb) => ({
-          mintSigner: tb.getContext().mintSigner as Signer,
-          mintAddress: tb.getContext().mintSigner.publicKey,
-          tokenAddress: tb.getContext().tokenAddress,
-        }));
-        const blockhash = await mx.rpc().getLatestBlockhash();
-        const signedTransactions = await wallet?.signAllTransactions?.(
-          transactionBuilders.map((t, ix) => {
+        const mints = transactionBuilders.map((tb) => {
+          console.log({ tb });
+          return {
+            mintSigner: tb.getContext().mintSigner as Signer,
+            mintAddress: tb.getContext().mintSigner.publicKey,
+            tokenAddress: tb.getContext().tokenAddress,
+          };
+        });
+        // const blockhash = await mxs.rpc().getLatestBlockhash();
+        const blockhash = await connection.getLatestBlockhash();
+        let signedTransactions: web3.Transaction[] | undefined = [];
+
+        if (magic && session?.user?.provider === authProviderNames.magic) {
+          const payer = new web3.PublicKey(publicAddress || "");
+
+          const transactionMagic = new web3.Transaction({
+            feePayer: payer,
+            recentBlockhash: blockhash.blockhash,
+          });
+          console.log({ transactionMagic });
+          // const tx = transactionBuilders.map((t, ix) => {
+          //   const tx = t.toTransaction(blockhash);
+          //   tx.sign(mints[ix]?.mintSigner as Signer);
+          //   return tx;
+          // });
+          // signedTransactions = await wallet?.signAllTransactions?.(
+          //   transactionBuilders.map((t, ix) => {
+          //     const tx = t.toTransaction(blockhash);
+          //     tx.sign(mints[ix]?.mintSigner as Signer);
+          //     return tx;
+          //   })
+          // );
+          const tx = transactionBuilders.map((t, ix) => {
             const tx = t.toTransaction(blockhash);
             tx.sign(mints[ix]?.mintSigner as Signer);
+            // tx.feePayer = payer;
             return tx;
-          })
-        );
+          });
+          console.log({ transactionMagic, tx });
+
+          const signed = await Promise.all(
+            tx.map(async (t) => {
+              const txn = transactionMagic.add(...[t]);
+              console.log({ txn });
+              // transactionMagic.partialSign();
+
+              // transactionMagic.partialSign(web3.Keypair.generate());
+              return await signTransaction(txn);
+            })
+          );
+          console.log({ signed });
+          const output = await Promise.all(
+            signed.map((tx, i) => {
+              console.log({ tx });
+              return mxs
+                .rpc()
+                .sendAndConfirmTransaction(tx, { commitment: "finalized" })
+                .then((tx) => {
+                  console.log({ txthen: tx });
+                  return {
+                    ...tx,
+                    context: transactionBuilders[i]?.getContext() as unknown,
+                  };
+                })
+                .catch((e) => {
+                  console.log({ e });
+                  throw new Error("Error Sending Transaction");
+                });
+            })
+          );
+          console.log({ output });
+
+          // transactionMagic.add(...[...tx]);
+
+          // const signedTransaction = await magic.solana.signTransaction(
+          //   transactionMagic,
+          //   serializeConfig
+          // );
+          // console.log({ signedTransaction });
+
+          // signedTransactions = [magicSign];
+          // console.log({ signedTransactions });
+
+          // const signature = await connection.sendRawTransaction(
+          //   transaction.serialize()
+          // );
+          // console.log({ signature });
+          return;
+          // signedTransactions = await magic.solana.signTransaction
+        } else {
+          signedTransactions = await wallet?.signAllTransactions?.(
+            transactionBuilders.map((t, ix) => {
+              const tx = t.toTransaction(blockhash);
+              tx.sign(mints[ix]?.mintSigner as Signer);
+              return tx;
+            })
+          );
+          console.log({ signedTransactions });
+        }
+
         if (!signedTransactions) throw new Error("No signed transactions");
 
         // for (let signer in signers) {
@@ -753,7 +932,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
         const output = await Promise.all(
           signedTransactions.map((tx, i) => {
             console.log({ tx });
-            return mx
+            return mxs
               .rpc()
               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
               .then((tx) => {
@@ -852,12 +1031,14 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
       // guardsAndEligibility,
       walletBalance,
       solUsdPrice,
+      // publicAddress
       // updateCandyMachine,
     };
   }, [
     // candyMachine,
     // items,
     // guardsAndEligibility,
+    // publicAddress,
     walletBalance,
     solUsdPrice,
   ]);
@@ -872,6 +1053,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
         ...memoedValue,
         candyMachines,
         mint,
+        // setPublicAddress,
         // candyMachineV3: {
         //   ...memoedValue,
         // },

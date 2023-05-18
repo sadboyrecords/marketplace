@@ -1,28 +1,21 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import React from "react";
-// import MintingContainer from '@/components/MintingContainer';
-// import { addresses } from "@/utils/constants";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import { api } from "@/utils/api";
 import Typography from "@/components/typography";
-import BattleCard from "@/components/battleDrops/BattleCard";
-import SolIcon from "@/components/iconComponents/SolIcon";
-import Countdown from "@/components/countdown/Countdown";
 import Button from "@/components/buttons/Button";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { toast } from "react-toastify";
-import { Toggle, ToggleItem } from "@tremor/react";
 import LineUp from "@/components/battleDrops/LineUp";
 import { useSession } from "next-auth/react";
+import dayjs from "dayjs";
 
 function BattleDetails() {
   const today = new Date();
   const twoWeeksLater = new Date();
   twoWeeksLater.setDate(today.getDate() - 14);
 
-  const { publicKey } = useWallet();
   const { data: session } = useSession();
   const router = useRouter();
   const { id } = router.query;
@@ -89,7 +82,10 @@ function BattleDetails() {
   }
   console.log({ data });
 
-  if ((!session?.user.isAdmin || !publicKey) && !data?.isActive) {
+  if (
+    (!session?.user.isAdmin || !session?.user.walletAddress) &&
+    !data?.isActive
+  ) {
     return (
       <div className="flex flex-col space-y-4">
         <Typography> You do not have access to view this battle</Typography>
@@ -128,6 +124,20 @@ function BattleDetails() {
             Activate
           </Button>
         )}
+      </div>
+      <Typography className="font-bold">Details</Typography>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2">
+        <Typography>
+          Start Date:{" "}
+          {dayjs(data?.battleStartDate).format("MMM DD, YYYY h:mm A")}
+        </Typography>
+        <Typography>
+          End Date: {dayjs(data?.battleEndDate).format("MMM DD, YYYY h:mm A")}
+        </Typography>
+
+        <Typography>Price: {data?.battlePrice} SOL</Typography>
+        {/* <Typography>Price: {data?.battleDescription} </Typography> */}
       </div>
       {data && <LineUp data={data} />}
     </div>

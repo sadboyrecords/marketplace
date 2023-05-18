@@ -13,6 +13,11 @@ import { routes } from "@/utils/constants";
 import { useMetaplex } from "../providers/MetaplexProvider";
 import { SolIcon } from "../iconComponents";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
+import { magic } from "@/lib/magic";
+import { authProviderNames } from "@/utils/constants";
+import { selectPublicAddress, setPublicAddress } from "@/lib/slices/appSlice";
+import { useSelector, useDispatch } from "react-redux";
+
 // import ShieldCheckIcon from "@heroicons/react/24/outline/ShieldCheckIcon";
 
 function AvataterNav() {
@@ -26,17 +31,66 @@ function AvataterNav() {
     enabled: !!session,
     staleTime: 1000 * 10,
   });
+  const publicAddress = useSelector(selectPublicAddress);
+  const dispatch = useDispatch();
+
+  // const testMagic = async () => {
+  //   if (!magic) return;
+  //   const pubKey = await magic.wallet?.getInfo();
+  //   const idToken = await magic.user.getIdToken();
+  //   const userinfo = await magic.user.getInfo();
+  //   //  magic.user.
+  //   console.log({ pubKey, idToken, userinfo });
+  // };
+
+  const updateUserMutation = api.user.updateUser.useMutation();
 
   useEffect(() => {
     if (session) {
-      void getUserBalance();
+      if (data?.magicSolanaAddress) {
+        dispatch(setPublicAddress(data?.magicSolanaAddress));
+      }
+      if (session?.user?.provider === authProviderNames.magic) {
+        if (!magic) return;
+        void magic?.user.isLoggedIn().then((isLoggedIn) => {
+          // console.log({ isLoggedIn });
+          if (isLoggedIn) {
+            if (!magic) return;
+            // testMagic();
+            void magic?.user.getInfo().then((user) => {
+              // console.log({ user });
+              dispatch(setPublicAddress(user?.publicAddress as string));
+              void getUserBalance(user?.publicAddress as string);
+              if (data && !data?.magicSolanaAddress) {
+                // need this because the back end call doesn't provide SOlana wallet. provides eth only wallet. This will be the default wallet but we still need the solana wallet
+                updateUserMutation.mutate({
+                  magicSolanaAddress: user?.publicAddress as string,
+                  walletAddress: session?.user?.walletAddress,
+                });
+              }
+            });
+          }
+          if (!isLoggedIn) {
+            void signOut();
+          }
+        });
+      } else {
+        dispatch(setPublicAddress(session.user.walletAddress as string));
+        void getUserBalance();
+      }
     }
-  }, [getUserBalance, session]);
+  }, [
+    getUserBalance,
+    session,
+    dispatch,
+    data?.magicSolanaAddress,
+    updateUserMutation,
+  ]);
 
   const handleCopy = () => {
-    if (!session?.user?.walletAddress) return;
+    if (!publicAddress) return;
     navigator.clipboard
-      .writeText(session?.user?.walletAddress)
+      .writeText(publicAddress)
       .then(() => {
         setCopied(true);
         setTimeout(() => {
@@ -63,6 +117,8 @@ function AvataterNav() {
   const handleLogout = async () => {
     void disconnect();
     await signOut();
+    if (magic) await magic.user.logout();
+    // await magic.user.logout();
     return;
   };
   return (
@@ -111,42 +167,56 @@ function AvataterNav() {
                 sizes="50px"
                 pinnedStatus={data?.pinnedProfilePicture?.status}
               />
-              <div className="items-center">
-                <Typography size="body" className=" font-semibold">
-                  {data?.name ||
-                    data?.firstName ||
-                    `${data?.walletAddress?.slice(
-                      0,
-                      5
-                    )}...${data?.walletAddress.slice(-4)}`}
-                </Typography>
-                <div
-                  className={`${
-                    copied ? "tooltip-open tooltip tooltip-bottom" : ""
-                  }  cursor-pointer`}
-                  data-tip="Copied"
-                  onClick={handleCopy}
-                >
-                  <Typography
-                    type="div"
-                    size="body-xs"
-                    color="neutral-gray"
-                    className="flex"
-                  >
-                    {`${data?.walletAddress?.slice(
-                      0,
-                      5
-                    )}...${data?.walletAddress.slice(-4)}`}
-
-                    <CopyIcon className="ml-1 h-4 w-4" />
-                    <div className="ml-2 flex items-center space-x-1">
-                      {" "}
-                      (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
-                      {walletBalance} )
-                    </div>
+              {!publicAddress && <div className="loading btn-ghost btn" />}
+              {publicAddress && (
+                <div className="items-center">
+                  <Typography size="body" className=" font-semibold">
+                    {data?.name ||
+                      data?.firstName ||
+                      (publicAddress &&
+                        `${publicAddress?.slice(0, 5)}...${publicAddress?.slice(
+                          -4
+                        )}`) ||
+                      ""}
                   </Typography>
+                  <div
+                    className={`${
+                      copied ? "tooltip-open tooltip tooltip-bottom" : ""
+                    }  cursor-pointer`}
+                    data-tip="Copied"
+                    onClick={handleCopy}
+                  >
+                    <Typography
+                      type="div"
+                      size="body-xs"
+                      color="neutral-gray"
+                      className="flex"
+                    >
+                      {publicAddress &&
+                        `${publicAddress?.slice(0, 5)}...${publicAddress.slice(
+                          -4
+                        )}`}
+
+                      <CopyIcon className="ml-1 h-4 w-4" />
+                      <div className="ml-2 flex items-center space-x-1">
+                        {" "}
+                        (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
+                        {walletBalance} )
+                      </div>
+                    </Typography>
+                  </div>
+                  {data?.email && (
+                    <Typography
+                      type="div"
+                      size="body-xs"
+                      color="neutral-gray"
+                      className="flex"
+                    >
+                      {data?.email}
+                    </Typography>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
             <div className="px-1 py-1 ">
               <Menu.Item>

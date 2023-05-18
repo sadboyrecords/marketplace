@@ -352,7 +352,7 @@ export const candyMachineRouter = createTRPCRouter({
             equals: input.id,
           },
           // ownerWalletAddress: {
-          //   equals: ctx.session.walletAddress,
+
           // },
         },
         include: {
@@ -373,7 +373,7 @@ export const candyMachineRouter = createTRPCRouter({
     return await ctx.prisma.candyMachineDraft?.findMany?.({
       where: {
         ownerWalletAddress: {
-          equals: ctx.session.walletAddress,
+          equals: ctx.session.user.walletAddress,
         },
         isPublished: {
           equals: false,
@@ -520,14 +520,14 @@ export const candyMachineRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { formSubmission } = input;
-      if (!ctx.session.walletAddress) {
+      if (!ctx.session.user.walletAddress) {
         throw new Error("Wallet not connected");
       }
       return await ctx.prisma.candyMachineDraft?.create?.({
         data: {
           dropName: formSubmission.collectionName,
           formSubmission: formSubmission as object,
-          ownerWalletAddress: ctx.session.walletAddress,
+          ownerWalletAddress: ctx.session.user.walletAddress,
           currentStep: "CREATED",
           audioUri: input.audioUri,
           audioIpfsHash: input.audioIpfsHash,
@@ -839,8 +839,8 @@ export const candyMachineRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       if (
-        !ctx.session.walletAddress ||
-        ctx.session.walletAddress !== input.userAddress
+        !ctx.session.user.walletAddress ||
+        ctx.session.user.walletAddress !== input.userAddress
       ) {
         throw new Error("Unauthorized");
       }
@@ -900,8 +900,8 @@ export const candyMachineRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // if (
-      //   !ctx.session.walletAddress ||
-      //   ctx.session.walletAddress !== input.userAddress
+      //   !ctx.session.user.walletAddress ||
+      //   ctx.session.user.walletAddress !== input.userAddress
       // ) {
       //   throw new Error('Unauthorized');
       // }

@@ -17,14 +17,17 @@ export const userRouter = createTRPCRouter({
     }),
   myProfile: protectedProcedure.query(({ ctx }) => {
     console.log({ session: ctx.session });
-    if (!ctx.session || !ctx.session.walletAddress) {
+    if (!ctx.session || !ctx.session.user.walletAddress) {
       throw new Error("No wallet address found in session");
     }
     return ctx.prisma.user.upsert({
-      where: { walletAddress: ctx.session.walletAddress },
-      update: {},
+      where: { walletAddress: ctx.session.user.walletAddress },
+      update: {
+        email: ctx.session.user.email,
+      },
       create: {
-        walletAddress: ctx.session.walletAddress,
+        walletAddress: ctx.session.user.walletAddress,
+        email: ctx.session.user.email,
       },
       include: {
         pinnedProfilePicture: {
@@ -46,7 +49,7 @@ export const userRouter = createTRPCRouter({
                 creators: true,
                 likes: {
                   where: {
-                    userWallet: ctx.session.walletAddress,
+                    userWallet: ctx.session.user.walletAddress,
                   },
                 },
               },
@@ -368,7 +371,7 @@ export const userRouter = createTRPCRouter({
     });
     return {
       ...user,
-      isAdmin: ctx.session?.isAdmin || ctx.session.isSuperAdmin,
+      isAdmin: ctx.session?.user.isAdmin || ctx.session.user.isSuperAdmin,
     };
   }),
   create: publicProcedure
@@ -391,7 +394,7 @@ export const userRouter = createTRPCRouter({
         ...user,
       };
     }),
-  updateUser: publicProcedure
+  updateUser: protectedProcedure
     .input(
       z.object({
         walletAddress: z.string().optional(),
@@ -407,6 +410,7 @@ export const userRouter = createTRPCRouter({
         profileBannerYAxis: z.number().optional(),
         description: z.string().max(160).optional(),
         socialWebLinks: z.array(z.string()).optional(),
+        magicSolanaAddress: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -433,6 +437,7 @@ export const userRouter = createTRPCRouter({
           profileBannerXAxis: input.profileBannerXAxis,
           profileBannerYAxis: input.profileBannerYAxis,
           socialWebLinks: input.socialWebLinks,
+          magicSolanaAddress: input.magicSolanaAddress,
         },
       });
       return {

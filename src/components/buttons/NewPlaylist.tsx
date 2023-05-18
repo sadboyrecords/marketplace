@@ -1,29 +1,29 @@
 import React, { useState } from "react";
 import Button from "@/components/buttons/Button";
 import { api } from "@/utils/api";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { routes } from "@/utils/constants";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { useSession } from "next-auth/react";
 
 function NewPlaylistButton({ isNav }: { isNav?: boolean }) {
-  const { publicKey } = useWallet();
+  const { data: session } = useSession();
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
   const { data: playlists } = api.playlist.getPlaylistByUser.useQuery(
     {
-      walletAddress: publicKey?.toBase58() || "",
+      walletAddress: session?.user?.walletAddress || "",
     },
     {
-      enabled: !!publicKey,
+      enabled: !!session?.user?.walletAddress,
     }
   );
   const createPlaylist = api.playlist.createPlaylist.useMutation();
 
   const handleCreatePlaylist = async () => {
     try {
-      if (!publicKey) {
+      if (!session?.user?.walletAddress) {
         toast.warn("Sign in first");
         return;
       }
@@ -33,7 +33,7 @@ function NewPlaylistButton({ isNav }: { isNav?: boolean }) {
 
       const playlist = await createPlaylist.mutateAsync({
         playlistName: newName,
-        walletAddress: publicKey?.toBase58(),
+        walletAddress: session?.user?.walletAddress,
       });
       void router.push(routes.playlistDetail(playlist.id) + "?isCurated=true");
     } catch (error) {

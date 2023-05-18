@@ -30,6 +30,7 @@ type CreateContextOptions = {
           walletAddress?: string;
           isAdmin?: boolean;
           isSuperAdmin?: boolean;
+          provier?: string;
         };
       })
     | null;
@@ -131,7 +132,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 });
 
 const enforceUserIsAdmin = t.middleware(({ next, ctx }) => {
-  if (!ctx.session?.isAdmin && !ctx.session?.isSuperAdmin) {
+  if (!ctx.session?.user.isAdmin && !ctx.session?.user.isSuperAdmin) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "No Proviledges" });
   }
 
