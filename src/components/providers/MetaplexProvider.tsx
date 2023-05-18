@@ -109,7 +109,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
   const { connection } = useConnection();
 
   const wallet = useWallet();
-  const mx = useMemo(
+  let mx = useMemo(
     () => Metaplex.make(connection).use(walletAdapterIdentity(wallet)),
     [connection, wallet]
   );
@@ -737,8 +737,10 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
       tx,
       serializeConfig
     );
-
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const transaction = web3.Transaction.from(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       signedTransaction?.rawTransaction
     );
     console.log({ signedTransaction, transaction });
@@ -761,7 +763,9 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
       });
 
       console.log({ signature });
-      if (signature) transaction.addSignature(publicKey, signature?.signature!);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (signature) transaction.addSignature(publicKey, signature?.signature);
     });
 
     return transaction;
@@ -800,10 +804,13 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
         // }
         console.log("--minting--");
         // mx.connection.
-        const mxs = Metaplex.make(connection); //.use(keypairIdentity()); //.use(walletAdapterIdentity(wallet))
+        if (session?.user?.provider === authProviderNames.magic) {
+          mx = Metaplex.make(connection); //.use(keypairIdentity()); //.use(walletAdapterIdentity(wallet))
+        }
+
         const transactionBuilders = await Promise.all(
           new Array(quantityString).fill(0).map(() =>
-            mxs
+            mx
               .candyMachines()
               .builders()
               .mint({
@@ -829,7 +836,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
             tokenAddress: tb.getContext().tokenAddress,
           };
         });
-        // const blockhash = await mxs.rpc().getLatestBlockhash();
+        // const blockhash = await mx.rpc().getLatestBlockhash();
         const blockhash = await connection.getLatestBlockhash();
         let signedTransactions: web3.Transaction[] | undefined = [];
 
@@ -875,7 +882,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
           const output = await Promise.all(
             signed.map((tx, i) => {
               console.log({ tx });
-              return mxs
+              return mx
                 .rpc()
                 .sendAndConfirmTransaction(tx, { commitment: "finalized" })
                 .then((tx) => {
@@ -932,7 +939,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
         const output = await Promise.all(
           signedTransactions.map((tx, i) => {
             console.log({ tx });
-            return mxs
+            return mx
               .rpc()
               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
               .then((tx) => {
