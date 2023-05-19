@@ -53,7 +53,7 @@ function Button({
       secondary: "border border-gray-300",
       // border-gray-300 text-gray-700
       neutral:
-        "border border-gray-300 text-gray-700 hover:text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
+        "border border-neutral-content hover:border-neutral-content/70 text-neutral-content hover:text-neutral-content/70 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2",
       error:
         "border border-error-600 hover:border-error-800 text-error-600 hover:text-error-800",
     },
@@ -88,7 +88,7 @@ function Button({
   return (
     <Tag
       type={type}
-      className={`${
+      className={`  ${
         loading ? "loading btn" : ""
       } inline-flex cursor-pointer items-center justify-center font-medium shadow-sm  ${
         variantClasses[variant][color]

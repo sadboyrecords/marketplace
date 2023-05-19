@@ -3,15 +3,23 @@ require("@solana/wallet-adapter-react-ui/styles.css");
 import { useWallet } from "@solana/wallet-adapter-react";
 
 import base58 from "bs58";
-import React from "react";
+import React, { useCallback } from "react";
 import Button from "@/components/buttons/Button";
 import { SigninMessage } from "@/utils/SignMessage";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
-import { selectAuthModal, open, close } from "@/lib/slices/appSlice";
+import { magic } from "@/lib/magic";
+
+import {
+  selectAuthModal,
+  open,
+  close,
+  setPublicAddress,
+} from "@/lib/slices/appSlice";
 import { useSelector, useDispatch } from "react-redux";
+import { authProviderNames } from "@/utils/constants";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -23,7 +31,7 @@ const DynamicAuthMethods = dynamic(
   }
 );
 
-const AvataterNav = dynamic(() => import("@/components/buttons/AvataterNav"), {
+const AvatarNav = dynamic(() => import("@/components/buttons/AvatarNav"), {
   ssr: false,
 });
 
@@ -38,10 +46,12 @@ export default function WalletAdaptor() {
   const { data: session, status } = useSession();
   const loading = status === "loading";
 
-  api.user.myProfile.useQuery(undefined, {
+  const { data: userInfo, refetch } = api.user.myProfile.useQuery(undefined, {
     enabled: !!session,
     staleTime: 1000 * 10,
   });
+
+  const userMutation = api.user.updateUser.useMutation();
 
   const handleSignIn = React.useCallback(async () => {
     if (!publicKey) {
@@ -112,6 +122,18 @@ export default function WalletAdaptor() {
     // connected,
   }, [connected, handleSignIn, status]);
 
+  React.useEffect(() => {
+    if (!session) {
+      dispatch(setPublicAddress(null));
+    }
+    dispatch(
+      setPublicAddress(
+        session?.user?.magicSolanaAddress ||
+          (session?.user.walletAddress as string)
+      )
+    );
+  }, [dispatch, session]);
+
   return (
     <>
       <GenericModal
@@ -127,7 +149,7 @@ export default function WalletAdaptor() {
           Sign In
         </Button>
       )}
-      {session && <AvataterNav />}
+      {session && <AvatarNav />}
     </>
   );
 }

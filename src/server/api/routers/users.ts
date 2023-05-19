@@ -28,6 +28,7 @@ export const userRouter = createTRPCRouter({
       create: {
         walletAddress: ctx.session.user.walletAddress,
         email: ctx.session.user.email,
+        magicSolanaAddress: ctx.session.user.magicSolanaAddress,
       },
       include: {
         pinnedProfilePicture: {
@@ -414,10 +415,7 @@ export const userRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
-      if (
-        !ctx?.session?.user?.walletAddress ||
-        input.walletAddress !== ctx?.session?.user?.walletAddress
-      ) {
+      if (!ctx?.session?.user?.walletAddress) {
         throw new Error("Not Authorized");
       }
       const user = await ctx.prisma.user.update({

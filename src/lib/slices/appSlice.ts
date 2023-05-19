@@ -21,7 +21,7 @@ export const appSlice = createSlice({
     close: (state) => {
       state.authModal = false;
     },
-    setPublicAddress: (state, action: PayloadAction<string>) => {
+    setPublicAddress: (state, action: PayloadAction<string | null>) => {
       state.publicAddress = action.payload;
     },
   },

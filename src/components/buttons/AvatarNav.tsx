@@ -14,17 +14,16 @@ import { useMetaplex } from "../providers/MetaplexProvider";
 import { SolIcon } from "../iconComponents";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
 import { magic } from "@/lib/magic";
-import { authProviderNames } from "@/utils/constants";
-import { selectPublicAddress, setPublicAddress } from "@/lib/slices/appSlice";
-import { useSelector, useDispatch } from "react-redux";
+import { selectPublicAddress } from "@/lib/slices/appSlice";
+import { useSelector } from "react-redux";
 
 // import ShieldCheckIcon from "@heroicons/react/24/outline/ShieldCheckIcon";
 
-function AvataterNav() {
+function AvatarNav() {
   const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { disconnect } = useWallet();
-  const { getUserBalance, walletBalance } = useMetaplex();
+  const { walletBalance } = useMetaplex();
   const [copied, setCopied] = useState<boolean>();
 
   const { data, isLoading } = api.user.myProfile.useQuery(undefined, {
@@ -32,60 +31,6 @@ function AvataterNav() {
     staleTime: 1000 * 10,
   });
   const publicAddress = useSelector(selectPublicAddress);
-  const dispatch = useDispatch();
-
-  // const testMagic = async () => {
-  //   if (!magic) return;
-  //   const pubKey = await magic.wallet?.getInfo();
-  //   const idToken = await magic.user.getIdToken();
-  //   const userinfo = await magic.user.getInfo();
-  //   //  magic.user.
-  //   console.log({ pubKey, idToken, userinfo });
-  // };
-
-  const updateUserMutation = api.user.updateUser.useMutation();
-
-  useEffect(() => {
-    if (session) {
-      if (data?.magicSolanaAddress) {
-        dispatch(setPublicAddress(data?.magicSolanaAddress));
-      }
-      if (session?.user?.provider === authProviderNames.magic) {
-        if (!magic) return;
-        void magic?.user.isLoggedIn().then((isLoggedIn) => {
-          // console.log({ isLoggedIn });
-          if (isLoggedIn) {
-            if (!magic) return;
-            // testMagic();
-            void magic?.user.getInfo().then((user) => {
-              // console.log({ user });
-              dispatch(setPublicAddress(user?.publicAddress as string));
-              void getUserBalance(user?.publicAddress as string);
-              if (data && !data?.magicSolanaAddress) {
-                // need this because the back end call doesn't provide SOlana wallet. provides eth only wallet. This will be the default wallet but we still need the solana wallet
-                updateUserMutation.mutate({
-                  magicSolanaAddress: user?.publicAddress as string,
-                  walletAddress: session?.user?.walletAddress,
-                });
-              }
-            });
-          }
-          if (!isLoggedIn) {
-            void signOut();
-          }
-        });
-      } else {
-        dispatch(setPublicAddress(session.user.walletAddress as string));
-        void getUserBalance();
-      }
-    }
-  }, [
-    getUserBalance,
-    session,
-    dispatch,
-    data?.magicSolanaAddress,
-    updateUserMutation,
-  ]);
 
   const handleCopy = () => {
     if (!publicAddress) return;
@@ -197,11 +142,11 @@ function AvataterNav() {
                           -4
                         )}`}
 
-                      <CopyIcon className="ml-1 h-4 w-4" />
-                      <div className="ml-2 flex items-center space-x-1">
+                      <CopyIcon className="ml-1 h-4 w-7" />
+                      <div className="ml-1 flex w-full items-center space-x-1">
                         {" "}
                         (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
-                        {walletBalance} )
+                        {walletBalance?.toFixed(2)} )
                       </div>
                     </Typography>
                   </div>
@@ -323,4 +268,4 @@ function AvataterNav() {
   );
 }
 
-export default AvataterNav;
+export default AvatarNav;

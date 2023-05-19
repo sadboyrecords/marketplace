@@ -7,13 +7,15 @@ import { magic } from "@/lib/magic";
 import { toast } from "react-toastify";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { close } from "@/lib/slices/appSlice";
 
 type FormValues = {
   email: string;
 };
 function DynamicAuthMethods() {
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { publicKey, signMessage, connected, wallets, select } = useWallet();
+  const { wallets, select } = useWallet();
   const {
     register,
     handleSubmit,
@@ -31,6 +33,7 @@ function DynamicAuthMethods() {
       return 0;
     }
   });
+  const dispatch = useDispatch();
 
   const submit = async (data: FormValues) => {
     if (!magic) {
@@ -44,14 +47,13 @@ function DynamicAuthMethods() {
         email: data.email,
         showUI: true,
       });
-      console.log({ didToken });
 
       await signIn("magic-link", {
         didToken,
         callbackUrl: window.location.href,
       });
-
       setLoading(false);
+      dispatch(close());
     } catch (error) {
       console.log({ error });
       toast.error("There was an error logging in");

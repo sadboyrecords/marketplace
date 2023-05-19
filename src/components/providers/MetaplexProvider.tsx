@@ -28,6 +28,7 @@ import {
   type UpdateCandyMachineOutput,
   keypairIdentity,
   derivedIdentity,
+  guestIdentity,
 } from "@metaplex-foundation/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import {
@@ -51,6 +52,7 @@ type MintType = {
   quantityString: number;
   label: string;
   candyMachineId: string;
+  refetchTheseIds?: string[];
 };
 
 interface CandyMachineState {
@@ -109,10 +111,18 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
   const { connection } = useConnection();
 
   const wallet = useWallet();
-  let mx = useMemo(
+  const publicAddress = useSelector(selectPublicAddress);
+  const mx = useMemo(
     () => Metaplex.make(connection).use(walletAdapterIdentity(wallet)),
     [connection, wallet]
   );
+
+  useEffect(() => {
+    if (publicAddress && publicAddress !== wallet.publicKey?.toBase58()) {
+      mx.use(guestIdentity(new PublicKey(publicAddress)));
+    }
+  }, [mx, publicAddress, wallet]);
+
   const candyMutation = api.candyMachine.update.useMutation();
   const updateTotalMinted = api.candyMachine.updatetotalMinted.useMutation();
   const [solUsdPrice, setSolUsdPrice] = React.useState<number | null>(null);
@@ -140,44 +150,38 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
   //   remaining: 0,
   //   redeemed: 0,
   // });
-  const publicAddress = useSelector(selectPublicAddress);
 
-  const getUserBalance = async (publicAddress?: string) => {
-    // if (!wallet?.publicKey) return;
-    if (!session || !session.user.walletAddress) return;
+  const getUserBalance = useCallback(
+    async (publicAddress?: string) => {
+      // if (!wallet?.publicKey) return;
+      if (!session || !session.user.walletAddress) return;
+      let userBalanceLamport = 0;
+      if (!publicAddress) {
+        userBalanceLamport = await connection.getBalance(
+          new web3.PublicKey(session.user.walletAddress)
+        );
+      }
+      if (publicAddress) {
+        userBalanceLamport = await connection.getBalance(
+          new web3.PublicKey(publicAddress)
+        );
+      }
+      const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
 
-    // const userBalanceLamport = await mx.connection.getBalance(
-    //   wallet?.publicKey
-    // );
-    // connection.getBalance(pubKey).then((bal) => setBalance(bal / 1000000000));
-    let userBalanceLamport = 0;
-    if (!publicAddress) {
-      userBalanceLamport = await connection.getBalance(
-        new web3.PublicKey(session.user.walletAddress)
-      );
-    }
-    if (publicAddress) {
-      userBalanceLamport = await connection.getBalance(
-        new web3.PublicKey(publicAddress)
-      );
-    }
-    // const pubKey = new web3.PublicKey(
-    //   "DTQfkPeZ9TN6ZEhhA99LSBAUAW4FRs6tSbUXhCkcVspU"
-    // );
-    // const userBalanceLamport = await connection.getBalance(pubKey);
-    const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
-
-    setWalletBalance(Number(userBalance.toFixed(2)));
-    // return userBalance;
-  };
+      setWalletBalance(Number(userBalance.toFixed(2)));
+      // return userBalance;
+    },
+    [connection, session]
+  );
   // const getMagic = async () => {
   //   const metadata = await magic.user.getMetadata();
   //   console.log("-----metadata----", metadata);
   // };
   useEffect(() => {
-    // void getMagic();
-    // const userBalance = await mx.rpc().getBalance()
-  }, []);
+    if (publicAddress) {
+      void getUserBalance(publicAddress);
+    }
+  }, [getUserBalance, publicAddress]);
 
   const checkEligibility = async (
     guard: DefaultCandyGuardSettings,
@@ -434,6 +438,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
     return { ...eligibility, inEligibleReasons };
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleGuardsSummary = async (cndyInput: CandyMachine) => {
     if (!cndyInput) return;
 
@@ -521,12 +526,13 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
           },
         };
       }
-
-      if (wallet?.connected && wallet?.publicKey) {
+      // (wallet?.connected && wallet?.publicKey) ||
+      if (publicAddress) {
         const e = await checkEligibility(
           g.guards,
           cndyInput,
-          wallet.publicKey,
+          new web3.PublicKey(publicAddress),
+          // wallet.publicKey,
           g.label
         );
 
@@ -543,37 +549,40 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
     return eligibility;
   };
 
-  const fetchCandyMachineById = async (id: string) => {
-    const key = new PublicKey(id);
-    const solPrice = await getSolUsdPrice();
-    setSolUsdPrice(solPrice);
-    await mx
-      ?.candyMachines()
-      .findByAddress({
-        address: key,
-      })
-      .then(async (cndy) => {
-        const eligibility = await handleGuardsSummary(cndy);
+  const fetchCandyMachineById = useCallback(
+    async (id: string) => {
+      const key = new PublicKey(id);
+      const solPrice = await getSolUsdPrice();
+      setSolUsdPrice(solPrice);
+      await mx
+        ?.candyMachines()
+        .findByAddress({
+          address: key,
+        })
+        .then(async (cndy) => {
+          const eligibility = await handleGuardsSummary(cndy);
 
-        setCandyMachines((prevState) => {
-          const updated = { ...prevState };
-          updated[id] = {
-            ...updated[id],
-            candyMachine: cndy,
-            items: {
-              available: cndy.itemsAvailable.toNumber(),
-              remaining: cndy.itemsRemaining.toNumber(),
-              redeemed: cndy.itemsMinted.toNumber(),
-            },
-            guardsAndEligibility: eligibility,
-          };
+          setCandyMachines((prevState) => {
+            const updated = { ...prevState };
+            updated[id] = {
+              ...updated[id],
+              candyMachine: cndy,
+              items: {
+                available: cndy.itemsAvailable.toNumber(),
+                remaining: cndy.itemsRemaining.toNumber(),
+                redeemed: cndy.itemsMinted.toNumber(),
+              },
+              guardsAndEligibility: eligibility,
+            };
 
-          return updated;
-        });
-        return cndy;
-      })
-      .catch((e) => console.error("Error while fetching candy machine", e));
-  };
+            return updated;
+          });
+          return cndy;
+        })
+        .catch((e) => console.error("Error while fetching candy machine", e));
+    },
+    [handleGuardsSummary, mx]
+  );
 
   // const updateCandyMachine = async (input: IMint) => {
   //   // todo update back end
@@ -737,26 +746,23 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
       tx,
       serializeConfig
     );
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const transaction = web3.Transaction.from(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       signedTransaction?.rawTransaction
     );
-    console.log({ signedTransaction, transaction });
-    // const signature = await connection.sendRawTransaction(tx.serialize(),{
-
-    // });
-    // console.log({ signature });
-    //               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
+    console.log({ signedTransaction, transaction, tx });
+    transaction?.signatures?.forEach((s) => {
+      console.log({ sig: s?.publicKey?.toBase58() });
+    });
 
     // add missing signers from original transaction to the newly created one
     const missingSigners = transaction.signatures
       .filter((s) => !s?.signature)
       .map((s) => s.publicKey);
-    console.log({ missingSigners, tx });
     missingSigners.forEach((publicKey) => {
-      console.log({ publicKey, keybase: publicKey.toBase58() });
       const signature = tx?.signatures.find((s) => {
         console.log({ s });
         return publicKey.equals(s.publicKey);
@@ -767,47 +773,46 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
       // @ts-ignore
       if (signature) transaction.addSignature(publicKey, signature?.signature);
     });
+    console.log({ updatedTx: transaction });
+
+    // const updatedSignatures = transaction.signatures.filter(
+    //   (s) => s?.signature
+    // );
+    // const updateTransaction = transaction;
+    // updateTransaction.signatures = updatedSignatures;
+    // .addSignatures(updatedSignatures)
+    // console.log({ updatedSignatures, updateTransaction });
+    // const signature = await connection.sendRawTransaction(
+    //   transaction.serialize(),
+    //   {}
+    // );
+    // console.log({ signature });
+    //               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
 
     return transaction;
     // return signedTransaction
   }
 
   const mint = React.useCallback(
-    async ({ quantityString, label, candyMachineId }: MintType) => {
-      // if (!guardsAndEligibility[opts.groupLabel || 'default'])
-      //   throw new Error('Unknown guard group label');
+    async ({
+      quantityString,
+      label,
+      candyMachineId,
+      refetchTheseIds,
+    }: MintType) => {
       if (!candyMachineId || !candyMachines)
         throw new Error("No candy machine id provided");
       const candy = candyMachines[candyMachineId];
       console.log({ candyMachines, candy });
       if (!candy || !candy.candyMachine)
         throw new Error("No candy machine found for id");
-      // const
+
       const found = candy.guardsAndEligibility?.find((g) => g.label === label);
-      console.log({ found });
+
       if (!found) throw new Error("Unknown guard group label");
 
-      const nfts: (Sft | SftWithToken | Nft | NftWithToken)[] = [];
       try {
         if (!candy) throw new Error("Candy Machine not loaded yet!");
-
-        // const transactionBuilders: TransactionBuilder[] = [];
-
-        // for (let index = 0; index < quantityString; index++) {
-        //   transactionBuilders.push(
-        //     await mintFromCandyMachineBuilder(mx, {
-        //       candyMachine,
-        //       collectionUpdateAuthority: candyMachine.authorityAddress, // mx.candyMachines().pdas().authority({candyMachine: candyMachine.address})
-        //       group: label,
-        //     })
-        //   );
-        // }
-        console.log("--minting--");
-        // mx.connection.
-        if (session?.user?.provider === authProviderNames.magic) {
-          mx = Metaplex.make(connection); //.use(keypairIdentity()); //.use(walletAdapterIdentity(wallet))
-        }
-
         const transactionBuilders = await Promise.all(
           new Array(quantityString).fill(0).map(() =>
             mx
@@ -826,7 +831,6 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
               })
           )
         );
-        console.log({ transactionBuilders });
 
         const mints = transactionBuilders.map((tb) => {
           console.log({ tb });
@@ -836,92 +840,45 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
             tokenAddress: tb.getContext().tokenAddress,
           };
         });
-        // const blockhash = await mx.rpc().getLatestBlockhash();
+
         const blockhash = await connection.getLatestBlockhash();
         let signedTransactions: web3.Transaction[] | undefined = [];
 
         if (magic && session?.user?.provider === authProviderNames.magic) {
           const payer = new web3.PublicKey(publicAddress || "");
 
-          const transactionMagic = new web3.Transaction({
-            feePayer: payer,
-            recentBlockhash: blockhash.blockhash,
-          });
-          console.log({ transactionMagic });
-          // const tx = transactionBuilders.map((t, ix) => {
-          //   const tx = t.toTransaction(blockhash);
-          //   tx.sign(mints[ix]?.mintSigner as Signer);
-          //   return tx;
-          // });
-          // signedTransactions = await wallet?.signAllTransactions?.(
-          //   transactionBuilders.map((t, ix) => {
-          //     const tx = t.toTransaction(blockhash);
-          //     tx.sign(mints[ix]?.mintSigner as Signer);
-          //     return tx;
-          //   })
-          // );
           const tx = transactionBuilders.map((t, ix) => {
             const tx = t.toTransaction(blockhash);
+            tx.feePayer = payer;
+            console.log({ tx });
             tx.sign(mints[ix]?.mintSigner as Signer);
-            // tx.feePayer = payer;
+
+            tx.signatures.forEach((s) =>
+              console.log({ sigPkey: s.publicKey.toBase58() })
+            );
             return tx;
           });
-          console.log({ transactionMagic, tx });
-
-          const signed = await Promise.all(
+          signedTransactions = await Promise.all(
             tx.map(async (t) => {
-              const txn = transactionMagic.add(...[t]);
-              console.log({ txn });
+              // t.partialSign(web3.Keypair.generate());
+              // const txn = transactionMagic.add(...[t]);
+              console.log({ t });
               // transactionMagic.partialSign();
 
               // transactionMagic.partialSign(web3.Keypair.generate());
-              return await signTransaction(txn);
+              return await signTransaction(t);
             })
           );
-          console.log({ signed });
-          const output = await Promise.all(
-            signed.map((tx, i) => {
-              console.log({ tx });
-              return mx
-                .rpc()
-                .sendAndConfirmTransaction(tx, { commitment: "finalized" })
-                .then((tx) => {
-                  console.log({ txthen: tx });
-                  return {
-                    ...tx,
-                    context: transactionBuilders[i]?.getContext() as unknown,
-                  };
-                })
-                .catch((e) => {
-                  console.log({ e });
-                  throw new Error("Error Sending Transaction");
-                });
-            })
-          );
-          console.log({ output });
-
-          // transactionMagic.add(...[...tx]);
-
-          // const signedTransaction = await magic.solana.signTransaction(
-          //   transactionMagic,
-          //   serializeConfig
-          // );
-          // console.log({ signedTransaction });
-
-          // signedTransactions = [magicSign];
-          // console.log({ signedTransactions });
-
-          // const signature = await connection.sendRawTransaction(
-          //   transaction.serialize()
-          // );
-          // console.log({ signature });
-          return;
-          // signedTransactions = await magic.solana.signTransaction
         } else {
           signedTransactions = await wallet?.signAllTransactions?.(
             transactionBuilders.map((t, ix) => {
               const tx = t.toTransaction(blockhash);
+              console.log({ tx });
               tx.sign(mints[ix]?.mintSigner as Signer);
+              tx.signatures.forEach((s) =>
+                console.log({ sigPkey: s.publicKey.toBase58() })
+              );
+              console.log({ tx, mintSigner: mints[ix]?.mintSigner });
               return tx;
             })
           );
@@ -976,7 +933,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
                 mintAddress: c?.mintSigner?.publicKey,
                 tokenAddress: c?.tokenAddress,
               })
-              .catch((e) => null);
+              .catch(() => null);
           })
         );
 
@@ -995,7 +952,13 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
           console.log({ error });
         }
         await fetchCandyMachineById(candy.candyMachine.address.toBase58());
+        if (refetchTheseIds) {
+          await Promise.all(
+            refetchTheseIds.map((id) => fetchCandyMachineById(id))
+          );
+        }
         return { nftData: data, signatures };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         console.log({ error });
         let message = "Minting failed! Please try again!";
@@ -1028,7 +991,17 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
     },
     // candyMachines, guardsAndEligibility, mx, wallet?.publicKey
     // fetchCandyMachineById
-    [candyMachines, mx, updateTotalMinted, wallet]
+    [
+      candyMachines,
+      connection,
+      fetchCandyMachineById,
+      mx,
+      publicAddress,
+      session?.user?.provider,
+      updateTotalMinted,
+      wallet,
+    ]
+    //  [candyMachines, mx, updateTotalMinted, wallet]
   );
 
   const memoedValue = React.useMemo(() => {

@@ -14,7 +14,7 @@ import { SigninMessage } from "@/utils/SignMessage";
 import { getCsrfToken } from "next-auth/react";
 import { type NextApiRequest } from "next";
 import { adminWallets } from "@/utils/constants";
-import { Magic } from "@magic-sdk/admin";
+import { Magic, WalletType } from "@magic-sdk/admin";
 import { authProviderNames } from "@/utils/constants";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -32,6 +32,7 @@ declare module "next-auth" {
       isAdmin?: boolean;
       isSuperAdmin?: boolean;
       provider?: string;
+      magicSolanaAddress?: string;
       // ...other properties
       // role: UserRole;
     } & DefaultSession["user"];
@@ -131,6 +132,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       async authorize(credentials) {
         // console.log("----AUTHORIZING----")
         try {
+          if (!credentials?.didToken) return null;
           magic.token.validate(credentials?.didToken || "");
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const metadata = await magic.users.getMetadataByToken(
@@ -143,6 +145,24 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
           // magic.users.
           //  magic.token.
 
+          const walletData = await magic.users.getMetadataByTokenAndWallet(
+            credentials?.didToken || "",
+            WalletType.SOLANA
+          );
+
+          console.log({ walletData });
+          walletData.wallets?.forEach((wallet) => {
+            console.log({ wallet });
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const solanaAddress = walletData.wallets?.find(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            (wallet) => wallet.wallet_type === WalletType.SOLANA
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+          )?.public_address as string;
+          console.log({ solanaAddress });
           const data = {
             id: metadata.publicAddress as string,
             walletAddress: metadata.publicAddress as string,
@@ -151,6 +171,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
             phoneNumber: metadata.phoneNumber as string | null | undefined,
             provider: authProviderNames.magic,
             issuer: metadata.issuer,
+            magicSolanaAddress: solanaAddress,
           };
 
           return data;
@@ -215,16 +236,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
         token.isAdmin = isAdmin;
         return token;
       },
-      session: ({ session, token, user }) => {
-        console.log({ session, token, user });
-        // session
-        // let isAdmin = false;
-        // if (token.sub && adminWallets.includes(token.sub)) {
-        //   isAdmin = true;
-        // }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // session.user = token?.user;
+      session: ({ session, token }) => {
         session = {
           ...session,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

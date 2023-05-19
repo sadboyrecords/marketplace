@@ -30,7 +30,8 @@ type CreateContextOptions = {
           walletAddress?: string;
           isAdmin?: boolean;
           isSuperAdmin?: boolean;
-          provier?: string;
+          provider?: string;
+          magicSolanaAddress?: string;
         };
       })
     | null;
