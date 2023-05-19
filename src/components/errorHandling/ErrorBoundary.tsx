@@ -1,5 +1,10 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
-import ErrorFallback from "./ErrorFallback";
+// import ErrorFallback from "./ErrorFallback";
+import dynamic from "next/dynamic";
+
+const ErrorFallback = dynamic(() => import("./ErrorFallback"), {
+  ssr: false,
+});
 
 interface Props {
   children?: ReactNode;

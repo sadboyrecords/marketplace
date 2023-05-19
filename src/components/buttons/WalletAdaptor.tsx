@@ -3,14 +3,13 @@ require("@solana/wallet-adapter-react-ui/styles.css");
 import { useWallet } from "@solana/wallet-adapter-react";
 
 import base58 from "bs58";
-import React, { useCallback } from "react";
+import React from "react";
 import Button from "@/components/buttons/Button";
 import { SigninMessage } from "@/utils/SignMessage";
-import { getCsrfToken, signIn, signOut, useSession } from "next-auth/react";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
-import { magic } from "@/lib/magic";
 
 import {
   selectAuthModal,
@@ -19,7 +18,6 @@ import {
   setPublicAddress,
 } from "@/lib/slices/appSlice";
 import { useSelector, useDispatch } from "react-redux";
-import { authProviderNames } from "@/utils/constants";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,

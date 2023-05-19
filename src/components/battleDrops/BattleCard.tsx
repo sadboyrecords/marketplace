@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Typography from "@/components/typography";
-import { type inferRouterOutputs } from "@trpc/server";
-import { type AppRouter } from "@/server/api/root";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
 import AvatarImage from "@/components/avatar/Avatar";
 import GeneralLikes from "@/components/likes-plays/GeneralLikes";
@@ -30,8 +28,6 @@ import dynamic from "next/dynamic";
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
 });
-
-type RouterOutput = inferRouterOutputs<AppRouter>;
 
 type BattleCardProps = {
   index: number;

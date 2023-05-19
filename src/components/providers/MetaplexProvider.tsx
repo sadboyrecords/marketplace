@@ -12,22 +12,10 @@ import React, {
 import {
   type CandyMachine,
   Metaplex,
-  // mintFromCandyMachineBuilder,
-  type Nft,
-  type NftWithToken,
   PublicKey,
-  type Sft,
-  type SftWithToken,
   // TransactionBuilder,
   walletAdapterIdentity,
   type DefaultCandyGuardSettings,
-  sol,
-  toBigNumber,
-  toDateTime,
-  type IdentitySigner,
-  type UpdateCandyMachineOutput,
-  keypairIdentity,
-  derivedIdentity,
   guestIdentity,
 } from "@metaplex-foundation/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -35,7 +23,6 @@ import {
   // CandyMachineUpdateType,
   type GuardsAndEligibilityType,
   type AllGuardsType,
-  type IMint,
   type MintResponseType,
 } from "@/utils/types";
 import { LAMPORTS_PER_SOL, type Signer } from "@solana/web3.js";
@@ -107,7 +94,11 @@ export function useMetaplex() {
   return useContext(MetaplexContext);
 }
 
-export function MetaplexProvider({ children }: { children: React.ReactNode }) {
+export default function MetaplexProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { connection } = useConnection();
 
   const wallet = useWallet();
@@ -123,7 +114,7 @@ export function MetaplexProvider({ children }: { children: React.ReactNode }) {
     }
   }, [mx, publicAddress, wallet]);
 
-  const candyMutation = api.candyMachine.update.useMutation();
+  // const candyMutation = api.candyMachine.update.useMutation();
   const updateTotalMinted = api.candyMachine.updatetotalMinted.useMutation();
   const [solUsdPrice, setSolUsdPrice] = React.useState<number | null>(null);
   const [walletBalance, setWalletBalance] = React.useState<number | null>();
