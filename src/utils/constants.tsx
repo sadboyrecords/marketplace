@@ -125,3 +125,8 @@ export const cdnUrl = process.env.NEXT_PUBLIC_CDN_URL || "";
 // export const liveIpfsGateway = 'https://niftytunes.myfilebase.com/ipfs/';
 
 // export const liveIpfsGateway = 'https://niftytunes.b-cdn.net/ipfs/';
+
+export const authProviderNames = {
+  magic: "magic-link",
+  solana: "solana-auth",
+};

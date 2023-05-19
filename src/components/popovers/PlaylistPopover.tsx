@@ -131,7 +131,6 @@ const PlaylistPopover = ({
                             } group flex w-full items-center rounded-md px-4 py-4 text-sm
                                                           `}
                             onClick={handleAddToPlaylist}
-                            // disabled={!publicKey}
                             onBlur={() => setIsOpen(false)}
                           >
                             Add to Playlist

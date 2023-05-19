@@ -1,37 +1,59 @@
 // import { useEffect } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 require("@solana/wallet-adapter-react-ui/styles.css");
+import { useWallet } from "@solana/wallet-adapter-react";
+
 import base58 from "bs58";
-import React, { useEffect } from "react";
+import React from "react";
 import Button from "@/components/buttons/Button";
 import { SigninMessage } from "@/utils/SignMessage";
-import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
+import { getCsrfToken, signIn, useSession } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
 
-const AvataterNav = dynamic(() => import("@/components/buttons/AvataterNav"), {
+import {
+  selectAuthModal,
+  open,
+  close,
+  setPublicAddress,
+} from "@/lib/slices/appSlice";
+import { useSelector, useDispatch } from "react-redux";
+
+const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
+  ssr: false,
+});
+const DynamicAuthMethods = dynamic(
+  () => import("@/components/auth/DynamicAuthMethods"),
+  {
+    ssr: false,
+  }
+);
+
+const AvatarNav = dynamic(() => import("@/components/buttons/AvatarNav"), {
   ssr: false,
 });
 
 export default function WalletAdaptor() {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { publicKey, signMessage, disconnect, connected } = useWallet();
-  // console.log({ publicKey: publicKey?.toBase58(), connected });
-  const { setVisible, visible } = useWalletModal();
+
+  const dispatch = useDispatch();
+
+  const authModal = useSelector(selectAuthModal);
 
   const { data: session, status } = useSession();
   const loading = status === "loading";
 
-  api.user.myProfile.useQuery(undefined, {
+  const { data: userInfo, refetch } = api.user.myProfile.useQuery(undefined, {
     enabled: !!session,
     staleTime: 1000 * 10,
   });
 
+  const userMutation = api.user.updateUser.useMutation();
+
   const handleSignIn = React.useCallback(async () => {
     if (!publicKey) {
-      setVisible(true);
+      dispatch(open());
       return;
     }
     try {
@@ -59,6 +81,7 @@ export default function WalletAdaptor() {
         redirect: false,
         callbackUrl: window.location.href,
       });
+      dispatch(close());
       if (!res) {
         console.log("NO RES");
         await disconnect();
@@ -96,16 +119,35 @@ export default function WalletAdaptor() {
     // }
     // connected,
   }, [connected, handleSignIn, status]);
-  // console.log({ session, status, connected });
+
+  React.useEffect(() => {
+    if (!session) {
+      dispatch(setPublicAddress(null));
+    }
+    dispatch(
+      setPublicAddress(
+        session?.user?.magicSolanaAddress ||
+          (session?.user.walletAddress as string)
+      )
+    );
+  }, [dispatch, session]);
 
   return (
     <>
+      <GenericModal
+        closeModal={() => dispatch(close())}
+        title="Log In/Sign Up"
+        isOpen={authModal}
+      >
+        {/* <WalletMultiButton /> */}
+        <DynamicAuthMethods />
+      </GenericModal>
       {!session && !loading && (
-        <Button loading={loading} size="sm" onClick={() => setVisible(true)}>
+        <Button loading={loading} size="sm" onClick={() => dispatch(open())}>
           Sign In
         </Button>
       )}
-      {session && <AvataterNav />}
+      {session && <AvatarNav />}
     </>
   );
 }

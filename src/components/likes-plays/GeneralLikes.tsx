@@ -7,6 +7,9 @@ import { api } from "@/utils/api";
 import Typography from "@/components/typography";
 import Button from "@/components/buttons/Button";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { selectPublicAddress } from "@/lib/slices/appSlice";
 
 function GeneralLikes({
   hideNumber = false,
@@ -23,7 +26,6 @@ function GeneralLikes({
   isPrimary?: boolean;
   padding?: "none" | "xs" | "sm";
 }) {
-  const { publicKey } = useWallet();
   const likeMutation = api.likes.likeSong.useMutation();
   const { data: songLikes, refetch } = api.likes.getLikesBySongId.useQuery(
     {
@@ -34,14 +36,16 @@ function GeneralLikes({
       staleTime: 4000,
     }
   );
-  const userHasLiked = songLikes?.find(
-    (l) => l.userWallet === publicKey?.toBase58()
-  );
 
   const [liking, setLiking] = useState(false);
+  const { data: session } = useSession();
+
+  const userHasLiked = songLikes?.find(
+    (l) => l.userWallet === session?.user?.walletAddress
+  );
 
   const handleLikeUnlike = async () => {
-    if (!publicKey) {
+    if (!session) {
       toast.warn("Please sign in.");
       return;
     }
@@ -77,30 +81,6 @@ function GeneralLikes({
   //   );
 
   //   const dropLikeMutation = api.candyMachine.likeUnlikeDrop.useMutation();
-
-  //   const handleLikeUnlike = async () => {
-  //     if (!publicKey) {
-  //       toast.error("Connect your wallet first");
-  //       return;
-  //     }
-  //     if (!candyMachineId) return;
-  //     try {
-  //       const newLike = !userLikes?.isLiked;
-  //       console.log({ newLike });
-  //       await dropLikeMutation.mutateAsync({
-  //         isLiked: newLike,
-  //         userWallet: publicKey?.toBase58(),
-  //         candyMachineId: candyMachineId,
-  //       });
-  //       await utils.candyMachine.getLikesByUser.invalidate({
-  //         candyMachineId: candyMachineId,
-  //         walletAddress: publicKey?.toBase58(),
-  //       });
-  //     } catch (error) {
-  //       console.log({ error });
-  //       toast.error("Sorry something went wrong");
-  //     }
-  //   };
 
   return (
     <>

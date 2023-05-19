@@ -5,7 +5,7 @@
 import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useSession } from "next-auth/react";
 import Typography from "@/components/typography";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
@@ -26,14 +26,15 @@ export default function PlaylistModal({
   const [internalOpen, setInternalOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
 
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
+  const { data: session } = useSession();
   const { data: playlists, refetch: refetchPlaylists } =
     api.playlist.getPlaylistByUser.useQuery(
       {
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
       },
       {
-        enabled: !!publicKey,
+        enabled: !!session?.user?.walletAddress,
       }
     );
 
@@ -55,7 +56,7 @@ export default function PlaylistModal({
   }
 
   const handleCreatePlaylist = async () => {
-    if (!publicKey)
+    if (!session?.user?.walletAddress)
       return toast.error("You must connect your wallet to create a playlist");
     const loadId = toast.loading("Creating playlist...");
     try {
@@ -64,7 +65,7 @@ export default function PlaylistModal({
 
       const newPlaylist = await createPlaylistWithTracks.mutateAsync({
         playlistName: newName,
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
         trackId: songId,
       });
       toast.update(loadId, {
@@ -123,7 +124,7 @@ export default function PlaylistModal({
       await addTokenToPlaylistMutation.mutateAsync({
         playlistId: playlist?.id,
         trackId: songId,
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
       });
       // refetchPlaylists();
       toast.update(toastId, {
@@ -167,7 +168,7 @@ export default function PlaylistModal({
       await removeTokenFromPlaylistMutation.mutateAsync({
         playlistId,
         trackId: songId,
-        walletAddress: publicKey?.toBase58() || "",
+        walletAddress: session?.user?.walletAddress || "",
       });
       void refetchPlaylists();
       toast.update(toastId, {

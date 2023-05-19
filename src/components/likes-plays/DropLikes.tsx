@@ -4,7 +4,7 @@ import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
 import Button from "@/components/buttons/Button";
 import { toast } from "react-toastify";
 import { abbreviateNumber } from "@/utils/helpers";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useSession } from "next-auth/react";
 import { api } from "@/utils/api";
 import Typography from "@/components/typography";
 
@@ -21,9 +21,10 @@ function DropLikes({
   isPrimary?: boolean;
   padding?: "none" | "xs" | "sm";
 }) {
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
   const utils = api.useContext();
-  const publicKeyString = publicKey?.toBase58() || null;
+  const { data: session } = useSession();
+  const publicKeyString = session?.user?.walletAddress || null;
 
   const { data: userLikes } = api.candyMachine.getLikesByUser.useQuery(
     {
@@ -38,7 +39,7 @@ function DropLikes({
   const dropLikeMutation = api.candyMachine.likeUnlikeDrop.useMutation();
 
   const handleLikeUnlike = async () => {
-    if (!publicKey) {
+    if (!session?.user?.walletAddress) {
       toast.error("Connect your wallet first");
       return;
     }
@@ -48,12 +49,12 @@ function DropLikes({
       console.log({ newLike });
       await dropLikeMutation.mutateAsync({
         isLiked: newLike,
-        userWallet: publicKey?.toBase58(),
+        userWallet: session?.user?.walletAddress,
         candyMachineId: candyMachineId,
       });
       await utils.candyMachine.getLikesByUser.invalidate({
         candyMachineId: candyMachineId,
-        walletAddress: publicKey?.toBase58(),
+        walletAddress: session?.user?.walletAddress,
       });
     } catch (error) {
       console.log({ error });

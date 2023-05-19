@@ -71,7 +71,7 @@ function DropHead() {
           size="body"
           className="text-center uppercase tracking-[0.2rem]"
         >
-          {battle ? text : "Coming Soon"}
+          {!isLoading && <>{battle ? text : "Coming Soon"}</>}
         </Typography>
         {battle && (
           <Countdown

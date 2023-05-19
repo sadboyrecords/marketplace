@@ -45,7 +45,12 @@ function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
       {/* grid auto-cols-max grid-flow-col-dense  gap-4 md:grid-cols-3 */}
       {/* grid-cols-1 md:grid-cols-3 */}
       <div className=" w-full  lg:w-5/12 ">
-        <BattleCard index={0} battle={data} totalPot={totalPot} />
+        <BattleCard
+          index={0}
+          competitorIndex={1}
+          battle={data}
+          totalPot={totalPot}
+        />
       </div>
 
       <div className="flex flex-col items-center justify-between">
@@ -83,7 +88,12 @@ function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
       </div>
       <div className="h-full w-full  lg:w-5/12 ">
         {/* flex-auto */}
-        <BattleCard index={1} battle={data} totalPot={totalPot} />
+        <BattleCard
+          index={1}
+          competitorIndex={0}
+          battle={data}
+          totalPot={totalPot}
+        />
       </div>
     </div>
   );

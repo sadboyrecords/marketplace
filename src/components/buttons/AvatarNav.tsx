@@ -13,30 +13,29 @@ import { routes } from "@/utils/constants";
 import { useMetaplex } from "../providers/MetaplexProvider";
 import { SolIcon } from "../iconComponents";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
+import { magic } from "@/lib/magic";
+import { selectPublicAddress } from "@/lib/slices/appSlice";
+import { useSelector } from "react-redux";
+
 // import ShieldCheckIcon from "@heroicons/react/24/outline/ShieldCheckIcon";
 
-function AvataterNav() {
+function AvatarNav() {
   const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { disconnect } = useWallet();
-  const { getUserBalance, walletBalance } = useMetaplex();
+  const { walletBalance } = useMetaplex();
   const [copied, setCopied] = useState<boolean>();
 
   const { data, isLoading } = api.user.myProfile.useQuery(undefined, {
     enabled: !!session,
     staleTime: 1000 * 10,
   });
-
-  useEffect(() => {
-    if (session) {
-      void getUserBalance();
-    }
-  }, [getUserBalance, session]);
+  const publicAddress = useSelector(selectPublicAddress);
 
   const handleCopy = () => {
-    if (!session?.user?.walletAddress) return;
+    if (!publicAddress) return;
     navigator.clipboard
-      .writeText(session?.user?.walletAddress)
+      .writeText(publicAddress)
       .then(() => {
         setCopied(true);
         setTimeout(() => {
@@ -63,6 +62,8 @@ function AvataterNav() {
   const handleLogout = async () => {
     void disconnect();
     await signOut();
+    if (magic) await magic.user.logout();
+    // await magic.user.logout();
     return;
   };
   return (
@@ -111,42 +112,56 @@ function AvataterNav() {
                 sizes="50px"
                 pinnedStatus={data?.pinnedProfilePicture?.status}
               />
-              <div className="items-center">
-                <Typography size="body" className=" font-semibold">
-                  {data?.name ||
-                    data?.firstName ||
-                    `${data?.walletAddress?.slice(
-                      0,
-                      5
-                    )}...${data?.walletAddress.slice(-4)}`}
-                </Typography>
-                <div
-                  className={`${
-                    copied ? "tooltip-open tooltip tooltip-bottom" : ""
-                  }  cursor-pointer`}
-                  data-tip="Copied"
-                  onClick={handleCopy}
-                >
-                  <Typography
-                    type="div"
-                    size="body-xs"
-                    color="neutral-gray"
-                    className="flex"
-                  >
-                    {`${data?.walletAddress?.slice(
-                      0,
-                      5
-                    )}...${data?.walletAddress.slice(-4)}`}
-
-                    <CopyIcon className="ml-1 h-4 w-4" />
-                    <div className="ml-2 flex items-center space-x-1">
-                      {" "}
-                      (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
-                      {walletBalance} )
-                    </div>
+              {!publicAddress && <div className="loading btn-ghost btn" />}
+              {publicAddress && (
+                <div className="items-center">
+                  <Typography size="body" className=" font-semibold">
+                    {data?.name ||
+                      data?.firstName ||
+                      (publicAddress &&
+                        `${publicAddress?.slice(0, 5)}...${publicAddress?.slice(
+                          -4
+                        )}`) ||
+                      ""}
                   </Typography>
+                  <div
+                    className={`${
+                      copied ? "tooltip-open tooltip tooltip-bottom" : ""
+                    }  cursor-pointer`}
+                    data-tip="Copied"
+                    onClick={handleCopy}
+                  >
+                    <Typography
+                      type="div"
+                      size="body-xs"
+                      color="neutral-gray"
+                      className="flex"
+                    >
+                      {publicAddress &&
+                        `${publicAddress?.slice(0, 5)}...${publicAddress.slice(
+                          -4
+                        )}`}
+
+                      <CopyIcon className="ml-1 h-4 w-7" />
+                      <div className="ml-1 flex w-full items-center space-x-1">
+                        {" "}
+                        (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
+                        {walletBalance?.toFixed(2)} )
+                      </div>
+                    </Typography>
+                  </div>
+                  {data?.email && (
+                    <Typography
+                      type="div"
+                      size="body-xs"
+                      color="neutral-gray"
+                      className="flex"
+                    >
+                      {data?.email}
+                    </Typography>
+                  )}
                 </div>
-              </div>
+              )}
             </div>
             <div className="px-1 py-1 ">
               <Menu.Item>
@@ -253,4 +268,4 @@ function AvataterNav() {
   );
 }
 
-export default AvataterNav;
+export default AvatarNav;

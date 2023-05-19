@@ -150,6 +150,9 @@ export const playlistRouter = createTRPCRouter({
   getPlaylistByUser: publicProcedure
     .input(z.object({ walletAddress: z.string() }))
     .query(async ({ input, ctx }) => {
+      if (!input.walletAddress) {
+        return null;
+      }
       const user = await ctx.prisma.user.findUnique({
         where: {
           walletAddress: input.walletAddress,

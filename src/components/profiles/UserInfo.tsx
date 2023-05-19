@@ -15,6 +15,8 @@ import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import Input from "@/components/formFields/Input";
 import TextArea from "@/components/formFields/TextArea";
+import { useSelector } from "react-redux";
+import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 type UserInfoProps = {
@@ -28,8 +30,6 @@ function UserInfo({ walletAddress }: UserInfoProps) {
       enabled: !!walletAddress,
     }
   );
-
-  const { publicKey: loggedInUserKey } = useWallet();
 
   const { data: user, refetch } = userData;
 
@@ -48,12 +48,17 @@ function UserInfo({ walletAddress }: UserInfoProps) {
   const [editing, setEditing] = useState(false);
   const [copied, setCopied] = useState(false);
   const { data: session } = useSession();
+  // const { publicKey: loggedInUserKey } = useWallet();
+  const loggedInUserKey = session?.user.walletAddress;
+  const publicAddress =
+    userData?.data?.magicSolanaAddress || userData?.data?.walletAddress;
   const disableSave = uploadingImage || uploadingAvatarImage;
   const imFollowing = userData?.data?.followers?.filter(
-    (f) => f?.followerAddress === loggedInUserKey?.toBase58()
+    (f) => f?.followerAddress === loggedInUserKey
   );
 
   const follow = api.user.followUnfollow.useMutation();
+  // console.log({ loggedInUserKey });
 
   const handleFollow = async () => {
     if (!walletAddress) return;
@@ -63,7 +68,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
       await follow.mutateAsync({
         followingAddress: walletAddress,
         isFollowing: followUser,
-        userAddress: loggedInUserKey?.toBase58() as string,
+        userAddress: loggedInUserKey as string,
       });
       // debugger;
       await refetch();
@@ -71,11 +76,11 @@ function UserInfo({ walletAddress }: UserInfoProps) {
         followUser
           ? `You're now following ${getCreatorname({
               name: user?.name || user?.firstName || "",
-              walletAddress: user?.walletAddress || "",
+              walletAddress: publicAddress || "",
             })}`
           : `You have unfollowed ${getCreatorname({
               name: user?.name || user?.firstName || "",
-              walletAddress: user?.walletAddress || "",
+              walletAddress: publicAddress || "",
             })}`
       );
       setIsLoading(false);
@@ -86,9 +91,9 @@ function UserInfo({ walletAddress }: UserInfoProps) {
   };
 
   const handleCopy = () => {
-    if (!walletAddress) return;
+    if (!publicAddress) return;
     navigator.clipboard
-      .writeText(walletAddress)
+      .writeText(publicAddress)
       .then(() => {
         setCopied(true);
         setTimeout(() => {
@@ -124,7 +129,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
       const updatedProfile = {
         name: data.name,
         description: data.description,
-        walletAddress: session?.user?.walletAddress,
+        walletAddress: session?.user.walletAddress,
         profileBannerImage: imageUrl,
         profileBannerHash: imageHash,
         profilePictureImage: avatarImageUrl,
@@ -228,10 +233,10 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                   height="150px"
                   widthNumber={150}
                   heightNumber={150}
-                  alt={user?.name || user?.firstName || user?.walletAddress}
+                  alt={user?.name || user?.firstName || publicAddress || ""}
                   pinnedStatus={user?.pinnedProfilePicture?.status}
                   username={
-                    user?.name || user?.firstName || user?.walletAddress
+                    user?.name || user?.firstName || publicAddress || ""
                   }
                   path={user?.pinnedProfilePicture?.path}
                   // mx-auto lg:ml-[3rem]
@@ -239,7 +244,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                 {/* follow button/edit/Cancel */}
                 {session?.user && (
                   <div className="mt-2 sm:w-full">
-                    {walletAddress !== loggedInUserKey?.toBase58() ? (
+                    {walletAddress !== loggedInUserKey ? (
                       <Button
                         className=" w-full"
                         onClick={handleFollow}
@@ -345,7 +350,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                       >
                         {getCreatorname({
                           name: user?.name || user?.firstName || "",
-                          walletAddress: user?.walletAddress,
+                          walletAddress: publicAddress || "",
                         })}
                         {/* {user?.firstName || walletAddress} */}
                       </Typography>
@@ -361,7 +366,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                         >
                           {getCreatorname({
                             name: "",
-                            walletAddress: user?.walletAddress,
+                            walletAddress: publicAddress || "",
                           })}
                           {/* {user?.firstName || walletAddress} */}
                         </Typography>
