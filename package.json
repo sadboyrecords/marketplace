@@ -42,6 +42,7 @@
     "@trpc/server": "^10.18.0",
     "@upstash/qstash": "^0.3.6",
     "@web3uikit/core": "^0.4.5",
+    "ably": "^1.2.39",
     "aws4": "^1.12.0",
     "axios": "^1.3.6",
     "borsh": "^0.7.0",

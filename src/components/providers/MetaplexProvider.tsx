@@ -9,23 +9,8 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import {
-  type CandyMachine,
-  Metaplex,
-  PublicKey,
-  // TransactionBuilder,
-  walletAdapterIdentity,
-  type DefaultCandyGuardSettings,
-  guestIdentity,
-} from "@metaplex-foundation/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import {
-  // CandyMachineUpdateType,
-  type GuardsAndEligibilityType,
-  type AllGuardsType,
-  type MintResponseType,
-} from "@/utils/types";
-import { LAMPORTS_PER_SOL, type Signer } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { api } from "@/utils/api";
 import { getSolUsdPrice } from "@/utils/rpcCalls";
 import { useSession } from "next-auth/react";
@@ -34,6 +19,22 @@ import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { useSelector } from "react-redux";
 import { authProviderNames } from "@/utils/constants";
 import { magic } from "@/lib/magic";
+import {
+  Metaplex,
+  PublicKey,
+  walletAdapterIdentity,
+  guestIdentity,
+} from "@metaplex-foundation/js";
+import { type Signer } from "@solana/web3.js";
+import {
+  type GuardsAndEligibilityType,
+  type AllGuardsType,
+  type MintResponseType,
+} from "@/utils/types";
+import {
+  type CandyMachine,
+  type DefaultCandyGuardSettings,
+} from "@metaplex-foundation/js";
 
 type MintType = {
   quantityString: number;
@@ -543,6 +544,9 @@ export default function MetaplexProvider({
   const fetchCandyMachineById = useCallback(
     async (id: string) => {
       const key = new PublicKey(id);
+
+      console.log({ id });
+
       const solPrice = await getSolUsdPrice();
       setSolUsdPrice(solPrice);
       await mx
@@ -571,6 +575,36 @@ export default function MetaplexProvider({
           return cndy;
         })
         .catch((e) => console.error("Error while fetching candy machine", e));
+
+      // await connection.logS
+      // const signatures = await connection.getSignaturesForAddress(key, {
+      //   limit: 1,
+      // });
+      // const mappedSig = signatures
+      //   .filter((s) => !s.err)
+      //   .map((sig) => sig.signature);
+      // const parsedTransactions = await connection.getParsedTransactions(
+      //   mappedSig,
+      //   {
+      //     maxSupportedTransactionVersion: 0,
+      //   }
+      // );
+
+      // const minted = parsedTransactions.filter((t) =>
+      //   t?.transaction?.message?.instructions?.find(
+      //     (int) => int?.parsed?.type === "mintTo"
+      //   )
+      // );
+      // const userAndNft = minted.map((m) => {
+      //   const int = m?.transaction?.message?.instructions?.find(
+      //     (int) => int?.parsed?.type === "mintTo"
+      //   );
+      //   return {
+      //     user: int?.parsed?.info?.mintAuthority,
+      //     nft: int?.parsed?.info?.mint,
+      //   };
+      // });
+      // console.log({ signatures, parsedTransactions, minted, userAndNft });
     },
     [handleGuardsSummary, mx]
   );

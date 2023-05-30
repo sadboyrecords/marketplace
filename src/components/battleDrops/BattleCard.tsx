@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import Typography from "@/components/typography";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
 import AvatarImage from "@/components/avatar/Avatar";
 import GeneralLikes from "@/components/likes-plays/GeneralLikes";
 import PlayButton from "@/components/likes-plays/PlayButton";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import SolIcon from "@/components/iconComponents/SolIcon";
 import { useSession } from "next-auth/react";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -24,6 +25,7 @@ import type {
   MintResponseType,
 } from "@/utils/types";
 import dynamic from "next/dynamic";
+import { api } from "@/utils/api";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -44,13 +46,8 @@ function BattleCard({
 }: BattleCardProps) {
   const { publicKey } = useWallet();
   const { data: session } = useSession();
-  const {
-    fetchCandyMachineById,
-    candyMachines,
-    mint,
-    solUsdPrice,
-    walletBalance,
-  } = useMetaplex();
+  const { fetchCandyMachineById, candyMachines, mint, solUsdPrice } =
+    useMetaplex();
   const draft = battle?.battleContestants[index]?.candyMachineDraft;
   const imageHash = battle?.battleContestants[index]?.candyMachineDraft
     ?.imageIpfsHash as string;
@@ -70,8 +67,91 @@ function BattleCard({
     ? battle?.battleContestants[competitorIndex]?.candyMachineDraft
         ?.candyMachineId
     : null;
+
+  const transactions = api.transaction.getCandyTransactions.useQuery(
+    {
+      candymachineId: candyMachineId || "",
+    },
+    {
+      enabled: !!candyMachineId,
+    }
+  );
+
+  // @ts-ignore
+  const supporters: {
+    [key: string]: {
+      walletAddress: string;
+      tokenAddress: string;
+      user: {
+        walletAddress: string;
+        pinnedProfilePicture: {
+          ipfsHash: string;
+          width: string;
+          height: string;
+          originalUrl: string;
+          path: string;
+          status: string;
+        };
+      };
+    }[];
+  } = transactions?.data?.reduce((acc, curr) => {
+    const { receiverWalletAddress } = curr;
+    // @ts-ignore
+    if (!acc[receiverWalletAddress as string]) {
+      // @ts-ignore
+      acc[receiverWalletAddress] = [];
+    }
+
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    acc[receiverWalletAddress].push({
+      walletAddress: curr?.receiverWalletAddress,
+      tokenAddress: curr?.tokenAddressReferenceOnly,
+      user: curr?.receiver,
+    });
+    console.log({ acc });
+    return acc;
+  }, {});
+
+  console.log({ supporters });
+  const updateTransactions = api.transaction.updateCandy.useMutation();
+
   const candyMachine = candyMachines?.[candyMachineId || ""];
-  console.log({ candyMachine });
+  // console.log({ transactions, candyMachine });
+
+  const handleUpdateTransaction = useCallback(async () => {
+    if (!candyMachineId || !candyMachine?.items?.redeemed) return null;
+    try {
+      const update = await updateTransactions.mutateAsync({
+        candymachineId: candyMachineId,
+        redeemed: candyMachine?.items?.redeemed,
+      });
+      if (update) {
+        await transactions.refetch();
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candyMachine?.items?.redeemed, candyMachineId]);
+
+  useEffect(() => {
+    if (
+      candyMachineId &&
+      candyMachine?.items?.redeemed &&
+      transactions.data &&
+      candyMachine?.items?.redeemed > transactions.data.length
+    ) {
+      console.log("-----update transaction------");
+      void handleUpdateTransaction();
+    }
+  }, [
+    candyMachine?.items?.redeemed,
+    transactions.data,
+    candyMachineId,
+    handleUpdateTransaction,
+  ]);
+
   const formSubmission = battle?.battleContestants[index]?.candyMachineDraft
     .formSubmission as IMint | undefined;
   const song =
@@ -233,7 +313,7 @@ function BattleCard({
           }
         />
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-shrink items-center justify-between">
         <div className="flex items-center space-x-2">
           <AvatarImage
             alt="artist profile picture"
@@ -242,10 +322,12 @@ function BattleCard({
           />
           <Typography> {artistName} </Typography>
         </div>
-        {/* <div className="flex flex-col items-center">
-          <Typography size="body-xs"> Win - Loss </Typography>
-          <Typography size="body-xs"> 4 - 1 </Typography>
-        </div> */}
+        <div className=" hidden flex-col items-center sm:flex">
+          <Typography size="body-xs">Collectables Redeemed by fans </Typography>
+          <Typography size="display-xs" className="font-bold">
+            {candyMachine?.items?.redeemed}
+          </Typography>
+        </div>
         <div className="">
           <PlayButton
             song={song || null}
@@ -263,23 +345,71 @@ function BattleCard({
           )}
         </div>
       </div>
+      <div className="flex items-center space-x-2 sm:hidden">
+        <Typography size="display-xs" className="font-bold">
+          {candyMachine?.items?.redeemed}
+        </Typography>
+        <Typography size="body-xs">(Collectables Redeemed by fans) </Typography>
+      </div>
       {candyMachine &&
         candyMachine.guardsAndEligibility?.[0]?.hasStarted &&
         !candyMachine.guardsAndEligibility?.[0]?.hasEnded && (
           <div>
             <div>
-              <div className="flex justify-between">
-                <div>
+              {Object.keys(supporters).length > 0 && (
+                <div className="flex items-center justify-between space-x-1">
                   <Typography size="body-xs" className="text-neutral-content">
                     Supporters
                   </Typography>
+                  <div className="flex flex-1 items-center overflow-scroll">
+                    <div className="isolate flex flex-shrink cursor-pointer -space-x-3 overflow-scroll">
+                      {supporters &&
+                        Object?.keys(supporters).map((key) => (
+                          <Link
+                            key={key}
+                            href={routes.userProfile(key)}
+                            target="_blank"
+                          >
+                            <AvatarImage
+                              alt="artist profile picture"
+                              username={key}
+                              height={
+                                supporters[key]?.[0]?.user?.pinnedProfilePicture
+                                  ?.height
+                              }
+                              width={
+                                supporters[key]?.[0]?.user?.pinnedProfilePicture
+                                  ?.width
+                              }
+                              path={
+                                supporters[key]?.[0]?.user?.pinnedProfilePicture
+                                  ?.path
+                              }
+                              pinnedStatus={
+                                supporters[key]?.[0]?.user?.pinnedProfilePicture
+                                  ?.status
+                              }
+                              imageHash={
+                                supporters[key]?.[0]?.user?.pinnedProfilePicture
+                                  ?.ipfsHash
+                              }
+                              type="circle"
+                              // className="h-6"
+                              widthNumber={30}
+                              heightNumber={30}
+                            />
+                          </Link>
+                        ))}
+                    </div>
+                  </div>
+                  {percentagePot && (
+                    <Typography size="body-xs" className="text-neutral-content">
+                      {percentagePot.toFixed(2)}% of pot
+                    </Typography>
+                  )}
                 </div>
-                {percentagePot && (
-                  <Typography size="body-xs" className="text-neutral-content">
-                    {percentagePot.toFixed(2)}% of pot
-                  </Typography>
-                )}
-              </div>
+              )}
+
               <progress
                 className="progress progress-primary h-1 w-full bg-base-300"
                 value={percentagePot || 0}

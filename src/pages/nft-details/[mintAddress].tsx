@@ -1,8 +1,6 @@
-import React, { useEffect, useState, useContext, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import { Share } from "@/components/iconComponents";
-import Icon from "@/components/icons";
 import Link from "next/link";
 // import TokenActivity from '@/components/TokenActivity';
 import { api } from "@/utils/api";
@@ -12,7 +10,7 @@ import { routes } from "@/utils/constants";
 import { useWallet } from "@solana/wallet-adapter-react";
 import ShareLink from "@/components/shareLink/Share";
 import ModalContainer from "@/components/modalContainer/ModalContainer";
-import Button from "@/components/buttons/Button";
+
 // import TokenSaleCard from '@/components/TokenSaleCard';
 // import { type Metaplex } from "@metaplex-foundation/js";
 import type {
@@ -21,7 +19,7 @@ import type {
   Nft,
   NftWithToken,
 } from "@metaplex-foundation/js";
-import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import MintDescription from "@/components/mintDetails/MintDescription";
 import About from "@/components/mintDetails/About";
 import {
@@ -36,7 +34,7 @@ import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { getHashAndUriFromNFT } from "@/utils/helpers";
 import PlayButton from "@/components/likes-plays/PlayButton";
-import type { IMetaplexMetadata, PartialSongType } from "@/utils/types";
+import type { PartialSongType } from "@/utils/types";
 import GeneralLikes from "@/components/likes-plays/GeneralLikes";
 
 function TokenProfilePage() {
@@ -82,6 +80,7 @@ function TokenProfilePage() {
     audioUrl: string | undefined;
   }>();
 
+  console.log({ nftOwner });
   // api.token.findOrCreateNft.useQuery(
   //   {
   //     mintAddress: mintAddress as any as string,
@@ -205,6 +204,7 @@ function TokenProfilePage() {
       // );
       // const data = await res.json();
       const t = await getNftOwner(addy);
+
       if (!t) setIsCheckingOwner(false);
       setNftOwner(t?.owner as string);
       setTokenAccountAddress(t?.tokenAccountAddress);
@@ -228,10 +228,10 @@ function TokenProfilePage() {
     } catch (error) {}
   };
 
-  const handleRefresh = async () => {
-    await getNftDetails({ mintAddress: mintAddress });
-    return;
-  };
+  // const handleRefresh = async () => {
+  //   await getNftDetails({ mintAddress: mintAddress });
+  //   return;
+  // };
 
   // console.log({
   //   nftDetails,
@@ -301,7 +301,7 @@ function TokenProfilePage() {
                     quality={90}
                     alt={nftDetails?.name || "nft"}
                     className="rounded-box transition-shadow duration-300 hover:opacity-75 hover:shadow-xl"
-                    imgTagClassName="w-full block rounded-xl"
+                    imgTagClassName="w-full h-full block rounded-xl object-cover"
                   />
                 </>
               )}

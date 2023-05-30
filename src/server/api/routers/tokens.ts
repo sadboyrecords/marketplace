@@ -55,6 +55,7 @@ export const tokenRouter = createTRPCRouter({
     .input(z.object({ contractAddress: z.string() }))
     .query(async ({ ctx, input }) => {
       // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
+
       const topNfts = await ctx.prisma?.tokens?.findFirst?.({
         where: {
           mintAddress: {

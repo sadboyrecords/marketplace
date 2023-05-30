@@ -6,7 +6,7 @@ import base58 from "bs58";
 import React from "react";
 import Button from "@/components/buttons/Button";
 import { SigninMessage } from "@/utils/SignMessage";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
@@ -103,6 +103,7 @@ export default function WalletAdaptor() {
     // visible,
   ]);
 
+  // console.log({ connected, status });
   React.useEffect(() => {
     if (status === "loading") return;
     if (connected && status === "unauthenticated") {
@@ -110,13 +111,16 @@ export default function WalletAdaptor() {
 
       void handleSignIn();
     }
-    // if (status === "authenticated" && !connected) {
-    //   console.log("authenticated - not connected");
-    //   // void disconnect();
-    //   // signOut()
-    //   //   .then(() => null)
-    //   //   .catch(() => null);
-    // }
+    if (status === "authenticated" && !connected) {
+      console.log("authenticated - not connected");
+      // void handleSignIn();
+
+      // void disconnect();
+      signOut()
+        .then(() => null)
+        .catch(() => null);
+      void handleSignIn();
+    }
     // connected,
   }, [connected, handleSignIn, status]);
 

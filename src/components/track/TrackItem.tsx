@@ -103,9 +103,9 @@ function TrackItem({
 
   return (
     <div
-      className={`flex flex-wrap items-center justify-between gap-8 border-b border-base-300 px-4 py-6`}
+      className={`flex flex-wrap items-center justify-between gap-8 border-b border-base-300 px-4 py-6 sm:items-center`}
     >
-      <div className="flex flex-1 items-center space-x-6">
+      <div className="flex flex-1 flex-wrap items-center gap-x-6 gap-y-3">
         {/* Image */}
         <div className="flex  items-center gap-2">
           {/* <button
@@ -175,7 +175,7 @@ function TrackItem({
           </div>
         </div>
         {/* track title + artist names */}
-        <div className=" min-w-[10rem] flex-1 ">
+        <div className=" min-w-[5rem] flex-1 ">
           {getTrackUrl(track) ? (
             <Link href={getTrackUrl(track) || ""}>
               <Typography

@@ -515,7 +515,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
       >
         <Input
           label="Battle Name"
-          optional
+          // optional
           type="text"
           error={!!errors?.battleName}
           errorMessage={(errors?.battleName?.message as string) || ""}

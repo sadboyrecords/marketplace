@@ -129,6 +129,8 @@ model User {
     battles              BattleContestants[]
     createdBattles       Battle[]
     magicSolanaAddress   String?
+    sentTransactions     Transactions[]      @relation("SentTransactions")
+    receivedTransactions Transactions[]      @relation("ReceivedTransactions")
     // creationEvents CreationEvents[]
     // battles              Battle[]
 }
@@ -311,6 +313,7 @@ model CandyMachines {
     CandyMachineDraft    CandyMachineDraft?
     totalMinted          Int?                @default(0)
     battleContestant     BattleContestants[]
+    transactions         Transactions[]
 }
 
 model CandyMachineDraft {
@@ -473,6 +476,7 @@ model Tokens {
     isCollection         Boolean?
     pinnedImage          PinnedFiles?    @relation("PinnedTokenImage", fields: [lossyArtworkIPFSHash], references: [ipfsHash])
     pinnedAudio          PinnedFiles?    @relation("PinnedTokenAudio", fields: [audioIpfsHash], references: [ipfsHash])
+    transactions         Transactions[]
     // tokens               Tokens[]       @relation("collectionAddress")
     // tokensRelation       Tokens[]       @relation("collectionAddress")
 
@@ -573,6 +577,32 @@ model Listing {
     // song              Songs      @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "listing_songid_foreign")
     // walletAddress     String 
     // user              User      @relation(fields: [walletAddress], references: [walletAddress], onDelete: Cascade, onUpdate: NoAction, map: "listing_walletaddress_foreign")
+}
+
+model Transactions {
+    id                        String           @id @default(uuid())
+    signature                 String           @unique
+    fromWalletAddress         String?
+    receiverWalletAddress     String?
+    candymachineAddress       String?
+    tokenAddress              String?
+    tokenAddressReferenceOnly String?
+    transactionType           TransactionTypes
+    blockTime                 Int
+    candyMachine              CandyMachines?   @relation(fields: [candymachineAddress], references: [candyMachineId])
+    fromUser                  User?            @relation("SentTransactions", fields: [fromWalletAddress], references: [walletAddress])
+    receiver                  User?            @relation("ReceivedTransactions", fields: [receiverWalletAddress], references: [walletAddress])
+    token                     Tokens?          @relation(fields: [tokenAddress], references: [mintAddress])
+    createdAt                 DateTime         @default(now())
+    updatedAt                 DateTime         @updatedAt
+}
+
+enum TransactionTypes {
+    MINT
+    TRANSFER
+    LIST
+    BUY
+    CANDY_MACHINE
 }
 
 model IndexingError {

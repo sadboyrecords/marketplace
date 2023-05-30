@@ -4,9 +4,24 @@ import BattleCard from "@/components/battleDrops/BattleCard";
 import SolIcon from "@/components/iconComponents/SolIcon";
 import Countdown from "@/components/countdown/Countdown";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@metaplex-foundation/js";
 
 function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
+  const { connection } = useConnection();
+
+  // void (() => {
+  //   connection.onLogs(
+  //     new PublicKey("6yUPiLfYuzyA35oqy1prJ8SJWbkdDNXrhecoEf1TSfXH"),
+  //     (logs, context) => console.log("Updated account info: ", logs),
+  //     "confirmed"
+  //   );
+
+  // })();
+
+  // useEffect(() => {}, []);
+
   const { candyMachines, solUsdPrice } = useMetaplex();
   const id1 = data?.battleContestants[0]?.candyMachineDraft.candyMachineId;
   const id2 = data?.battleContestants[1]?.candyMachineDraft.candyMachineId;
