@@ -3,7 +3,7 @@ import { Magic } from "magic-sdk";
 import { SolanaExtension } from "@magic-ext/solana";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const rpcUrl = "process.env.NEXT_PUBLIC_RPC_HOST!"; // "https://api.devnet.solana.com"; //process.env.NEXT_PUBLIC_RPC_HOST!;
+const rpcUrl = process.env.NEXT_PUBLIC_RPC_HOST!; // "https://api.devnet.solana.com"; //process.env.NEXT_PUBLIC_RPC_HOST!;
 // console.log({ magicRpcUrl: rpcUrl });
 
 const createMagic = (key: string) =>

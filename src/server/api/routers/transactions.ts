@@ -30,6 +30,7 @@ export const transactionRouter = createTRPCRouter({
           receiver: {
             select: {
               walletAddress: true,
+              magicSolanaAddress: true,
               pinnedProfilePicture: {
                 select: {
                   ipfsHash: true,
@@ -118,8 +119,34 @@ export const transactionRouter = createTRPCRouter({
         };
       });
       console.log({ forSave });
+
+      const updated = await ctx.prisma.$transaction(async (tx) => {
+        const mapped = await Promise.all(
+          forSave.map(async (f) => {
+            const user = await tx.user.findFirst({
+              where: {
+                OR: [
+                  {
+                    walletAddress: f.receiverWalletAddress,
+                  },
+                  {
+                    magicSolanaAddress: f.receiverWalletAddress,
+                  },
+                ],
+              },
+            });
+
+            return {
+              ...f,
+              receiverWalletAddress: user?.walletAddress,
+            };
+          })
+        );
+        return mapped;
+      });
+
       return await ctx.prisma.transactions.createMany({
-        data: forSave,
+        data: updated,
       });
     }),
 });

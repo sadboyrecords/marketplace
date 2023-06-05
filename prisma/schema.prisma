@@ -128,7 +128,7 @@ model User {
     sessions             Session[]
     battles              BattleContestants[]
     createdBattles       Battle[]
-    magicSolanaAddress   String?
+    magicSolanaAddress   String?             @unique
     sentTransactions     Transactions[]      @relation("SentTransactions")
     receivedTransactions Transactions[]      @relation("ReceivedTransactions")
     // creationEvents CreationEvents[]

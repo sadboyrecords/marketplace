@@ -96,7 +96,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
   });
   const router = useRouter();
   const id = router.query.id as string | undefined;
-  console.log({ id });
+  // console.log({ id });
 
   const { data: battle, isLoading } = api.battle.getBattleById.useQuery(
     { battleId: id || "" },
@@ -244,7 +244,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
 
   const mutation = api.battle.createBattle.useMutation();
   const updateBattle = api.battle.updateBattle.useMutation();
-  console.log({ imageHash, imageHash2, first, second });
+  // console.log({ imageHash, imageHash2, first, second });
 
   const onSubmit = async (data: FormValues) => {
     console.log({ formSubmission: data });
@@ -355,8 +355,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
       console.log({ submitData });
       if (!isEditing) {
         const res = await mutation.mutateAsync(submitData);
-        console.log({ res });
-        console.log({ res });
+
         void router.push(routes.battleDetails(res.id));
         if (!res) {
           setLoading(false);
@@ -371,7 +370,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
           contestantOneId: battle.battleContestants[0]?.id,
           contestantTwoId: battle.battleContestants[1]?.id,
         });
-        console.log({ res });
+
         void router.push(routes.battleDetails(res.id));
         if (!res) {
           setLoading(false);

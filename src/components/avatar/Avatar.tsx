@@ -103,7 +103,7 @@ function AvatarImage({
           setImageIpfsHash(cid);
           setImageUrl(`${ipfsPublicGateway}${cid}`);
           setLoadingUpload(false);
-          console.log({ cid });
+          // console.log({ cid });
           toast.success("Your image has been successfully uploaded.");
         }
         if (!cid) {

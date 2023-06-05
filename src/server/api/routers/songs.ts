@@ -5,6 +5,69 @@ import { z } from "zod";
 import { publicProcedure, createTRPCRouter } from "@/server/api/trpc";
 
 export const songRouter = createTRPCRouter({
+  checkCanPlay: publicProcedure.query(async ({ ctx }) => {
+    const battle = await ctx.prisma.battle.findMany({
+      where: {
+        AND: [
+          {
+            isActive: true,
+            battleEndDate: {
+              gte: new Date(),
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        battleContestants: {
+          select: {
+            primaryArtistName: true,
+            candyMachineDraft: {
+              select: {
+                drop: {
+                  select: {
+                    dropName: true,
+                    candyMachineId: true,
+                    transactions: {
+                      select: {
+                        tokenAddressReferenceOnly: true,
+                        tokenAddress: true,
+                        receiverWalletAddress: true,
+                        receiver: {
+                          select: {
+                            walletAddress: true,
+                            magicSolanaAddress: true,
+                            firstName: true,
+                            name: true,
+                            pinnedProfilePicture: {
+                              select: {
+                                ipfsHash: true,
+                                width: true,
+                                height: true,
+                                originalUrl: true,
+                                path: true,
+                                status: true,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                    song: {
+                      select: {
+                        id: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return battle;
+  }),
   getRecentTracks: publicProcedure.query(async ({ ctx }) => {
     // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
     const recentSongs = await ctx.prisma.songs.findMany({

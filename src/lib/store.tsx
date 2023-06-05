@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import candyMachineReducer from "@/lib/slices/candyMachine";
 import audioReducer from "@/lib/slices/audioSlice";
 import appReducer from "@/lib/slices/appSlice";
+import onrampReducer from "@/lib/slices/onRampSlice";
 
 export const store = configureStore({
   reducer: {
     candyMachine: candyMachineReducer,
     audio: audioReducer,
     app: appReducer,
+    onramp: onrampReducer,
   },
 });
 

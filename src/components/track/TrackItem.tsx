@@ -22,6 +22,11 @@ import {
 } from "@/lib/slices/audioSlice";
 import { api } from "@/utils/api";
 import { toast } from "react-toastify";
+import {
+  openJoinBattleFansModal,
+  selectPublicAddress,
+} from "@/lib/slices/appSlice";
+import { handleCanPlay } from "@/utils/audioHelpers";
 
 function TrackItem({
   track,
@@ -47,7 +52,32 @@ function TrackItem({
   const { currentSong, isPlaying } = useSelector(selectAudio);
   const dispatch = useDispatch();
 
+  const { data: activeBattles } = api.songs.checkCanPlay.useQuery(undefined, {
+    staleTime: 1000 * 5,
+  });
+
+  const publicAddress = useSelector(selectPublicAddress);
+
   const handlePlay = () => {
+    const canPlay = handleCanPlay({
+      song: track,
+      activeBattles,
+      publicAddress: publicAddress || "",
+    });
+    console.log({ canPlay, play: canPlay?.canPlay });
+    if (!canPlay.canPlay) {
+      dispatch(
+        openJoinBattleFansModal({
+          supporters: canPlay.supporters,
+          artistName: canPlay.artistName,
+          collectionName: canPlay.collectionName,
+          candymachineId: canPlay.candyId,
+          competitorCandyId: canPlay.competitorCandyId,
+          // battleName: canPlay.battleName,
+        })
+      );
+      return;
+    }
     if (playlistTracks && playlistName) {
       dispatch(
         setPlaylist({

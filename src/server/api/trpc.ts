@@ -35,6 +35,7 @@ type CreateContextOptions = {
         };
       })
     | null;
+  ip?: string | string[] | undefined;
 };
 
 /**
@@ -51,6 +52,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    ip: opts.ip,
   };
 };
 
@@ -62,12 +64,23 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
+  let forwardedIp: string | undefined = undefined;
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) {
+    if (typeof forwarded === "string") {
+      forwardedIp = forwarded;
+    }
+  }
+
+  const ip =
+    req.headers["x-real-ip"] || forwardedIp || req.socket.remoteAddress;
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
     session,
+    ip,
   });
 };
 
@@ -128,6 +141,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
     ctx: {
       // infers the `session` as non-nullable
       session: { ...ctx.session, user: ctx.session.user },
+      ip: ctx.ip,
     },
   });
 });

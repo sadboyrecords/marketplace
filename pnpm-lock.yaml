@@ -64,6 +64,12 @@ dependencies:
   '@solana/web3.js':
     specifier: ^1.76.0
     version: 1.76.0(encoding@0.1.13)
+  '@stripe/crypto':
+    specifier: ^0.0.4
+    version: 0.0.4(@stripe/stripe-js@1.53.0)
+  '@stripe/stripe-js':
+    specifier: ^1.53.0
+    version: 1.53.0
   '@tanstack/react-query':
     specifier: ^4.28.0
     version: 4.28.0(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0)
@@ -106,6 +112,9 @@ dependencies:
   canvas-confetti:
     specifier: ^1.6.0
     version: 1.6.0
+  crypto:
+    specifier: ^1.0.1
+    version: 1.0.1
   daisyui:
     specifier: ^2.51.6
     version: 2.51.6(autoprefixer@10.4.14)(postcss@8.4.21)
@@ -178,6 +187,9 @@ dependencies:
   slugify:
     specifier: ^1.6.6
     version: 1.6.6
+  stripe:
+    specifier: ^12.7.0
+    version: 12.7.0
   superjson:
     specifier: 1.12.2
     version: 1.12.2
@@ -5528,6 +5540,18 @@ packages:
       - utf-8-validate
     dev: false
 
+  /@stripe/crypto@0.0.4(@stripe/stripe-js@1.53.0):
+    resolution: {integrity: sha512-gcD/aG0N90ZrNVppWYf9ADPECptw6PVtF67VIeaFP7fhgd2NvNx8erkzlcvk3VIVSY+bZ6YGX7c7cASoySX74Q==}
+    peerDependencies:
+      '@stripe/stripe-js': ^1.46.0
+    dependencies:
+      '@stripe/stripe-js': 1.53.0
+    dev: false
+
+  /@stripe/stripe-js@1.53.0:
+    resolution: {integrity: sha512-qhhAa5WxlgVqh1J41ppyqqQVu6S1T1Q9lDAk2Ho9eI/GjrkMvAHcJpKqhekJRsZ1vjsK4P68PYOcXBXPyNCpnQ==}
+    dev: false
+
   /@supercharge/promise-pool@2.4.0:
     resolution: {integrity: sha512-O9CMipBlq5OObdt1uKJGIzm9cdjpPWfj+a+Zw9EgWKxaMNHKC7EU7X9taj3H0EGQNLOSq2jAcOa3EzxlfHsD6w==}
     engines: {node: '>=8'}
@@ -8140,6 +8164,11 @@ packages:
 
   /crypto-js@4.1.1:
     resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
+    dev: false
+
+  /crypto@1.0.1:
+    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
+    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
     dev: false
 
   /css-selector-tokenizer@0.8.0:
@@ -14132,6 +14161,14 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
     dev: true
+
+  /stripe@12.7.0:
+    resolution: {integrity: sha512-4yY9gNFznBI6fZtR0B4y2a+o2EJe+s7p4DiHECKphwa36zYIczpWzO1g4dF0PF3lhTRw5FWTaHGBjwaD5FEiDQ==}
+    engines: {node: '>=12.*'}
+    dependencies:
+      '@types/node': 18.15.5
+      qs: 6.11.2
+    dev: false
 
   /strnum@1.0.5:
     resolution: {integrity: sha512-J8bbNyKKXl5qYcR36TIO8W3mVGVHrmmxsd5PAItGkmyzwJvybiw2IVq5nqd0i4LSNSkB/sx9VHllbfFdr9k1JA==}

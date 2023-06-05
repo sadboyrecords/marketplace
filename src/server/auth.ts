@@ -76,38 +76,28 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       },
 
       async authorize(credentials) {
-        // console.log("----AUTHORIZING----")
         try {
-          // console.log({ credentials, message: credentials?.message})
           const signinMessage = new SigninMessage(
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             JSON.parse(credentials?.message || "{}")
           );
-          // console.log({ body: req.body, stringy: JSON.stringify(req.body)})
 
           const nextAuthUrl = new URL(process.env.NEXTAUTH_URL || "");
-          // console.log({ nextAuthUrl, signinMessage })
+
           if (signinMessage.domain !== nextAuthUrl.host) {
             return null;
           }
-          // console.log("chcking csrf", {
-          //   header: req.headers, body: req.body, cookies: req.cookies })
 
           const csrfToken = await getCsrfToken({
             req: { headers: req.headers },
           });
-          //  {...req, body: JSON.stringify(req.body)},
-          // console.log("----SIGNING IN----")
-          // console.log({ csrfToken, signinMessage })
           if (signinMessage.nonce !== csrfToken) {
-            console.log("csrf failed");
             return null;
           }
 
           const validationResult = signinMessage.validate(
             credentials?.signature || ""
           );
-          console.log({ validationResult });
 
           if (!validationResult)
             throw new Error("Could not validate the signed message");
@@ -130,7 +120,6 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       },
 
       async authorize(credentials) {
-        // console.log("----AUTHORIZING----")
         try {
           if (!credentials?.didToken) return null;
           magic.token.validate(credentials?.didToken || "");
@@ -138,22 +127,15 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
           const metadata = await magic.users.getMetadataByToken(
             credentials?.didToken || ""
           );
-          // const publicAddress = magic.token.getPublicAddress(
-          //   credentials?.didToken || ""
-          // );
-          // console.log({ publicAddress, metadata });
-          // magic.users.
-          //  magic.token.
 
           const walletData = await magic.users.getMetadataByTokenAndWallet(
             credentials?.didToken || "",
             WalletType.SOLANA
           );
 
-          console.log({ walletData });
-          walletData.wallets?.forEach((wallet) => {
-            console.log({ wallet });
-          });
+          // walletData.wallets?.forEach((wallet) => {
+          //   console.log({ wallet });
+          // });
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           const solanaAddress = walletData.wallets?.find(
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -162,7 +144,6 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
           )?.public_address as string;
-          console.log({ solanaAddress });
           const data = {
             id: metadata.publicAddress as string,
             walletAddress: metadata.publicAddress as string,
@@ -227,7 +208,7 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       //   return Promise.resolve(token); //token
       // },
       jwt: ({ token, user }) => {
-        console.log("JWT===", { token, user });
+        // console.log("JWT===", { token, user });
         user && (token.user = user);
         let isAdmin = false;
         if (token.sub && adminWallets.includes(token.sub)) {

@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { XMarkIcon as XIcon } from "@heroicons/react/24/solid";
+import Typography from "../typography";
 
 interface Props {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface Props {
   children?: React.ReactNode;
   title?: string;
   description?: string;
+  noPadding?: boolean;
 }
 
 export default function MyModal({
@@ -16,6 +18,7 @@ export default function MyModal({
   closeModal,
   children,
   title,
+  noPadding,
   description,
 }: Props) {
   return (
@@ -45,21 +48,37 @@ export default function MyModal({
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative w-full transform overflow-hidden rounded-lg bg-base-300 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:max-w-md sm:p-6">
+                <Dialog.Panel
+                  className={`relative w-full transform overflow-hidden rounded-lg bg-base-100  pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 md:max-w-xl ${
+                    noPadding ? "p-0" : "px-4 sm:p-6"
+                  } `}
+                >
                   <div>
                     <div className="mt-3  text-center">
                       <div className="flex items-center">
                         <Dialog.Title
-                          as="h3"
+                          as="div"
                           className="flex-1 text-base font-semibold leading-6 text-base-content"
                         >
                           {title}
+                          {description && (
+                            <Typography
+                              color="neutral-gray"
+                              className="font-normal"
+                              size="body-sm"
+                            >
+                              {description}
+                            </Typography>
+                          )}
                         </Dialog.Title>
+
                         <button
                           onClick={closeModal}
                           className=" text-gray-neutral"
                         >
-                          <XIcon className="h-5 w-5" />
+                          <XIcon
+                            className={`h-5 w-5 ${noPadding ? "mr-6" : ""}`}
+                          />
                         </button>
                       </div>
 

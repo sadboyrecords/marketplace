@@ -1,35 +1,6 @@
-import {
-  createSlice,
-  createSelector,
-  createAsyncThunk,
-} from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import {
-  // CandyMachineUpdateType,
-  type GuardsAndEligibilityType,
-  type AllGuardsType,
-  type IMint,
-  type MintResponseType,
-} from "@/utils/types";
-import {
-  type CandyMachine,
-  Metaplex,
-  // mintFromCandyMachineBuilder,
-  type Nft,
-  type NftWithToken,
-  PublicKey,
-  type Sft,
-  type SftWithToken,
-  // TransactionBuilder,
-  walletAdapterIdentity,
-  type DefaultCandyGuardSettings,
-  sol,
-  toBigNumber,
-  toDateTime,
-  type IdentitySigner,
-  type UpdateCandyMachineOutput,
-} from "@metaplex-foundation/js";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { type GuardsAndEligibilityType } from "@/utils/types";
 
 interface CandyMachineState {
   isLoading?: boolean;
@@ -112,6 +83,8 @@ export const selectCandyMachine = createSelector(
   [(state: RootState) => state.cm, (state: RootState, id: string) => id],
   (cm, id) => cm?.[id]
 );
+
+export const selectAllCandymachines = (state: RootState) => state.cm;
 
 // const items = selectItemsByCategory(state, 'javascript');
 // // Another way if you're using redux hook:

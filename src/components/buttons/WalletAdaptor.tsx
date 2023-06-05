@@ -18,6 +18,7 @@ import {
   setPublicAddress,
 } from "@/lib/slices/appSlice";
 import { useSelector, useDispatch } from "react-redux";
+import { authProviderNames } from "@/utils/constants";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -111,7 +112,11 @@ export default function WalletAdaptor() {
 
       void handleSignIn();
     }
-    if (status === "authenticated" && !connected) {
+    if (
+      status === "authenticated" &&
+      !connected &&
+      session.user.provider !== authProviderNames.magic
+    ) {
       console.log("authenticated - not connected");
       // void handleSignIn();
 

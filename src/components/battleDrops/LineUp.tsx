@@ -4,12 +4,12 @@ import BattleCard from "@/components/battleDrops/BattleCard";
 import SolIcon from "@/components/iconComponents/SolIcon";
 import Countdown from "@/components/countdown/Countdown";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
-import { useState, useMemo, useEffect } from "react";
-import { useConnection } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@metaplex-foundation/js";
+import { useState, useMemo } from "react";
+// import { useConnection } from "@solana/wallet-adapter-react";
+// import { PublicKey } from "@metaplex-foundation/js";
 
 function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
-  const { connection } = useConnection();
+  // const { connection } = useConnection();
 
   // void (() => {
   //   connection.onLogs(
@@ -102,7 +102,6 @@ function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
         )}
       </div>
       <div className="h-full w-full  lg:w-5/12 ">
-        {/* flex-auto */}
         <BattleCard
           index={1}
           competitorIndex={0}
