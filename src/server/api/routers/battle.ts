@@ -263,6 +263,7 @@ export const battleRouter = createTRPCRouter({
       },
     });
   }),
+
   createBattle: protectedProcedure
     .input(
       z.object({
@@ -288,7 +289,7 @@ export const battleRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log({ session: ctx.session });
+      // console.log({ session: ctx.session });
       if (!ctx.session || !ctx.session.user.walletAddress) {
         throw new Error("No wallet address found in session");
       }
@@ -441,7 +442,7 @@ export const battleRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log({ session: ctx.session });
+      // console.log({ session: ctx.session });
       if (!ctx.session || !ctx.session.user.walletAddress) {
         throw new Error("No wallet address found in session");
       }

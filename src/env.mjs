@@ -22,6 +22,15 @@ const server = z.object({
   // DISCORD_CLIENT_ID: z.string(),
   // DISCORD_CLIENT_SECRET: z.string(),
   NEXT_PUBLIC_BATTLE_TREASURY: z.string().min(1),
+  NEXT_PUBLIC_MOONPAY_WEBHOOK: z.string().min(1),
+  MOONPAY_SK: z.string().min(1),
+  NEXT_PUBLIC_MOONPAY_PK: z.string().min(1),
+  STRIPE_SK: z.string().min(1),
+  NEXT_PUBLIC_STRIPE_PK: z.string().min(1),
+  NEXT_SOLANA_NETWORK: z.string().min(1),
+  NEXT_RPC_HOST: z.string().min(1),
+  MAGIC_SK: z.string().min(1),
+  NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY: z.string().min(1),
 });
 
 /**
@@ -50,6 +59,16 @@ const processEnv = {
   // DISCORD_CLIENT_ID: process.env.DISCORD_CLIENT_ID,
   // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
   NEXT_PUBLIC_BATTLE_TREASURY: process.env.NEXT_PUBLIC_BATTLE_TREASURY,
+  NEXT_PUBLIC_MOONPAY_WEBHOOK: process.env.NEXT_PUBLIC_BATTLE_TREASURY,
+  MOONPAY_SK: process.env.MOONPAY_SK,
+  NEXT_PUBLIC_MOONPAY_PK: process.env.NEXT_PUBLIC_MOONPAY_PK,
+  STRIPE_SK: process.env.STRIPE_SK,
+  NEXT_PUBLIC_STRIPE_PK: process.env.NEXT_PUBLIC_STRIPE_PK,
+  NEXT_SOLANA_NETWORK: process.env.NEXT_SOLANA_NETWORK,
+  NEXT_RPC_HOST: process.env.NEXT_RPC_HOST,
+  MAGIC_SK: process.env.MAGIC_SK,
+  NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 

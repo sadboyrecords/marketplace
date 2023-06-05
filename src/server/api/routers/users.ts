@@ -16,7 +16,7 @@ export const userRouter = createTRPCRouter({
       };
     }),
   myProfile: protectedProcedure.query(({ ctx }) => {
-    console.log({ session: ctx.session });
+    // console.log({ session: ctx.session });
     if (!ctx.session || !ctx.session.user.walletAddress) {
       throw new Error("No wallet address found in session");
     }

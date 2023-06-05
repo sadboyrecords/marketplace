@@ -100,7 +100,7 @@ function MintDescription({
               {tokenAccountAddress ? (
                 <a
                   target={"_blank"}
-                  href={externalUrls.solscanAccountDetails(tokenAccountAddress)}
+                  href={externalUrls.solscanAccountDetails(ownerAddress || "")}
                 >
                   <Typography>
                     <span>{ownerAddress?.substring(0, 5)}</span>

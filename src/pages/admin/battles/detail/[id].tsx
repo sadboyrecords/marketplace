@@ -9,6 +9,7 @@ import { routes } from "@/utils/constants";
 import { toast } from "react-toastify";
 import LineUp from "@/components/battleDrops/LineUp";
 import { useSession } from "next-auth/react";
+import { Switch } from "@headlessui/react";
 import dayjs from "dayjs";
 
 function BattleDetails() {
@@ -46,19 +47,23 @@ function BattleDetails() {
     }
   };
 
+  const [toggleLoading, setToggleLoading] = React.useState<boolean>(false);
   const handleDisplayOnHomePage = async () => {
     console.log("firing");
     try {
       if (!data?.id) return;
+      setToggleLoading(true);
       await display.mutateAsync({
         battleId: data?.id,
         displayOnHome: !data?.displayOnHomePage,
       });
-      toast.success("Battle displayed on homepage successfully");
+      toast.success("Battle updated successfully");
       await refetch();
+      setToggleLoading(false);
     } catch (error) {
       console.log(error);
       toast.error("Error displaying battle on homepage");
+      setToggleLoading(false);
     }
   };
 
@@ -104,12 +109,26 @@ function BattleDetails() {
             <div className="form-control w-56">
               <label className="label cursor-pointer">
                 <span className="label-text">Display on home page</span>
-                <input
-                  type="checkbox"
-                  className="toggle-primary toggle toggle-sm"
-                  onChange={handleDisplayOnHomePage}
+                <Switch
                   checked={data?.displayOnHomePage}
-                />
+                  onChange={handleDisplayOnHomePage}
+                  className={`${
+                    data?.displayOnHomePage
+                      ? "bg-primary-600"
+                      : "bg-gray-neutral"
+                  } relative inline-flex h-5 w-11 items-center rounded-full`}
+                >
+                  <span className="sr-only">Enable notifications</span>
+                  <span
+                    className={`${
+                      data?.displayOnHomePage
+                        ? "translate-x-6"
+                        : "translate-x-1"
+                    } inline-block h-3 w-3 transform ${
+                      toggleLoading ? "animate-ping" : ""
+                    } rounded-full bg-white transition`}
+                  />
+                </Switch>
               </label>
             </div>
           )}

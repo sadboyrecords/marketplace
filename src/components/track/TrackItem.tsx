@@ -22,6 +22,11 @@ import {
 } from "@/lib/slices/audioSlice";
 import { api } from "@/utils/api";
 import { toast } from "react-toastify";
+import {
+  openJoinBattleFansModal,
+  selectPublicAddress,
+} from "@/lib/slices/appSlice";
+import { handleCanPlay } from "@/utils/audioHelpers";
 
 function TrackItem({
   track,
@@ -47,7 +52,32 @@ function TrackItem({
   const { currentSong, isPlaying } = useSelector(selectAudio);
   const dispatch = useDispatch();
 
+  const { data: activeBattles } = api.songs.checkCanPlay.useQuery(undefined, {
+    staleTime: 1000 * 5,
+  });
+
+  const publicAddress = useSelector(selectPublicAddress);
+
   const handlePlay = () => {
+    const canPlay = handleCanPlay({
+      song: track,
+      activeBattles,
+      publicAddress: publicAddress || "",
+    });
+    console.log({ canPlay, play: canPlay?.canPlay });
+    if (!canPlay.canPlay) {
+      dispatch(
+        openJoinBattleFansModal({
+          supporters: canPlay.supporters,
+          artistName: canPlay.artistName,
+          collectionName: canPlay.collectionName,
+          candymachineId: canPlay.candyId,
+          competitorCandyId: canPlay.competitorCandyId,
+          // battleName: canPlay.battleName,
+        })
+      );
+      return;
+    }
     if (playlistTracks && playlistName) {
       dispatch(
         setPlaylist({
@@ -103,9 +133,9 @@ function TrackItem({
 
   return (
     <div
-      className={`flex flex-wrap items-center justify-between gap-8 border-b border-base-300 px-4 py-6`}
+      className={`flex flex-wrap items-center justify-between gap-8 border-b border-base-300 px-4 py-6 sm:items-center`}
     >
-      <div className="flex flex-1 items-center space-x-6">
+      <div className="flex flex-1 flex-wrap items-center gap-x-6 gap-y-3">
         {/* Image */}
         <div className="flex  items-center gap-2">
           {/* <button
@@ -175,7 +205,7 @@ function TrackItem({
           </div>
         </div>
         {/* track title + artist names */}
-        <div className=" min-w-[10rem] flex-1 ">
+        <div className=" min-w-[5rem] flex-1 ">
           {getTrackUrl(track) ? (
             <Link href={getTrackUrl(track) || ""}>
               <Typography

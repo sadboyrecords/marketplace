@@ -81,7 +81,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // const url = s3.getSignedUrl("putObject", params);
     const command = new PutObjectCommand(params);
     const url = await getSignedUrl(client, command, { expiresIn: 3600 });
-    console.log({ url });
+    // console.log({ url });
     res.status(200).json(url);
   } catch (error) {
     // throw new Error(error as any);

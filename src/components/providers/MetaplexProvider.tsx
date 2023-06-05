@@ -9,31 +9,33 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import {
-  type CandyMachine,
-  Metaplex,
-  PublicKey,
-  // TransactionBuilder,
-  walletAdapterIdentity,
-  type DefaultCandyGuardSettings,
-  guestIdentity,
-} from "@metaplex-foundation/js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import {
-  // CandyMachineUpdateType,
-  type GuardsAndEligibilityType,
-  type AllGuardsType,
-  type MintResponseType,
-} from "@/utils/types";
-import { LAMPORTS_PER_SOL, type Signer } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { api } from "@/utils/api";
 import { getSolUsdPrice } from "@/utils/rpcCalls";
 import { useSession } from "next-auth/react";
 import * as web3 from "@solana/web3.js";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
+import { selectAllCandymachines } from "@/lib/slices/candyMachine";
 import { useSelector } from "react-redux";
 import { authProviderNames } from "@/utils/constants";
 import { magic } from "@/lib/magic";
+import {
+  Metaplex,
+  PublicKey,
+  walletAdapterIdentity,
+  guestIdentity,
+} from "@metaplex-foundation/js";
+import { type Signer } from "@solana/web3.js";
+import {
+  type GuardsAndEligibilityType,
+  type AllGuardsType,
+  type MintResponseType,
+} from "@/utils/types";
+import {
+  type CandyMachine,
+  type DefaultCandyGuardSettings,
+} from "@metaplex-foundation/js";
 
 type MintType = {
   quantityString: number;
@@ -118,7 +120,7 @@ export default function MetaplexProvider({
   const updateTotalMinted = api.candyMachine.updatetotalMinted.useMutation();
   const [solUsdPrice, setSolUsdPrice] = React.useState<number | null>(null);
   const [walletBalance, setWalletBalance] = React.useState<number | null>();
-
+  const [initalStateSet, setInitalStateSet] = React.useState(false); //using this to avoid firing off fetching candy machine before wallet has been loaded
   const [candyMachines, setCandyMachines] = React.useState<Record<
     string,
     CandyMachineState
@@ -142,35 +144,36 @@ export default function MetaplexProvider({
   //   redeemed: 0,
   // });
 
-  const getUserBalance = useCallback(
-    async (publicAddress?: string) => {
-      // if (!wallet?.publicKey) return;
-      if (!session || !session.user.walletAddress) return;
-      let userBalanceLamport = 0;
-      if (!publicAddress) {
-        userBalanceLamport = await connection.getBalance(
-          new web3.PublicKey(session.user.walletAddress)
-        );
-      }
-      if (publicAddress) {
-        userBalanceLamport = await connection.getBalance(
-          new web3.PublicKey(publicAddress)
-        );
-      }
-      const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
+  const getUserBalance = useCallback(async () => {
+    // if (!wallet?.publicKey) return;
+    if (!session || !session.user.walletAddress || !publicAddress) return;
+    let userBalanceLamport = 0;
+    // if (!publicAddress) {
+    //   userBalanceLamport = await connection.getBalance(
+    //     new web3.PublicKey(session.user.walletAddress)
+    //   );
+    // }
+    // if (publicAddress) {
+    //   userBalanceLamport = await connection.getBalance(
+    //     new web3.PublicKey(publicAddress)
+    //   );
+    // }
+    userBalanceLamport = await connection.getBalance(
+      new web3.PublicKey(publicAddress)
+    );
+    const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
 
-      setWalletBalance(Number(userBalance.toFixed(2)));
-      // return userBalance;
-    },
-    [connection, session]
-  );
+    setWalletBalance(Number(userBalance.toFixed(2)));
+    // return userBalance;
+    setInitalStateSet(true);
+  }, [connection, publicAddress, session]);
   // const getMagic = async () => {
   //   const metadata = await magic.user.getMetadata();
   //   console.log("-----metadata----", metadata);
   // };
   useEffect(() => {
     if (publicAddress) {
-      void getUserBalance(publicAddress);
+      void getUserBalance();
     }
   }, [getUserBalance, publicAddress]);
 
@@ -193,6 +196,7 @@ export default function MetaplexProvider({
     const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
 
     setWalletBalance(Number(userBalance.toFixed(2)));
+    setInitalStateSet(true);
     // address gate
     if (guard.addressGate !== null) {
       if (
@@ -216,8 +220,7 @@ export default function MetaplexProvider({
           candyMachine: candyMachine.address,
           candyGuard: candyMachine.candyGuard?.address as PublicKey,
         });
-      //Read Data from chain
-      // console.log({ mintLimitCounter });
+
       const mintedAmountBuffer = await mx.connection.getAccountInfo(
         mintLimitCounter,
         "processed"
@@ -543,6 +546,7 @@ export default function MetaplexProvider({
   const fetchCandyMachineById = useCallback(
     async (id: string) => {
       const key = new PublicKey(id);
+
       const solPrice = await getSolUsdPrice();
       setSolUsdPrice(solPrice);
       await mx
@@ -571,9 +575,54 @@ export default function MetaplexProvider({
           return cndy;
         })
         .catch((e) => console.error("Error while fetching candy machine", e));
+
+      // await connection.logS
+      // const signatures = await connection.getSignaturesForAddress(key, {
+      //   limit: 1,
+      // });
+      // const mappedSig = signatures
+      //   .filter((s) => !s.err)
+      //   .map((sig) => sig.signature);
+      // const parsedTransactions = await connection.getParsedTransactions(
+      //   mappedSig,
+      //   {
+      //     maxSupportedTransactionVersion: 0,
+      //   }
+      // );
+
+      // const minted = parsedTransactions.filter((t) =>
+      //   t?.transaction?.message?.instructions?.find(
+      //     (int) => int?.parsed?.type === "mintTo"
+      //   )
+      // );
+      // const userAndNft = minted.map((m) => {
+      //   const int = m?.transaction?.message?.instructions?.find(
+      //     (int) => int?.parsed?.type === "mintTo"
+      //   );
+      //   return {
+      //     user: int?.parsed?.info?.mintAuthority,
+      //     nft: int?.parsed?.info?.mint,
+      //   };
+      // });
+      // console.log({ signatures, parsedTransactions, minted, userAndNft });
     },
     [handleGuardsSummary, mx]
   );
+  // const allCms = Object.keys(candyMachines).map((key) => {
+  //     const cm = candyMachines[key];
+  //     return {
+  //       id: key,
+  //       label: cm.candyMachine?.uuid,
+  //     }
+  //   })
+  // const allCms = useSelector(selectAllCandymachines);
+  // useMemo(() => {
+  //   if (Object?.keys(allCms || {}).length === 0) return; //|| !initalStateSet
+  //   Object?.keys(allCms).map((key) => {
+  //
+  //   });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [walletBalance, allCms]);
 
   // const updateCandyMachine = async (input: IMint) => {
   //   // todo update back end
@@ -729,10 +778,12 @@ export default function MetaplexProvider({
     tx: web3.Transaction
   ): Promise<web3.Transaction> {
     if (!magic) return tx;
+
     const serializeConfig = {
       requireAllSignatures: false,
       verifySignatures: true,
     };
+
     const signedTransaction = await magic.solana.signTransaction(
       tx,
       serializeConfig
@@ -744,10 +795,10 @@ export default function MetaplexProvider({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       signedTransaction?.rawTransaction
     );
-    console.log({ signedTransaction, transaction, tx });
-    transaction?.signatures?.forEach((s) => {
-      console.log({ sig: s?.publicKey?.toBase58() });
-    });
+
+    // transaction?.signatures?.forEach((s) => {
+    //   console.log({ sig: s?.publicKey?.toBase58() });
+    // });
 
     // add missing signers from original transaction to the newly created one
     const missingSigners = transaction.signatures
@@ -755,16 +806,13 @@ export default function MetaplexProvider({
       .map((s) => s.publicKey);
     missingSigners.forEach((publicKey) => {
       const signature = tx?.signatures.find((s) => {
-        console.log({ s });
         return publicKey.equals(s.publicKey);
       });
 
-      console.log({ signature });
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (signature) transaction.addSignature(publicKey, signature?.signature);
     });
-    console.log({ updatedTx: transaction });
 
     // const updatedSignatures = transaction.signatures.filter(
     //   (s) => s?.signature
@@ -772,12 +820,12 @@ export default function MetaplexProvider({
     // const updateTransaction = transaction;
     // updateTransaction.signatures = updatedSignatures;
     // .addSignatures(updatedSignatures)
-    // console.log({ updatedSignatures, updateTransaction });
+    //
     // const signature = await connection.sendRawTransaction(
     //   transaction.serialize(),
     //   {}
     // );
-    // console.log({ signature });
+    //
     //               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
 
     return transaction;
@@ -794,7 +842,7 @@ export default function MetaplexProvider({
       if (!candyMachineId || !candyMachines)
         throw new Error("No candy machine id provided");
       const candy = candyMachines[candyMachineId];
-      console.log({ candyMachines, candy });
+      // console.log({ candyMachines, candy });
       if (!candy || !candy.candyMachine)
         throw new Error("No candy machine found for id");
 
@@ -824,7 +872,6 @@ export default function MetaplexProvider({
         );
 
         const mints = transactionBuilders.map((tb) => {
-          console.log({ tb });
           return {
             mintSigner: tb.getContext().mintSigner as Signer,
             mintAddress: tb.getContext().mintSigner.publicKey,
@@ -843,7 +890,7 @@ export default function MetaplexProvider({
             tx.feePayer = payer;
             console.log({ tx });
             tx.sign(mints[ix]?.mintSigner as Signer);
-
+            // debugger;
             tx.signatures.forEach((s) =>
               console.log({ sigPkey: s.publicKey.toBase58() })
             );
@@ -851,12 +898,7 @@ export default function MetaplexProvider({
           });
           signedTransactions = await Promise.all(
             tx.map(async (t) => {
-              // t.partialSign(web3.Keypair.generate());
-              // const txn = transactionMagic.add(...[t]);
               console.log({ t });
-              // transactionMagic.partialSign();
-
-              // transactionMagic.partialSign(web3.Keypair.generate());
               return await signTransaction(t);
             })
           );
@@ -902,7 +944,7 @@ export default function MetaplexProvider({
               });
           })
         );
-        console.log({ output });
+
         const nfts = await Promise.all(
           output.map(({ context }) => {
             // console.log({ context });
@@ -918,6 +960,7 @@ export default function MetaplexProvider({
                 publicKey: PublicKey;
               };
             };
+            console.log({ c });
             return mx
               .nfts()
               .findByMint({
@@ -933,6 +976,7 @@ export default function MetaplexProvider({
           address: n?.address.toBase58(),
           name: n?.name,
         }));
+        console.log({ output, nfts, data });
         const signatures = output.map((o) => o.signature);
         try {
           await updateTotalMinted.mutateAsync({

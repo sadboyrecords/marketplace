@@ -16,6 +16,11 @@ import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
 import { magic } from "@/lib/magic";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { useSelector } from "react-redux";
+import dynamic from "next/dynamic";
+
+const AddFunds = dynamic(() => import("@/components/onRamp/BuyWithStripe"), {
+  ssr: false,
+});
 
 // import ShieldCheckIcon from "@heroicons/react/24/outline/ShieldCheckIcon";
 
@@ -96,73 +101,88 @@ function AvatarNav() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-border-gray rounded-md bg-base-100 shadow-lg ring-1 ring-border-gray ring-opacity-5 focus:outline-none">
-            <div className="flex items-center space-x-3 px-2 py-4">
-              <Avatar
-                src={data?.profilePictureImage || undefined}
-                username={(data?.walletAddress as string) || "user"}
-                alt="User profile menu dropdown"
-                widthNumber={40}
-                heightNumber={40}
-                fill
-                loading={isLoading}
-                type="circle"
-                imageHash={data?.profilePictureHash || undefined}
-                path={data?.pinnedProfilePicture?.path}
-                sizes="50px"
-                pinnedStatus={data?.pinnedProfilePicture?.status}
-              />
-              {!publicAddress && <div className="loading btn-ghost btn" />}
-              {publicAddress && (
-                <div className="items-center">
-                  <Typography size="body" className=" font-semibold">
-                    {data?.name ||
-                      data?.firstName ||
-                      (publicAddress &&
-                        `${publicAddress?.slice(0, 5)}...${publicAddress?.slice(
-                          -4
-                        )}`) ||
-                      ""}
-                  </Typography>
-                  <div
-                    className={`${
-                      copied ? "tooltip-open tooltip tooltip-bottom" : ""
-                    }  cursor-pointer`}
-                    data-tip="Copied"
-                    onClick={handleCopy}
-                  >
-                    <Typography
-                      type="div"
-                      size="body-xs"
-                      color="neutral-gray"
-                      className="flex"
+          <Menu.Items className="absolute right-0 mt-2 w-80 max-w-xs origin-top-right divide-y divide-border-gray rounded-md bg-base-100 shadow-lg ring-1 ring-border-gray ring-opacity-5 focus:outline-none ">
+            <div className="flex flex-col space-y-2 px-2 py-4">
+              <div className="flex items-center space-x-3  ">
+                <Avatar
+                  src={data?.profilePictureImage || undefined}
+                  username={(data?.walletAddress as string) || "user"}
+                  alt="User profile menu dropdown"
+                  widthNumber={40}
+                  heightNumber={40}
+                  fill
+                  loading={isLoading}
+                  type="circle"
+                  imageHash={data?.profilePictureHash || undefined}
+                  path={data?.pinnedProfilePicture?.path}
+                  sizes="50px"
+                  pinnedStatus={data?.pinnedProfilePicture?.status}
+                />
+                {!publicAddress && <div className="loading btn-ghost btn" />}
+                {publicAddress && (
+                  <div className="items-center">
+                    <Typography size="body" className=" font-semibold">
+                      {data?.name ||
+                        data?.firstName ||
+                        (publicAddress &&
+                          `${publicAddress?.slice(
+                            0,
+                            5
+                          )}...${publicAddress?.slice(-4)}`) ||
+                        ""}
+                    </Typography>
+                    <div
+                      className={`${
+                        copied ? "tooltip-open tooltip tooltip-bottom" : ""
+                      }  cursor-pointer`}
+                      data-tip="Copied"
+                      onClick={handleCopy}
                     >
-                      {publicAddress &&
-                        `${publicAddress?.slice(0, 5)}...${publicAddress.slice(
-                          -4
-                        )}`}
+                      <Typography
+                        type="div"
+                        size="body-xs"
+                        color="neutral-gray"
+                        className="flex"
+                      >
+                        {publicAddress &&
+                          `${publicAddress?.slice(
+                            0,
+                            5
+                          )}...${publicAddress.slice(-4)}`}
 
-                      <CopyIcon className="ml-1 h-4 w-7" />
-                      <div className="ml-1 flex w-full items-center space-x-1">
-                        {" "}
-                        (<SolIcon className="mr-1 h-[0.6rem] w-[0.6rem]" />
-                        {walletBalance?.toFixed(2)} )
-                      </div>
+                        <CopyIcon className="ml-1 h-4 w-7" />
+                      </Typography>
+                    </div>
+                    {data?.email && (
+                      <Typography
+                        type="div"
+                        size="body-xs"
+                        color="neutral-gray"
+                        className="flex"
+                      >
+                        {data?.email}
+                      </Typography>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col justify-between px-1 py-1">
+                <Typography color="neutral-content" size="body-xs">
+                  Wallet Balance
+                </Typography>
+                <div className="flex items-center  justify-between">
+                  <div className="flex items-center space-x-1">
+                    <SolIcon className="h-4 w-4" />
+                    <Typography size="body-lg" className="font-bold">
+                      {walletBalance?.toFixed(2)} SOL
                     </Typography>
                   </div>
-                  {data?.email && (
-                    <Typography
-                      type="div"
-                      size="body-xs"
-                      color="neutral-gray"
-                      className="flex"
-                    >
-                      {data?.email}
-                    </Typography>
-                  )}
+                  <AddFunds />
                 </div>
-              )}
+                <div></div>
+              </div>
             </div>
+
             <div className="px-1 py-1 ">
               <Menu.Item>
                 {({ active }) => (

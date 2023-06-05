@@ -9,6 +9,8 @@ import { playlistRouter } from "./routers/playlists";
 import { likesRouter } from "./routers/likes";
 import { artistRouter } from "./routers/artists";
 import { tokenRouter } from "./routers/tokens";
+import { transactionRouter } from "./routers/transactions";
+import { onrampRouter } from "./routers/onramp";
 /**
  * This is the primary router for your server.
  *
@@ -25,6 +27,8 @@ export const appRouter = createTRPCRouter({
   likes: likesRouter,
   artist: artistRouter,
   token: tokenRouter,
+  transaction: transactionRouter,
+  onramp: onrampRouter,
   // healthcheck: publicProcedure.query(() => 'yay!'),
 
   //

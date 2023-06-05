@@ -37,18 +37,24 @@ export const getAccountInfo = async (tokenAccountAddress: string) => {
 
 export const getNftOwner = async (mintAddress: string) => {
   const response = await getTokenLargestAccounts(mintAddress);
-  // console.log({ response });
+
   const largestAccount = response.value.filter(
     (f) => f?.uiAmount && f?.uiAmount > 0
   );
+
   const tokenAccountAddress = largestAccount[0]?.address.toBase58();
+
   if (!tokenAccountAddress) return null;
   if (tokenAccountAddress) {
     const accountInfo = await getAccountInfo(tokenAccountAddress);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //  @ts-ignore
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    // const owner = accountInfo.value?.data?.parsed?.info?.owner;
-    const owner = "";
+    const owner = accountInfo?.value?.data?.parsed?.info
+      ?.owner as unknown as string;
+
+    // const owner = "";
     // console.log({ accountInfo, tokenAccountAddress });
     return { accountInfo, tokenAccountAddress, owner };
   }

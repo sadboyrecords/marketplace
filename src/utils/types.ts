@@ -38,6 +38,9 @@ export interface AppSession extends Session {
 }
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
+export type TransactionRecordType =
+  RouterOutput["transaction"]["getCandyTransactions"][number];
+export type CanPlayType = RouterOutput["songs"]["checkCanPlay"];
 export type PartialSongType = {
   id: string;
   lossyAudioURL: string;

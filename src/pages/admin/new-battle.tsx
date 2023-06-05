@@ -8,6 +8,7 @@ import NewBattle from "@/components/forms/NewBattle";
 
 function CreateToken() {
   const { publicKey } = useWallet();
+  console.log("publicKey", publicKey?.toBase58());
 
   return (
     <div>

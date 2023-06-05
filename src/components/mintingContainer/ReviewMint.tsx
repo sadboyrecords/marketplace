@@ -505,7 +505,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
         treasury: data.treasury || undefined,
       });
 
-      console.log({ res });
+      // console.log({ res });
       //   setSlug(res.slug);
       // setCurrentStep(stepperKeys.CREATE_CANDY_MACHINE);
       await utils.candyMachine.getDraftById.invalidate({

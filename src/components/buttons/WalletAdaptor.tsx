@@ -6,7 +6,7 @@ import base58 from "bs58";
 import React from "react";
 import Button from "@/components/buttons/Button";
 import { SigninMessage } from "@/utils/SignMessage";
-import { getCsrfToken, signIn, useSession } from "next-auth/react";
+import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
@@ -18,6 +18,7 @@ import {
   setPublicAddress,
 } from "@/lib/slices/appSlice";
 import { useSelector, useDispatch } from "react-redux";
+import { authProviderNames } from "@/utils/constants";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -44,12 +45,12 @@ export default function WalletAdaptor() {
   const { data: session, status } = useSession();
   const loading = status === "loading";
 
-  const { data: userInfo, refetch } = api.user.myProfile.useQuery(undefined, {
+  api.user.myProfile.useQuery(undefined, {
     enabled: !!session,
     staleTime: 1000 * 10,
   });
 
-  const userMutation = api.user.updateUser.useMutation();
+  // const userMutation = api.user.updateUser.useMutation();
 
   const handleSignIn = React.useCallback(async () => {
     if (!publicKey) {
@@ -103,6 +104,7 @@ export default function WalletAdaptor() {
     // visible,
   ]);
 
+  // console.log({ connected, status });
   React.useEffect(() => {
     if (status === "loading") return;
     if (connected && status === "unauthenticated") {
@@ -110,13 +112,20 @@ export default function WalletAdaptor() {
 
       void handleSignIn();
     }
-    // if (status === "authenticated" && !connected) {
-    //   console.log("authenticated - not connected");
-    //   // void disconnect();
-    //   // signOut()
-    //   //   .then(() => null)
-    //   //   .catch(() => null);
-    // }
+    if (
+      status === "authenticated" &&
+      !connected &&
+      session.user.provider !== authProviderNames.magic
+    ) {
+      console.log("authenticated - not connected");
+      // void handleSignIn();
+
+      // void disconnect();
+      signOut()
+        .then(() => null)
+        .catch(() => null);
+      void handleSignIn();
+    }
     // connected,
   }, [connected, handleSignIn, status]);
 

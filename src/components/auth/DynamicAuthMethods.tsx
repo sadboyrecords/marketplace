@@ -78,7 +78,7 @@ function DynamicAuthMethods() {
         />
         <button
           // onClick={() => select(wallet.adapter.name)}
-          className=" flex  h-12 w-full items-center justify-center rounded-md bg-base-100 p-4 hover:bg-base-100/70"
+          className=" flex  h-12 w-full items-center justify-center rounded-md bg-base-300 p-4 hover:bg-base-300/70"
         >
           <div className="flex items-center space-x-2">
             {loading && <div className="loading btn-ghost btn p-0" />}
@@ -102,7 +102,7 @@ function DynamicAuthMethods() {
           <button
             onClick={() => select(wallet.adapter.name)}
             key={wallet.adapter.name}
-            className="flex h-12 items-center justify-between rounded-md bg-base-100 p-4 text-left hover:bg-base-100/70"
+            className="flex h-12 items-center justify-between rounded-md bg-base-300 p-4 text-left hover:bg-base-300/70"
           >
             <div className="flex items-center space-x-2">
               <span className="relative mr-3 h-8 w-8">
