@@ -45,12 +45,12 @@ export default function WalletAdaptor() {
   const { data: session, status } = useSession();
   const loading = status === "loading";
 
-  const { data: userInfo, refetch } = api.user.myProfile.useQuery(undefined, {
+  api.user.myProfile.useQuery(undefined, {
     enabled: !!session,
     staleTime: 1000 * 10,
   });
 
-  const userMutation = api.user.updateUser.useMutation();
+  // const userMutation = api.user.updateUser.useMutation();
 
   const handleSignIn = React.useCallback(async () => {
     if (!publicKey) {

@@ -6,7 +6,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 export type b = StripeOnrampSessionRequest;
 // export type x = infer<StripeOnrampSessionRequest>
 export const onrampRouter = createTRPCRouter({
-  getMoonpayQuote: protectedProcedure.mutation(async ({ ctx }) => {}),
+  // getMoonpayQuote: protectedProcedure.mutation(async ({ ctx }) => {}),
   signMoonpayUrl: protectedProcedure
     .input(z.object({ url: z.string() }))
     .mutation(({ input }) => {

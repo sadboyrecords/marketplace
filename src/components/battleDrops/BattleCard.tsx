@@ -6,31 +6,22 @@ import AvatarImage from "@/components/avatar/Avatar";
 import GeneralLikes from "@/components/likes-plays/GeneralLikes";
 import PlayButton from "@/components/likes-plays/PlayButton";
 import React, { useCallback, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useWallet } from "@solana/wallet-adapter-react";
 import Button from "@/components/buttons/Button";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import Buy from "@/components/battleDrops/Buy";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
-import { toast } from "react-toastify";
-import confetti from "canvas-confetti";
+
 import type {
   BattleType,
   BattleTypeSummary,
   SongType,
   IMint,
-  MintResponseType,
 } from "@/utils/types";
-import dynamic from "next/dynamic";
 import { api } from "@/utils/api";
 import { getSupporters } from "@/utils/audioHelpers";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { openJoinBattleFansModal } from "@/lib/slices/appSlice";
-
-const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
-  ssr: false,
-});
 
 type BattleCardProps = {
   index: number;
@@ -45,23 +36,15 @@ function BattleCard({
   totalPot,
   competitorIndex,
 }: BattleCardProps) {
-  const { publicKey } = useWallet();
-  const { data: session } = useSession();
-  const { fetchCandyMachineById, candyMachines, mint, solUsdPrice } =
-    useMetaplex();
+  const { fetchCandyMachineById, candyMachines } = useMetaplex();
   const draft = battle?.battleContestants[index]?.candyMachineDraft;
   const imageHash = battle?.battleContestants[index]?.candyMachineDraft
     ?.imageIpfsHash as string;
-
-  const audioHash =
-    battle?.battleContestants[index]?.candyMachineDraft?.audioIpfsHash;
 
   const artistName =
     battle?.battleContestants[index]?.user.name ||
     (battle?.battleContestants[index]?.primaryArtistName as string);
 
-  // const [solInUsd, setSolInUsd] = React.useState<number>(20);
-  const [mintAmount, setMintAmount] = React.useState<number>(1);
   const candyMachineId =
     battle?.battleContestants[index]?.candyMachineDraft?.candyMachineId;
 
@@ -177,64 +160,6 @@ function BattleCard({
 
   const drop = battle?.battleContestants[index]?.candyMachineDraft?.drop;
 
-  const handleIncrease = () => {
-    setMintAmount(mintAmount + 1);
-  };
-
-  const handleDecrease = () => {
-    if (mintAmount > 1) {
-      setMintAmount(mintAmount - 1);
-    }
-  };
-  const [isMinting, setIsMinting] = React.useState<boolean>(false);
-
-  const [purchasedNft, setPurchasedNft] = React.useState<MintResponseType>();
-  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setPurchasedNft(undefined);
-  };
-
-  async function handleMint() {
-    if (!mintAmount || !candyMachineId) {
-      return;
-    }
-    setIsMinting(true);
-    const toastId = toast.loading("Purchase in progress");
-    try {
-      const data = await mint({
-        candyMachineId,
-        quantityString: mintAmount,
-        label: candyMachine?.guardsAndEligibility?.[0]?.label || "",
-        refetchTheseIds: competitorCandyId ? [competitorCandyId] : undefined,
-      });
-      setPurchasedNft(data);
-      setIsMinting(false);
-      toast.done(toastId);
-      setModalOpen(true);
-
-      void confetti({
-        particleCount: 100,
-        angle: 60,
-        spread: 70,
-        origin: { x: 0.2 },
-      });
-
-      void confetti({
-        particleCount: 100,
-        angle: 120,
-        spread: 70,
-        origin: { x: 0.8 },
-      });
-    } catch (error) {
-      console.log(error);
-      toast.done(toastId);
-
-      setIsMinting(false);
-      toast.error("Error minting");
-    }
-  }
-
   const [percentagePot, setPercentagePot] = React.useState<number>();
 
   React.useMemo(() => {
@@ -262,31 +187,6 @@ function BattleCard({
 
   return (
     <div className="mx-auto flex h-full max-w-xl flex-col  space-y-4 lg:mx-0">
-      <GenericModal
-        title="Congrats on  your purchase!"
-        isOpen={modalOpen}
-        closeModal={handleCloseModal}
-      >
-        <Typography size="body-sm" color="neutral-content">
-          Select {mintAmount > 1 ? "one of the links" : "the link"} below to
-          view your digital collectable
-        </Typography>
-        <div className="mt-2 flex flex-col space-y-2 text-left text-sm text-primary-500">
-          {purchasedNft?.nftData.map((nft) => (
-            <Link
-              key={nft.address}
-              className=""
-              href={routes.tokenItemDetails(nft?.address || "")}
-              target="_blank"
-            >
-              {nft.name}
-            </Link>
-          ))}
-        </div>
-        <Button onClick={handleCloseModal} color="neutral" variant="outlined">
-          Close
-        </Button>
-      </GenericModal>
       {/* flex flex-col items-center */}
       <Typography
         size="body-xl"
