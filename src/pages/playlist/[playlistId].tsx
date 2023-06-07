@@ -173,9 +173,6 @@ function PlaylistDetails() {
 
   useEffect(() => {
     if (!playlist?.songs && isCurated && !toasted) {
-      toast.success(
-        "Playlist Created. Add tracks and publish it to make it public"
-      );
       if (playlistId) {
         void router.replace(`/playlist/${playlistId}`, undefined, {
           shallow: true,

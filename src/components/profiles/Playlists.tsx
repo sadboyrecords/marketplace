@@ -10,7 +10,7 @@ type Props = {
   walletAddress: string | undefined;
 };
 
-function UserSongs({ walletAddress }: Props) {
+function UserPlaylists({ walletAddress }: Props) {
   const { data: playlists, isLoading } =
     api.playlist.getPlaylistByUser.useQuery(
       {
@@ -54,4 +54,4 @@ function UserSongs({ walletAddress }: Props) {
   );
 }
 
-export default UserSongs;
+export default UserPlaylists;
