@@ -10,13 +10,10 @@ import Avatar from "@/components/avatar/Avatar";
 import MarginLayout from "../layouts/MarginLayout";
 import { getCreatorname } from "@/utils/helpers";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import Input from "@/components/formFields/Input";
 import TextArea from "@/components/formFields/TextArea";
-import { useSelector } from "react-redux";
-import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 type UserInfoProps = {
@@ -72,17 +69,17 @@ function UserInfo({ walletAddress }: UserInfoProps) {
       });
       // debugger;
       await refetch();
-      toast.success(
-        followUser
-          ? `You're now following ${getCreatorname({
-              name: user?.name || user?.firstName || "",
-              walletAddress: publicAddress || "",
-            })}`
-          : `You have unfollowed ${getCreatorname({
-              name: user?.name || user?.firstName || "",
-              walletAddress: publicAddress || "",
-            })}`
-      );
+      // toast.success(
+      //   followUser
+      //     ? `You're now following ${getCreatorname({
+      //         name: user?.name || user?.firstName || "",
+      //         walletAddress: publicAddress || "",
+      //       })}`
+      //     : `You have unfollowed ${getCreatorname({
+      //         name: user?.name || user?.firstName || "",
+      //         walletAddress: publicAddress || "",
+      //       })}`
+      // );
       setIsLoading(false);
     } catch (error) {
       toast.error("Something went wrong. Please try again later");

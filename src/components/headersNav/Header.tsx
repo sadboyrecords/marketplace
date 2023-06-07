@@ -17,7 +17,7 @@ function Header({
   return (
     <>
       {/* sticky top-0  */}
-      <div className="sticky top-0 z-10  bg-gradient-to-b from-black px-4">
+      <div className="sticky top-0 z-50  bg-gradient-to-b from-black px-4">
         {/* bg-base-100 */}
         <div className="mx-auto flex h-20 max-w-7xl">
           {/* */}

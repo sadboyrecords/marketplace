@@ -101,7 +101,7 @@ function AvatarNav() {
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95"
         >
-          <Menu.Items className="absolute right-0 mt-2 w-80 max-w-xs origin-top-right divide-y divide-border-gray rounded-md bg-base-100 shadow-lg ring-1 ring-border-gray ring-opacity-5 focus:outline-none ">
+          <Menu.Items className="absolute right-0  mt-2 w-80 max-w-xs origin-top-right divide-y divide-border-gray rounded-md bg-base-100 shadow-lg ring-1 ring-border-gray ring-opacity-5 focus:outline-none ">
             <div className="flex flex-col space-y-2 px-2 py-4">
               <div className="flex items-center space-x-3  ">
                 <Avatar

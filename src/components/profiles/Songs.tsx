@@ -61,45 +61,54 @@ function UserSongs({ walletAddress }: Props) {
       <Typography className="font-bold tracking-wider" size="display-xs">
         Songs
       </Typography>
-      <div className="mt-2 flex space-x-5">
-        <span
-          className={`inline-flex cursor-pointer items-center rounded-md ${
-            buttonState === "CREATED"
-              ? "bg-primary-400 text-white hover:bg-primary-700"
-              : "bg-border-gray text-neutral-content hover:bg-border-gray/60"
-          } px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10`}
-          onClick={() => setButtonState("CREATED")}
-        >
-          Released
-        </span>
-        <span
-          className={`inline-flex cursor-pointer items-center rounded-md ${
-            buttonState === "LIKED"
-              ? "bg-primary-400 text-white hover:bg-primary-700"
-              : "bg-border-gray text-neutral-content hover:bg-border-gray/60"
-          } px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10`}
-          onClick={() => setButtonState("LIKED")}
-        >
-          Liked
-        </span>
-      </div>
+      {(songs?.length && songs?.length > 0) ||
+      (likedSongs && likedSongs?.length > 0) ? (
+        <>
+          <div className="mt-2 flex space-x-5">
+            <span
+              className={`inline-flex cursor-pointer items-center rounded-md ${
+                buttonState === "CREATED"
+                  ? "bg-primary-400 text-white hover:bg-primary-700"
+                  : "bg-border-gray text-neutral-content hover:bg-border-gray/60"
+              } px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10`}
+              onClick={() => setButtonState("CREATED")}
+            >
+              Released
+            </span>
+            <span
+              className={`inline-flex cursor-pointer items-center rounded-md ${
+                buttonState === "LIKED"
+                  ? "bg-primary-400 text-white hover:bg-primary-700"
+                  : "bg-border-gray text-neutral-content hover:bg-border-gray/60"
+              } px-2 py-1 text-xs font-medium ring-1 ring-inset ring-gray-500/10`}
+              onClick={() => setButtonState("LIKED")}
+            >
+              Liked
+            </span>
+          </div>
 
-      <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
-        {buttonState === "CREATED" && (
-          <>
-            {songs?.map((song) => (
-              <TrackItem key={song?.id} track={song} />
-            ))}
-          </>
-        )}
-        {buttonState === "LIKED" && (
-          <>
-            {likedSongs?.map((song) => (
-              <TrackItem key={song?.id} track={song} />
-            ))}
-          </>
-        )}
-      </div>
+          <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {buttonState === "CREATED" && (
+              <>
+                {songs?.map((song) => (
+                  <TrackItem key={song?.id} track={song} />
+                ))}
+              </>
+            )}
+            {buttonState === "LIKED" && (
+              <>
+                {likedSongs?.map((song) => (
+                  <TrackItem key={song?.id} track={song} />
+                ))}
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <Typography className="" size="body-sm" color="neutral-gray">
+          No songs released or liked
+        </Typography>
+      )}
     </MarginLayout>
   );
 }
