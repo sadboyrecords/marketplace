@@ -1,25 +1,13 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { XMarkIcon as XIcon } from "@heroicons/react/24/solid";
-import Typography from "../typography";
 import { useTheme } from "next-themes";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectOnrampModal,
-  openOnramp,
   closeOnramp,
   selectPublicAddress,
 } from "@/lib/slices/appSlice";
-
-interface Props {
-  // isOpen: boolean;
-  closeModal: () => void;
-  // openModal: () => void;
-  children?: React.ReactNode;
-  title?: string;
-  description?: string;
-  noPadding?: boolean;
-}
 
 export default function OnrampModal() {
   const { theme } = useTheme();
@@ -92,7 +80,9 @@ export default function OnrampModal() {
                         <iframe
                           src={`https://buy.onramper.com/?themeName=${
                             theme === "dark" ? "dark" : "light"
-                          }&primaryColor=9945FF&borderRadius=0.5&wgBorderRadius=1&defaultCrypto=SOL&onlyCryptos=SOL&apiKey=pk_prod_01H2Q8H9KSN4QYZW0D2YD19BCR${
+                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                          }&primaryColor=9945FF&borderRadius=0.5&wgBorderRadius=1&defaultCrypto=SOL&onlyCryptos=SOL&apiKey=${process
+                            .env.NEXT_PUBLIC_ONRAMPER_PK!}${
                             publicAddress
                               ? `&networkWallets=SOLANA:${publicAddress}`
                               : ""

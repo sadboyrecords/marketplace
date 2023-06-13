@@ -1,5 +1,4 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { BattleType, BattleTypeSummary } from "@/utils/types";
 
 export interface RootState {
   authModal: boolean;

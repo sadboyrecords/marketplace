@@ -30,7 +30,6 @@ function AvatarNav() {
   const { disconnect } = useWallet();
   const { walletBalance } = useMetaplex();
   const [copied, setCopied] = useState<boolean>();
-  const [isOpen, setIsOpen] = useState(false);
 
   const { data, isLoading } = api.user.myProfile.useQuery(undefined, {
     enabled: !!session,

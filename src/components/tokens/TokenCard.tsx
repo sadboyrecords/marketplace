@@ -1,10 +1,9 @@
-import type { SongType, PlaylistType } from "@/utils/types";
+import type { SongType } from "@/utils/types";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
 import Typography from "../typography";
-import PlayButton from "@/components/likes-plays/PlayButton";
 import { routes } from "@/utils/constants";
 
-import type { FindNftsByOwnerOutput, Nft } from "@metaplex-foundation/js";
+import type { Nft } from "@metaplex-foundation/js";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAudio, setCurrentSong } from "@/lib/slices/audioSlice";
 import { useEffect, useState } from "react";

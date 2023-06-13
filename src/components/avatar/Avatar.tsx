@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import Image from "next/image";
+
 // import Avatar from 'react-avatar';
 import { CameraIcon } from "@heroicons/react/24/outline";
 import LoaderSpinner from "@/components/iconComponents/LoadingSpinner";
@@ -51,7 +51,6 @@ function AvatarImage({
   height,
   style,
   className = "",
-  username,
   editing,
   setLoadingUpload,
   loadingUpload,
@@ -120,6 +119,7 @@ function AvatarImage({
         setLoadingUpload(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { getRootProps, getInputProps, open } = useDropzone({
