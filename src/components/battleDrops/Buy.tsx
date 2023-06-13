@@ -20,7 +20,7 @@ const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
 });
 
-const AddFunds = dynamic(() => import("@/components/onRamp/BuyWithStripe"), {
+const AddFunds = dynamic(() => import("@/components/onRamp/AddFunds"), {
   ssr: false,
 });
 

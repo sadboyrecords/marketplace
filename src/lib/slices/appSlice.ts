@@ -1,5 +1,4 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { BattleType, BattleTypeSummary } from "@/utils/types";
 
 export interface RootState {
   authModal: boolean;
@@ -13,6 +12,7 @@ export interface RootState {
     competitorCandyId?: string;
     supporters: ISupporters | undefined | null;
   } | null;
+  onRamperModal: boolean;
 }
 
 const initialState: RootState = {
@@ -20,6 +20,7 @@ const initialState: RootState = {
   publicAddress: null,
   joinBattleFansModal: false,
   battleDetailsAndSupporters: null,
+  onRamperModal: false,
 };
 
 export const appSlice = createSlice({
@@ -53,6 +54,12 @@ export const appSlice = createSlice({
       state.joinBattleFansModal = false;
       state.battleDetailsAndSupporters = null;
     },
+    openOnramp: (state) => {
+      state.onRamperModal = true;
+    },
+    closeOnramp: (state) => {
+      state.onRamperModal = false;
+    },
   },
 });
 
@@ -63,7 +70,12 @@ export const {
   setPublicAddress,
   openJoinBattleFansModal,
   closeJoinBattleFansModal,
+  openOnramp,
+  closeOnramp,
 } = appSlice.actions;
+
+export const selectOnrampModal = (state: { app: RootState }) =>
+  state.app.onRamperModal;
 
 export const selectJoinBattleFansModal = (state: { app: RootState }) =>
   state.app.joinBattleFansModal;

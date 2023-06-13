@@ -1,7 +1,6 @@
 import MarginLayout from "@/components/layouts/MarginLayout";
 import Typography from "@/components/typography";
 import { api } from "@/utils/api";
-import TrackItem from "@/components/track/TrackItem";
 import { useRouter } from "next/router";
 import OwnedNftsData from "./OwnedNftsData";
 

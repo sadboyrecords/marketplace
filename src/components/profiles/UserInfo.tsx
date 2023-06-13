@@ -55,7 +55,6 @@ function UserInfo({ walletAddress }: UserInfoProps) {
   );
 
   const follow = api.user.followUnfollow.useMutation();
-  // console.log({ loggedInUserKey });
 
   const handleFollow = async () => {
     if (!walletAddress) return;

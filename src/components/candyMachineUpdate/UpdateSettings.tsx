@@ -181,7 +181,7 @@ export default function UpdateSettings() {
   //   if (data.guards?.length > 1) {
   //     // console.log(' FILTER');
   //     const filteredStart = data.guards.filter((g) => g.startDate);
-  //     console.log({ filteredStart });
+  //     eredStart });
   //     const sortedStart = filteredStart.sort(
   //       (a, b) =>
   //         new Date(a?.startDate as Date)?.getTime() -

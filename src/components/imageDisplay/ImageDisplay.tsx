@@ -38,7 +38,7 @@ export default function ImageDisplay({
 }: PropsTypes) {
   // console.log({ url, hash });
   // console.log({ url, hash, pinnedStatus, path });
-  const hashedUrl = ipfsUrl(hash, quality);
+  // const hashedUrl = ipfsUrl(hash, quality);
   // console.log({ hash, url });
   // console.log({ hashedUrl });
 

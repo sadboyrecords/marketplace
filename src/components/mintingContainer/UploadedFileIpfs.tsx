@@ -56,11 +56,11 @@ function UploadedFileIpfs({
         const data = await uploadFileToIpfs({ imageFile: uploadedFile });
         const cid = data?.cid;
         const key = data?.key;
-        // console.log({ cid, key });
+        console.log({ cid, key });
         if (cid && key) {
           const dimensions = await getImageDimensions(uploadedFile);
-          console.log({ dimensions });
-          const res = await imageApi.mutateAsync({
+          console.log({ dimensions, cid, key });
+          await imageApi.mutateAsync({
             height: dimensions.height,
             width: dimensions.width,
             ipfsHash: cid,

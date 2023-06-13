@@ -234,6 +234,7 @@ export const uploadFileToIpfs = async ({
   let path = "";
   let forUpload;
   let fileType;
+  let fileExtension;
 
   if (!audioFile && !imageFile && !json) return;
   if (json) {
@@ -251,6 +252,7 @@ export const uploadFileToIpfs = async ({
     path = nftImagePath;
     forUpload = imageFile;
     fileType = imageFile.type;
+    fileExtension = fileType.split("/")[1];
   }
   if (json && stringifyJson) {
     hash = (await hashJSON(stringifyJson)) as string;
@@ -259,7 +261,9 @@ export const uploadFileToIpfs = async ({
     fileType = "application/json";
   }
 
-  const key = `${path}${hash}${json ? ".json" : ""}`;
+  const key = `${path}${hash}${json ? ".json" : ""}${
+    fileExtension ? `.${fileExtension}` : ""
+  }`;
   const params = {
     Bucket: process.env.NEXT_PUBLIC_FILEBASE_BUCKET,
     Key: key,
