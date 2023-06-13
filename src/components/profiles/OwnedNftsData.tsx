@@ -81,8 +81,6 @@ function OwnedNftsData({ walletAddress }: Props) {
     }
   }, [walletAddress]);
 
-  console.log({ ownedNfts });
-
   // if (isLoading)
   //   return (
   //     <MarginLayout>

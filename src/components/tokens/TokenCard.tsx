@@ -40,7 +40,7 @@ function TokenCard({ hideBottom, fullWidth, nft }: Props) {
       const filtered = nft?.json?.properties?.files?.filter((f) =>
         f?.type?.includes("audio")
       );
-      console.log({ filtered });
+      //   console.log({ filtered });
       const audioUri = filtered?.[0]?.uri;
       setTrack({
         id: audioUri || "",

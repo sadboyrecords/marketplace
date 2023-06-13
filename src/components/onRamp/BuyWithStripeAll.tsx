@@ -11,20 +11,30 @@ import { LoadingSpinner } from "@/components/iconComponents";
 import { useSession } from "next-auth/react";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { useSelector } from "react-redux";
-import { api } from "@/utils/api";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
+import { useTheme } from "next-themes";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
 });
+const OnrampModal = dynamic(() => import("@/components/modals/OnrampModal"), {
+  ssr: false,
+});
 
-function BuyWithStripe() {
+type Props = {
+  close?: () => void;
+};
+
+function BuyWithStripe({ close }: Props) {
   const stripeOnrampPromise = loadStripeOnramp(
     process.env.NEXT_PUBLIC_STRIPE_PK as string
   );
+  const { theme } = useTheme();
+
   const { candyMachines, fetchCandyMachineById, getUserBalance } =
     useMetaplex();
   const [open, setOpen] = useState(false);
+  console.log({ open });
   const { data: session } = useSession();
   const [clientSecret, setClientSecret] = useState<string>();
   // const [message, setMessage] = useState("");
@@ -47,9 +57,10 @@ function BuyWithStripe() {
     setIsLoading(false);
     return;
   };
+
   const handleBuy = async () => {
     setIsLoading(true);
-    console.log({ candyMachines });
+    // console.log({ candyMachines });
 
     try {
       const body = {
@@ -87,7 +98,23 @@ function BuyWithStripe() {
     }
   };
 
+  const handleOnRamper = () => {
+    // setIsLoading(true);
+    console.log(" ON RAMP -------");
+
+    try {
+      setOpen(true);
+    } catch (error) {
+      setIsLoading(false);
+      console.log({ error });
+      toast.error("There was an error adding funds.s");
+    }
+  };
+
   const handleClose = useCallback(() => {
+    if (close) {
+      close();
+    }
     setOpen(false);
     setClientSecret(undefined);
     setIsLoading(false);
@@ -106,7 +133,6 @@ function BuyWithStripe() {
       void handleCandyRefresh();
     }
   };
-  console.log({ clientSecret, loading });
 
   // const moonSign = api.onramp.signMoonpayUrl.useMutation();
   const handleMoon = () => {
@@ -167,21 +193,30 @@ function BuyWithStripe() {
     <div className="flex w-fit flex-col items-center space-x-3 space-y-2">
       <div
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={handleBuy}
+        // onClick={handleBuy}
+        onClick={handleOnRamper}
         className="flex cursor-pointer items-center rounded-md border border-border-gray   px-2 py-1 text-xs text-primary-500 hover:text-primary-700"
       >
         <MoneyIcon className="mr-2 h-4 w-4" />
         Add Funds
       </div>
-      <div
+      {/* <div
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={handleBuy}
+        className="flex cursor-pointer items-center rounded-md border border-border-gray   px-2 py-1 text-xs text-primary-500 hover:text-primary-700"
+      >
+        <MoneyIcon className="mr-2 h-4 w-4" />
+        Add Funds
+      </div> */}
+      {/* <div
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={handleMoon}
         className="flex cursor-pointer items-center rounded-md border border-border-gray   px-2 py-1 text-xs text-primary-500 hover:text-primary-700"
       >
         <MoneyIcon className="mr-2 h-4 w-4" />
         Add Funds MOON
-      </div>
-      <GenericModal
+      </div> */}
+      {/* <GenericModal
         title="Add Funds"
         noPadding
         isOpen={open}
@@ -192,7 +227,7 @@ function BuyWithStripe() {
             <LoadingSpinner className="h-10 w-10 text-primary-500" />
           </div>
         )}
-        {/* {message && <div id="onramp-message">{message}</div>} */}
+
         <CryptoElements stripeOnramp={stripeOnrampPromise}>
           {clientSecret && (
             // @ts-ignore
@@ -203,7 +238,28 @@ function BuyWithStripe() {
             />
           )}
         </CryptoElements>
-      </GenericModal>
+      </GenericModal> */}
+      <OnrampModal
+        title="Add Funds"
+        noPadding
+        isOpen={open}
+        closeModal={handleClose}
+      >
+        {/* {loading && (
+          <div className="flex h-32 w-full flex-col items-center justify-center">
+            <LoadingSpinner className="h-10 w-10 text-primary-500" />
+          </div>
+        )} */}
+        <iframe
+          src={`https://buy.onramper.com/?themeName=${
+            theme === "dark" ? "dark" : "light"
+          }&primaryColor=9945FF&borderRadius=0.5&wgBorderRadius=1`}
+          title="Onramper Widget"
+          height="630px"
+          width="100%" //"420px"
+          allow="accelerometer; autoplay; camera; gyroscope; payment"
+        />
+      </OnrampModal>
     </div>
   );
 }

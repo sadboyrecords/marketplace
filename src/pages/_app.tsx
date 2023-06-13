@@ -42,6 +42,10 @@ const JoinBattleFansModal = dynamic(
   }
 );
 
+const OnrampModal = dynamic(() => import("@/components/modals/OnrampModal"), {
+  ssr: false,
+});
+
 const MyApp: AppType<{ session: AppSession | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
@@ -59,6 +63,7 @@ const MyApp: AppType<{ session: AppSession | null }> = ({
               <MetaplexProvider>
                 <MainLayout>
                   <JoinBattleFansModal />
+                  <OnrampModal />
                   {getLayout(<Component {...pageProps} />)}
                 </MainLayout>
                 <PlayerBar />
