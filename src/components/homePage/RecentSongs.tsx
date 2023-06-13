@@ -6,6 +6,7 @@ function RecentlyAdded() {
   const songsQuery = api.songs.getRecentTracks.useQuery();
 
   const { data, isLoading } = songsQuery;
+  console.log({ data });
 
   return (
     <div className="">
