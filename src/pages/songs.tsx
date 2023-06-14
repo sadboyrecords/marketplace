@@ -4,6 +4,10 @@ import { api } from "@/utils/api";
 import { useState, useEffect } from "react";
 import Button from "@/components/buttons/Button";
 import Notification from "@/components/alertsNotifications/Notification";
+import superjson from "superjson";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { appRouter } from "@/server/api/root";
+import { prisma } from "@/server/db";
 import { type SongType } from "@/utils/types";
 
 function Songs() {
@@ -35,6 +39,7 @@ function Songs() {
         });
       });
     setAllSongs(songUpdates);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [songsQuery.data]);
 
   console.log({ songsQuery });
@@ -83,6 +88,36 @@ function Songs() {
       )}
     </>
   );
+}
+
+export async function getStaticProps() {
+  //
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    // ctx: await createContext(),
+    ctx: {
+      session: null,
+      ip: "",
+      prisma,
+    },
+    transformer: superjson,
+  });
+
+  void Promise.allSettled([
+    await helpers.songs.getAllSongsPaginated.prefetchInfinite({
+      limit: 15,
+    }),
+  ]);
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+    // Next.js will attempt to re-generate the page:
+    // - When a request comes in
+    // - At most once every 10 seconds
+    revalidate: 30, // In seconds
+  };
 }
 
 export default Songs;

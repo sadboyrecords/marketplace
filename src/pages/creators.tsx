@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import type { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { api } from "@/utils/api";
 import Typography from "@/components/typography";
@@ -13,7 +12,12 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { getCreatorname } from "@/utils/helpers";
-import { type ArtistType } from "@/utils/types";
+import superjson from "superjson";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { appRouter } from "@/server/api/root";
+import { prisma } from "@/server/db";
+import type { NextPage } from "next";
+import type { ArtistType } from "@/utils/types";
 
 // import { appRouter } from "server/router/_app";
 // import { createProxySSGHelpers } from "@api/react-query/ssg";
@@ -129,6 +133,35 @@ const Artists: NextPage = () => {
   );
 };
 
+export async function getStaticProps() {
+  //
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    // ctx: await createContext(),
+    ctx: {
+      session: null,
+      ip: "",
+      prisma,
+    },
+    transformer: superjson,
+  });
+
+  void Promise.allSettled([
+    await helpers.artist.getAllArtistsPaginated.prefetchInfinite({
+      limit: 20,
+    }),
+  ]);
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+    // Next.js will attempt to re-generate the page:
+    // - When a request comes in
+    // - At most once every 10 seconds
+    revalidate: 30, // In seconds
+  };
+}
 export default Artists;
 
 // export async function getStaticProps() {

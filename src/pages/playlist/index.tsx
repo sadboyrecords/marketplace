@@ -2,15 +2,15 @@ import type { NextPage } from "next";
 import { useState, useEffect } from "react";
 import { api } from "@/utils/api";
 import Typography from "@/components/typography";
-// import { CardGridContainer } from '@/components/Containers';
 import PlaylistCard from "@/components/playlist/PlaylistCard";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-// import { appRouter } from 'server/router/_app';
-// import { createProxySSGHelpers } from '@api/react-query/ssg';
 import superjson from "superjson";
-import type { PlaylistType, SongType } from "@/utils/types";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { appRouter } from "@/server/api/root";
+import { prisma } from "@/server/db";
 import { routes } from "@/utils/constants";
+import type { PlaylistType, SongType } from "@/utils/types";
 
 const NewPlaylistButton = dynamic(
   () => import("@/components/buttons/NewPlaylist"),
@@ -34,10 +34,10 @@ const Playlists: NextPage = () => {
   const {
     data,
     isLoading,
-    isError,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
+    // isError,
+    // hasNextPage,
+    // isFetchingNextPage,
+    // fetchNextPage,
   } = playlists;
 
   useEffect(() => {
@@ -94,6 +94,36 @@ const Playlists: NextPage = () => {
     </>
   );
 };
+
+export async function getStaticProps() {
+  //
+  const helpers = createServerSideHelpers({
+    router: appRouter,
+    // ctx: await createContext(),
+    ctx: {
+      session: null,
+      ip: "",
+      prisma,
+    },
+    transformer: superjson,
+  });
+
+  void Promise.allSettled([
+    await helpers.playlist.getAllPlaylistsPaginated.prefetchInfinite({
+      limit: 6,
+    }),
+  ]);
+
+  return {
+    props: {
+      trpcState: helpers.dehydrate(),
+    },
+    // Next.js will attempt to re-generate the page:
+    // - When a request comes in
+    // - At most once every 10 seconds
+    revalidate: 30, // In seconds
+  };
+}
 
 export default Playlists;
 
