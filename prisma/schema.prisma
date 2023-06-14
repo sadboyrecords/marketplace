@@ -2,22 +2,14 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
+    previewFeatures = ["filteredRelationCount"]
 }
 
 datasource db {
-    provider = "sqlite"
-    // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
-}
-
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
 }
 
 // Necessary for Next auth
@@ -47,15 +39,15 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-}
+// model User {
+//     id            String    @id @default(cuid())
+//     name          String?
+//     email         String?   @unique
+//     emailVerified DateTime?
+//     image         String?
+//     accounts      Account[]
+//     sessions      Session[]
+// }
 
 model VerificationToken {
     identifier String
@@ -63,4 +55,608 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model LikedUsers {
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    likedAddressId String
+    likedByAddress String
+    isLiked        Boolean
+    // likedArtist     RawArtists @relation("LikedArtistRelation", fields: [likedAddressId], references: [id], map: "liked_artist_fk")
+    // likedByArtistId RawArtists @relation("LikedByArtist", fields: [likedByAddress], references: [id], map: "liked_by_artist_fk")
+    likedByUser    User     @relation("LikedBy", fields: [likedByAddress], references: [walletAddress], map: "liked_by_user_fk")
+    likedUser      User     @relation("LikedUserRelation", fields: [likedAddressId], references: [walletAddress], map: "liked_user_fk")
+
+    @@id([likedAddressId, likedByAddress])
+    @@unique([likedAddressId, likedByAddress])
+}
+
+model Follow {
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+    followerAddress  String
+    followingAddress String
+    isFollowing      Boolean
+    // artistFollower   RawArtists @relation("ArtistFollowers", fields: [followerAddress], references: [id], map: "raw_artists_followers_fk")
+    // artistFollowing  RawArtists @relation("ArtistFollowing", fields: [followingAddress], references: [id], map: "raw_artists_following_fk")
+    follower         User     @relation("ImFollowing", fields: [followerAddress], references: [walletAddress], map: "user_im_following_fk")
+    following        User     @relation("MyFollowers", fields: [followingAddress], references: [walletAddress], map: "user_my_followers_fk")
+
+    @@id([followingAddress, followerAddress])
+    @@unique([followingAddress, followerAddress], name: "followingFollowAddress")
+}
+
+model User {
+    id                   String              @id @default(uuid())
+    email                String?             @unique
+    firstName            String?
+    lastName             String?
+    isAdmin              Boolean             @default(false)
+    profileBannerImage   String?
+    profilePictureImage  String?
+    profileBannerHash    String?
+    profilePictureHash   String?
+    profileBannerXAxis   Float?
+    profileBannerYAxis   Float?
+    profilePictureXAxis  Float?
+    profilePictureYAxis  Float?
+    description          String?
+    createdAt            DateTime            @default(now())
+    updatedAt            DateTime            @updatedAt
+    walletAddress        String              @unique
+    followers            Follow[]            @relation("MyFollowers")
+    following            Follow[]            @relation("ImFollowing")
+    likedPlaylists       LikedPlaylists[]
+    likedTracks          LikedTracks[]
+    likedUsers           LikedUsers[]        @relation("LikedBy")
+    mylikes              LikedUsers[]        @relation("LikedUserRelation")
+    createdPlaylists     Playlists[]
+    socials              SocialAccount[]
+    candyMachines        CandyMachines[]
+    ownedCandyMachines   CandyMachines[]     @relation("UserCandyMachines")
+    likedDrops           LikedDrops[]
+    creatorTokens        Tokens[]
+    songs                Songs[]
+    socialWebLinks       String[]
+    roles                Role[]
+    pinnedProfilePicture PinnedFiles?        @relation("PinnedProfilePicture", fields: [profilePictureHash], references: [ipfsHash])
+    pinnedProfileBanner  PinnedFiles?        @relation("PinnedBannerPicture", fields: [profileBannerHash], references: [ipfsHash])
+    name                 String?
+    emailVerified        DateTime?
+    image                String?
+    accounts             Account[]
+    sessions             Session[]
+    battles              BattleContestants[]
+    createdBattles       Battle[]
+    magicSolanaAddress   String?             @unique
+    sentTransactions     Transactions[]      @relation("SentTransactions")
+    receivedTransactions Transactions[]      @relation("ReceivedTransactions")
+    // creationEvents CreationEvents[]
+    // battles              Battle[]
+}
+
+enum Role {
+    ADMIN
+    SUPER_ADMIN
+}
+
+// model SocialLinks {
+//   id         String    @id @default(uuid())
+//   name       String
+//   url        String
+//   socialType String
+//   userId     String?
+//   createdAt  DateTime  @default(now())
+//   updatedAt  DateTime  @updatedAt
+//   walletAddress String
+//   creator    User      @relation(fields: [walletAddress], references: [walletAddress])
+
+//   // @@unique([id, walletAddress], name: "userWalletAndSocialId")
+// }
+
+model Playlists {
+    id               String           @id @default(uuid())
+    name             String
+    description      String?
+    isPublic         Boolean          @default(false)
+    playlistImageUrl String?
+    userId           String?
+    createdAt        DateTime         @default(now())
+    updatedAt        DateTime         @updatedAt
+    walletAddress    String
+    // isFeatured       Boolean          @default(false)
+    creator          User             @relation(fields: [walletAddress], references: [walletAddress])
+    likes            LikedPlaylists[]
+    // tracks           RawProcessedTracks[]
+    songs            Songs[]
+
+    @@unique([id, walletAddress], name: "userWalletAndPlaylistId")
+}
+
+model LikedPlaylists {
+    id         String    @id @default(uuid())
+    playlistId String
+    isLiked    Boolean
+    likedById  String
+    likedBy    User      @relation(fields: [likedById], references: [id])
+    playlist   Playlists @relation(fields: [playlistId], references: [id])
+
+    @@unique([playlistId, likedById], name: "playlistAndLikedBy")
+}
+
+model SocialAccount {
+    id       Int        @id @default(autoincrement())
+    type     SocialType
+    url      String
+    userId   String
+    verified DateTime?
+    user     User       @relation(fields: [userId], references: [id])
+}
+
+enum SocialType {
+    TWITTER
+    INSTAGRAM
+    FACEBOOK
+    YOUTUBE
+    SPOTIFY
+    APPLE
+    TIKTOK
+    SOUNDCLOUD
+    DISCORD
+    TELEGRAM
+    REDDIT
+    GITHUB
+    LINKEDIN
+    WEBSITE
+    EMAIL
+    // PHONE
+    // OTHER
+}
+
+enum PlaylistType {
+    LIKED
+    CREATED
+}
+
+model LikedDrops {
+    id             String        @id @default(uuid())
+    candyMachineId String
+    isLiked        Boolean
+    likedByWallet  String
+    likedBy        User          @relation(fields: [likedByWallet], references: [walletAddress])
+    candyMachine   CandyMachines @relation(fields: [candyMachineId], references: [candyMachineId])
+
+    @@unique([candyMachineId, likedByWallet], name: "dropAndLikedBy")
+}
+
+model Battle {
+    id                String              @id @default(cuid())
+    isLive            Boolean             @default(false)
+    isReady           Boolean             @default(false) // if both contestants are ready
+    isActive          Boolean             @default(false)
+    displayOnHomePage Boolean             @default(false)
+    order             Int                 @default(autoincrement())
+    createdByNifty    Boolean             @default(false)
+    battleName        String
+    battleDescription String?
+    battlePrice       Float?
+    battleStartDate   DateTime
+    battleEndDate     DateTime
+    royalties         Float?
+    itemsAvailable    Int?
+    slug              String?             @unique
+    createdByWallet   String?
+    createdBy         User?               @relation(fields: [createdByWallet], references: [walletAddress])
+    battleContestants BattleContestants[]
+    // constestantOneId  String            @unique
+    // contestantOne     BattleContestants @relation("ContestantOne", fields: [constestantOneId], references: [id])
+    // contestantTwoId   String            @unique
+    // contestantTwo     BattleContestants @relation("ContestanTwo", fields: [contestantTwoId], references: [id])
+    createdAt         DateTime            @default(now())
+    updatedAt         DateTime            @updatedAt
+}
+
+model BattleContestants {
+    id                String            @id @default(cuid())
+    primaryArtistName String
+    walletAddress     String
+    user              User              @relation(fields: [walletAddress], references: [walletAddress])
+    draftId           String            @unique
+    candyMachineDraft CandyMachineDraft @relation(fields: [draftId], references: [id])
+    candyMachineId    String?           @unique
+    candymachine      CandyMachines?    @relation(fields: [candyMachineId], references: [candyMachineId])
+    battleId          String
+    battle            Battle            @relation(fields: [battleId], references: [id])
+    // c1            Battle
+    // c2            Battle
+
+    @@unique([battleId, walletAddress], name: "battleAndArtist")
+}
+
+model CandyMachines {
+    id                   String              @id @default(uuid())
+    candyMachineId       String              @unique
+    slug                 String              @unique
+    createdAt            DateTime            @default(now())
+    updatedAt            DateTime            @updatedAt
+    startDate            DateTime
+    endDate              DateTime
+    earlyAccessStartDate DateTime?
+    earlyAccessEndDate   DateTime?
+    whiteListStartDate   DateTime?
+    whiteListEndDate     DateTime?
+    preSaleStartDate     DateTime?
+    preSaleEndDate       DateTime?
+    ownerWalletAddress   String
+    owner                User                @relation("UserCandyMachines", fields: [ownerWalletAddress], references: [walletAddress])
+    creators             User[]
+    songId               String?
+    audioUri             String
+    audioIpfsHash        String
+    song                 Songs               @relation("CandyMachineSong", fields: [audioIpfsHash], references: [lossyAudioIPFSHash])
+    priority             Int?                @default(0)
+    imageIpfsHash        String
+    candyMachineImageUrl String
+    jsonIpfsHash         String
+    description          String
+    dropName             String
+    likes                LikedDrops[]
+    collectionAddress    String?
+    token                Tokens?             @relation(fields: [collectionAddress], references: [mintAddress])
+    isFeatured           Boolean             @default(false)
+    isPublic             Boolean             @default(true)
+    lowestPrice          Float?
+    items                Int?
+    pinnedImage          PinnedFiles?        @relation("PinnedCandyMachineImage", fields: [imageIpfsHash], references: [ipfsHash])
+    // song                  Songs?          @relation(fields: [songId], references: [id])
+    // isEnded               Boolean          @default(false)
+    CandyMachineDraft    CandyMachineDraft?
+    totalMinted          Int?                @default(0)
+    battleContestant     BattleContestants[]
+    transactions         Transactions[]
+}
+
+model CandyMachineDraft {
+    id                        String             @id @default(cuid())
+    candyMachineId            String?            @unique
+    candyMachineIdPlaceholder String?            @unique
+    drop                      CandyMachines?     @relation(fields: [candyMachineId], references: [candyMachineId])
+    candyMachineSlug          String?            @unique
+    createdAt                 DateTime           @default(now())
+    updatedAt                 DateTime           @updatedAt
+    externalID                String?
+    partnerCode               PartnerCode?
+    partner                   Partner?           @relation(fields: [partnerCode], references: [code])
+    formSubmission            Json
+    metaDataHash              Float[]
+    metadataUri               String?
+    startDate                 DateTime?
+    endDate                   DateTime?
+    earlyAccessStartDate      DateTime?
+    earlyAccessEndDate        DateTime?
+    whiteListStartDate        DateTime?
+    whiteListEndDate          DateTime?
+    preSaleStartDate          DateTime?
+    preSaleEndDate            DateTime?
+    ownerWalletAddress        String
+    songId                    String?
+    audioUri                  String?
+    audioIpfsHash             String?
+    imageIpfsHash             String?
+    candyMachineImageUrl      String?
+    jsonIpfsHash              String?
+    description               String?
+    dropName                  String?
+    collectionAddress         String?
+    lowestPrice               Float?
+    items                     Int?
+    currentStep               CandyMachineSteps
+    isPublished               Boolean            @default(false)
+    primaryArtists            String[]
+    featuredArtists           String[]
+    artists                   String[]
+    upc                       String?
+    isrc                      String?
+    creators                  String[]
+    treasury                  String?
+    status                    DraftStatus?
+    battleContestant          BattleContestants?
+
+    //  isImported           Boolean      @default(false)
+    //   importedPlatform     String?
+    // song                  Songs?          @relation(fields: [songId], references: [id])
+    // isEnded               Boolean          @default(false)
+
+    @@unique([externalID, partnerCode], name: "externalIDAndMarketplace")
+    @@index([status], name: "status")
+}
+
+enum DraftStatus {
+    DRAFT
+    LAUNCHED
+    PENDING
+}
+
+model Partner {
+    id                String              @id @default(uuid())
+    name              String
+    lastRefresh       DateTime            @default(now())
+    code              PartnerCode         @unique
+    createdAt         DateTime            @default(now())
+    updatedAt         DateTime            @updatedAt
+    // candyMachines CandyMachines[]
+    CandyMachineDraft CandyMachineDraft[]
+}
+
+enum PartnerCode {
+    BRIDG3
+}
+
+model LikedTracks {
+    id         String  @id @default(uuid())
+    trackId    String
+    userWallet String
+    isLiked    Boolean
+    // track      RawProcessedTracks @relation(fields: [trackId], references: [id])
+    user       User    @relation(fields: [userWallet], references: [walletAddress])
+    song       Songs   @relation(fields: [trackId], references: [id])
+
+    @@unique([trackId, userWallet], name: "liked_tracks_track_id_walletAddress_unique")
+}
+
+model Songs {
+    id                   String          @id @default(uuid())
+    createdAt            DateTime        @default(now())
+    updatedAt            DateTime        @updatedAt
+    title                String
+    slug                 String          @db.VarChar(1020)
+    lossyAudioIPFSHash   String?         @unique
+    lossyAudioURL        String          @unique
+    lossyArtworkIPFSHash String?         @db.VarChar(255)
+    lossyArtworkURL      String?
+    candyMachines        CandyMachines[] @relation("CandyMachineSong")
+    platformInternalId   String?
+    description          String?
+    websiteUrl           String?
+    platformId           String?
+    tokens               Tokens[]
+    oldTokens            Tokens[]        @relation("OldSongs")
+    isDuplicate          Boolean         @default(false)
+    artistNames          String[]
+    otherTrackTitles     String[]
+    playlists            Playlists[]
+    creators             User[]
+    likes                LikedTracks[]
+    pinnedImage          PinnedFiles?    @relation("PinnedSongImage", fields: [lossyArtworkIPFSHash], references: [ipfsHash])
+    pinnedAudio          PinnedFiles?    @relation("PinnedSongAudio", fields: [lossyAudioIPFSHash], references: [ipfsHash])
+
+    // tokens               TokenItems[]
+    // artistId                     String?                  @db.VarChar(255)
+    // rawArtists                   RawArtists?              @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "raw_processed_tracks_artistid_foreign")
+    // rawPlatforms                 RawPlatforms?            @relation(fields: [platformId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "raw_processed_tracks_platformid_foreign")
+    // likes                        LikedTracks[]
+    // rawNftsProcessedTracks       RawNftsProcessedTracks[]
+    // playlists                    Playlists[]
+
+    // creationEvents       CreationEvents[]
+
+    // primaryArtist        String?
+    // featuredArtists      String?
+    @@index([lossyAudioIPFSHash])
+}
+
+model Tokens {
+    id                   String          @id @default(uuid()) //tokenAddresss 
+    createdAt            DateTime        @default(now())
+    mintAddress          String          @unique
+    chain                String
+    updatedAt            DateTime        @updatedAt
+    songId               String
+    collectionAddress    String?
+    tokenUri             String
+    audioUri             String
+    audioIpfsHash        String?
+    song                 Songs           @relation(fields: [songId], references: [id])
+    title                String
+    description          String?
+    slug                 String          @db.VarChar(1020)
+    // lossyAudioIPFSHash   String?
+    // lossyAudioURL        String?
+    lossyArtworkIPFSHash String?         @db.VarChar(255)
+    lossyArtworkURL      String?
+    platformInternalId   String?
+    externalUrl          String?
+    websiteUrl           String?
+    platformId           String?
+    candyMachines        CandyMachines[]
+    creators             User[]
+    listings             Listing[]
+    oldSongId            String?
+    oldSong              Songs?          @relation("OldSongs", fields: [oldSongId], references: [id])
+    isCollection         Boolean?
+    pinnedImage          PinnedFiles?    @relation("PinnedTokenImage", fields: [lossyArtworkIPFSHash], references: [ipfsHash])
+    pinnedAudio          PinnedFiles?    @relation("PinnedTokenAudio", fields: [audioIpfsHash], references: [ipfsHash])
+    transactions         Transactions[]
+    // tokens               Tokens[]       @relation("collectionAddress")
+    // tokensRelation       Tokens[]       @relation("collectionAddress")
+
+    @@unique([mintAddress, chain], name: "mintAddressAndChain")
+}
+
+model AllowedWallets {
+    id            String       @id @default(uuid())
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    walletAddress String       @unique
+    isAllowed     Boolean      @default(false)
+    type          AllowedTypes
+}
+
+model PinnedFiles {
+    id                String            @id @default(uuid())
+    createdAt         DateTime          @default(now())
+    updatedAt         DateTime          @updatedAt
+    ipfsHash          String            @unique
+    // url              String            @unique
+    path              String            @unique
+    type              PinnedFileType
+    // orginalUrl       String?
+    originalUrl       String?
+    width             Int?
+    height            Int?
+    name              String?
+    blurUrl           String?
+    pinnedToFileBase  Boolean           @default(false)
+    tags              String[]
+    status            PinnedFilesStatus
+    userProfileImage  User[]            @relation("PinnedProfilePicture")
+    userBannerImage   User[]            @relation("PinnedBannerPicture")
+    songImage         Songs[]           @relation("PinnedSongImage")
+    songAudio         Songs[]           @relation("PinnedSongAudio")
+    tokenImage        Tokens[]          @relation("PinnedTokenImage")
+    tokenAudio        Tokens[]          @relation("PinnedTokenAudio")
+    candyMachineImage CandyMachines[]   @relation("PinnedCandyMachineImage")
+}
+
+// model Creators {
+//   id        String   @id @default(uuid())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   walletAddress    String
+//   name      String?
+//   slug      String?   @unique
+//   // songs     Songs[]
+// }
+
+// model CreationEvents {
+//   id               String   @id @default(uuid())
+//   createdAt        DateTime @default(now())
+//   updatedAt        DateTime @updatedAt
+//   songId           String
+//   // song             Songs    @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "creation_events_songid_foreign")
+//   walletAddress    String
+//   isArtworkCreator Boolean  @default(false)
+//   isMusicProducer  Boolean  @default(false)
+//   isSongwriter     Boolean  @default(false)
+//   isMinter         Boolean  @default(false)
+//   isDistributor    Boolean  @default(false)
+//   isLabel          Boolean  @default(false)
+//   isPrimaryArtist  Boolean  @default(false)
+//   isFeaturedArtist Boolean  @default(false)
+//   user             User     @relation(fields: [walletAddress], references: [walletAddress], onDelete: Cascade, onUpdate: NoAction, map: "creation_events_walletaddress_foreign")
+// }
+
+model Collections {
+    id        String   @id //collectionAddress
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    // items            TokenItems[]?
+    // creators
+}
+
+model Listing {
+    id                   String        @id @default(uuid())
+    createdAt            DateTime      @default(now())
+    updatedAt            DateTime      @updatedAt
+    tokenMintAddress     String
+    token                Tokens        @relation(fields: [tokenMintAddress], references: [mintAddress])
+    sellerWalletAddress  String
+    receiptAddress       String        @unique
+    freeSellerTradeState String?
+    status               ListingStatus
+    price                Float
+    songUrl              String?
+    metadataUrl          String?
+    startDate            DateTime?
+    endDate              DateTime?
+    auctionHouseAddress  String
+    auctioneerAuthority  String?
+    listingType          ListingType
+    currency             CurrencyType  @default(SOL)
+    // songId            String
+    // song              Songs      @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "listing_songid_foreign")
+    // walletAddress     String 
+    // user              User      @relation(fields: [walletAddress], references: [walletAddress], onDelete: Cascade, onUpdate: NoAction, map: "listing_walletaddress_foreign")
+}
+
+model Transactions {
+    id                        String           @id @default(uuid())
+    signature                 String           @unique
+    fromWalletAddress         String?
+    receiverWalletAddress     String?
+    candymachineAddress       String?
+    tokenAddress              String?
+    tokenAddressReferenceOnly String?
+    transactionType           TransactionTypes
+    blockTime                 Int
+    candyMachine              CandyMachines?   @relation(fields: [candymachineAddress], references: [candyMachineId])
+    fromUser                  User?            @relation("SentTransactions", fields: [fromWalletAddress], references: [walletAddress])
+    receiver                  User?            @relation("ReceivedTransactions", fields: [receiverWalletAddress], references: [walletAddress])
+    token                     Tokens?          @relation(fields: [tokenAddress], references: [mintAddress])
+    createdAt                 DateTime         @default(now())
+    updatedAt                 DateTime         @updatedAt
+}
+
+enum TransactionTypes {
+    MINT
+    TRANSFER
+    LIST
+    BUY
+    CANDY_MACHINE
+}
+
+model IndexingError {
+    id           String   @id @default(uuid())
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+    error        String?
+    rectified    Boolean  @default(false)
+    originalData Json?
+}
+
+enum AllowedTypes {
+    CREATE_DROPS
+}
+
+enum ListingStatus {
+    LISTED
+    SOLD
+    CANCELLED
+    EXPIRED
+}
+
+enum ListingType {
+    AUCTION
+    FIXED
+}
+
+enum CurrencyType {
+    SOL
+    USD
+}
+
+enum Chains {
+    solana
+}
+
+enum CandyMachineSteps {
+    CREATED
+    METADATA_UPLOAD
+    CREATE_COLLECTION
+    CREATE_CANDY_MACHINE
+    INSERT_ITEMS
+    UPDATE_DB
+}
+
+enum PinnedFileType {
+    AUDIO
+    IMAGE
+    VIDEO
+}
+
+enum PinnedFilesStatus {
+    PINNED
+    IN_PROGRESS
+    PENDING
 }
