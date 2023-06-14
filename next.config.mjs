@@ -18,5 +18,19 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    domains: [
+      "placekitten.com",
+      "spinamp.mypinata.cloud",
+      "www.arweave.net",
+      "arweave.net",
+      "reamp.mypinata.cloud",
+      "gateway.pinata.cloud",
+      "niftytunes.mypinata.cloud",
+      "ipfs.io",
+      "niftytunes.myfilebase.com",
+      "niftytunes.b-cdn.net",
+    ],
+  },
 };
 export default config;

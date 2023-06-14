@@ -21,7 +21,21 @@ import { getServerAuthSession } from "@/server/auth";
 import { prisma } from "@/server/db";
 
 type CreateContextOptions = {
-  session: Session | null;
+  session:
+    | (Session & {
+        walletAddress?: string;
+        isAdmin?: boolean;
+        isSuperAdmin?: boolean;
+        user: {
+          walletAddress?: string;
+          isAdmin?: boolean;
+          isSuperAdmin?: boolean;
+          provider?: string;
+          magicSolanaAddress?: string;
+        };
+      })
+    | null;
+  ip?: string | string[] | undefined;
 };
 
 /**
@@ -38,6 +52,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    ip: opts.ip,
   };
 };
 
@@ -49,12 +64,23 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  */
 export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const { req, res } = opts;
+  let forwardedIp: string | undefined = undefined;
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) {
+    if (typeof forwarded === "string") {
+      forwardedIp = forwarded;
+    }
+  }
+
+  const ip =
+    req.headers["x-real-ip"] || forwardedIp || req.socket.remoteAddress;
 
   // Get the session from the server using the getServerSession wrapper function
   const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
     session,
+    ip,
   });
 };
 
@@ -115,6 +141,20 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
     ctx: {
       // infers the `session` as non-nullable
       session: { ...ctx.session, user: ctx.session.user },
+      ip: ctx.ip,
+    },
+  });
+});
+
+const enforceUserIsAdmin = t.middleware(({ next, ctx }) => {
+  if (!ctx.session?.user.isAdmin && !ctx.session?.user.isSuperAdmin) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "No Proviledges" });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
     },
   });
 });
@@ -128,3 +168,4 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const protectedAdminProcedure = t.procedure.use(enforceUserIsAdmin);
