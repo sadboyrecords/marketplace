@@ -81,13 +81,14 @@ function PlaylistCard({ songs, playlist, hideBottom, fullWidth }: Props) {
           {/* name, ispublic, created by, how many songs */}
           <div className="">
             <Typography color="neutral-gray" size="body-xs" className="mb-1">
+              By:{" "}
               {getCreatorname({
                 name:
                   playlist?.creator?.name || playlist?.creator?.firstName || "",
                 walletAddress: playlist?.creator?.walletAddress || "",
               })}
             </Typography>
-            <Typography className="font-bold">
+            <Typography className="font-bold" color="neutral-gray">
               {playlist?.name || "Playlist"}
             </Typography>
             <Typography color="neutral-gray" size="body-xs" className="">

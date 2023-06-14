@@ -3,7 +3,10 @@ import { useRouter } from "next/router";
 import UserSongs from "@/components/profiles/Songs";
 import Playlists from "@/components/profiles/Playlists";
 import OwnedCollectables from "@/components/profiles/OwnedCollectables";
-
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import { appRouter } from "@/server/api/root";
+import { prisma } from "@/server/db";
+import superjson from "superjson";
 import type { NextPageWithLayout } from "@/utils/types";
 
 const UserPage: NextPageWithLayout = () => {
