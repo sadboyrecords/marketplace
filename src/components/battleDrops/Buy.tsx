@@ -198,32 +198,34 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                     />
                   </Button>
                 </div>
-
-                <Button
-                  disabled={
-                    !candyMachine?.guardsAndEligibility?.[0]?.isEligible
-                  }
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  onClick={handleMint}
-                  loading={isMinting}
-                  // rounded="lg"
-                >
-                  Buy
-                  {/* {isMinting ? 'Minting...' : 'Mint'} */}
-                </Button>
+                <div className="flex flex-col space-y-2">
+                  {" "}
+                  <Button
+                    disabled={
+                      !candyMachine?.guardsAndEligibility?.[0]?.isEligible
+                    }
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClick={handleMint}
+                    loading={isMinting}
+                    // rounded="lg"
+                  >
+                    Buy
+                    {/* {isMinting ? 'Minting...' : 'Mint'} */}
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
             <>Connect your wallet</>
           )}
         </div>
-        {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
+        {/* {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
           <Typography color="neutral-gray">
             You can buy up to{" "}
             {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity}. Buy
             more sol to purchase more
           </Typography>
-        )}
+        )} */}
       </div>
       {(publicKey || session) &&
         candyMachine &&

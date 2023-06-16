@@ -145,27 +145,31 @@ export default function MetaplexProvider({
   // });
 
   const getUserBalance = useCallback(async () => {
-    // if (!wallet?.publicKey) return;
-    if (!session || !session.user.walletAddress || !publicAddress) return;
-    let userBalanceLamport = 0;
-    // if (!publicAddress) {
-    //   userBalanceLamport = await connection.getBalance(
-    //     new web3.PublicKey(session.user.walletAddress)
-    //   );
-    // }
-    // if (publicAddress) {
-    //   userBalanceLamport = await connection.getBalance(
-    //     new web3.PublicKey(publicAddress)
-    //   );
-    // }
-    userBalanceLamport = await connection.getBalance(
-      new web3.PublicKey(publicAddress)
-    );
-    const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
+    try {
+      // if (!wallet?.publicKey) return;
+      if (!session || !session.user.walletAddress || !publicAddress) return;
+      let userBalanceLamport = 0;
+      // if (!publicAddress) {
+      //   userBalanceLamport = await connection.getBalance(
+      //     new web3.PublicKey(session.user.walletAddress)
+      //   );
+      // }
+      // if (publicAddress) {
+      //   userBalanceLamport = await connection.getBalance(
+      //     new web3.PublicKey(publicAddress)
+      //   );
+      // }
+      userBalanceLamport = await connection.getBalance(
+        new web3.PublicKey(publicAddress)
+      );
+      const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
 
-    setWalletBalance(Number(userBalance.toFixed(2)));
-    // return userBalance;
-    setInitalStateSet(true);
+      setWalletBalance(Number(userBalance.toFixed(2)));
+      // return userBalance;
+      setInitalStateSet(true);
+    } catch (error) {
+      console.log({ error });
+    }
   }, [connection, publicAddress, session]);
   // const getMagic = async () => {
   //   const metadata = await magic.user.getMetadata();
