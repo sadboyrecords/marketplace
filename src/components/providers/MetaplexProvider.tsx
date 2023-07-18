@@ -9,14 +9,23 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
+import type { Signer } from "@solana/web3.js";
+import type {
+  CandyMachine,
+  DefaultCandyGuardSettings,
+} from "@metaplex-foundation/js";
+import type {
+  GuardsAndEligibilityType,
+  AllGuardsType,
+  MintResponseType,
+} from "@/utils/types";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, VersionedTransaction } from "@solana/web3.js";
 import { api } from "@/utils/api";
 import { getSolUsdPrice } from "@/utils/rpcCalls";
 import { useSession } from "next-auth/react";
 import * as web3 from "@solana/web3.js";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
-import { selectAllCandymachines } from "@/lib/slices/candyMachine";
 import { useSelector } from "react-redux";
 import { authProviderNames } from "@/utils/constants";
 import { magic } from "@/lib/magic";
@@ -26,23 +35,26 @@ import {
   walletAdapterIdentity,
   guestIdentity,
 } from "@metaplex-foundation/js";
-import { type Signer } from "@solana/web3.js";
+import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import {
-  type GuardsAndEligibilityType,
-  type AllGuardsType,
-  type MintResponseType,
-} from "@/utils/types";
+  mplCandyMachine,
+  mintV2,
+  fetchCandyMachine,
+} from "@metaplex-foundation/mpl-candy-machine";
+import type { DefaultGuardSetMintArgs } from "@metaplex-foundation/mpl-candy-machine";
 import {
-  type CandyMachine,
-  type DefaultCandyGuardSettings,
-} from "@metaplex-foundation/js";
-
-type MintType = {
-  quantityString: number;
-  label: string;
-  candyMachineId: string;
-  refetchTheseIds?: string[];
-};
+  createMintWithAssociatedToken,
+  setComputeUnitLimit,
+  fetchMint,
+} from "@metaplex-foundation/mpl-toolbox";
+import {
+  transactionBuilder,
+  generateSigner,
+  publicKey,
+  some,
+} from "@metaplex-foundation/umi";
+import { walletAdapterIdentity as walletIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 
 interface CandyMachineState {
   isLoading?: boolean;
@@ -64,32 +76,11 @@ const MetaplexContext = createContext({
   getUserBalance: async (_publicAddress?: string): Promise<void> => undefined,
   candyMachines: {} as Record<string, CandyMachineState> | null,
   fetchCandyMachineById: async (_id: string): Promise<void> => undefined,
-  mint: async (_input: MintType): Promise<MintResponseType | undefined> =>
-    undefined,
-  // candyMachineV3:
-  //   {
-  //     isLoading: false,
-  //     currentSlug: undefined as string | undefined,
-  //     candyMachineID: undefined as string | undefined,
-  //     candyMachine: undefined as CandyMachine | undefined,
-  //     items: {
-  //       available: 0,
-  //       remaining: 0,
-  //       redeemed: 0,
-  //     },
-  //     guardsAndEligibility: undefined as GuardsAndEligibilityType[] | undefined,
-  //     walletBalance: 0,
-  //     refresh: async (): Promise<void> => undefined,
-  //     handleChangeCandyMachineId: (id: string) => {},
-  //   } || null,
-  // updateCandyMachine: async (
-  //   input: IMint
-  // ): Promise<UpdateCandyMachineOutput | undefined> => undefined,
-  // mint: async (input: MintType): Promise<MintResponseType | undefined> =>
-  //   undefined,
-  // setCandyMachineID: (id: string | undefined) => {},
-  // setCurrentSlug: (id: string | undefined) => {},
-  // fetchCandyMachineById: async (id: string) => undefined,
+  createLookupTable: async (): Promise<string | undefined> => undefined, //Promise<web3.PublicKey | undefined>
+  extendLookupTable: async (): Promise<boolean | undefined> => undefined, //Promise<web3.PublicKey | undefined>
+  mint: async (
+    _input: MintType
+  ): Promise<MintResponseType | web3.Transaction[] | undefined> => undefined,
 });
 
 export function useMetaplex() {
@@ -103,6 +94,10 @@ export default function MetaplexProvider({
 }) {
   const { connection } = useConnection();
 
+  // const umi = useMemo(createUmi(process.env.NEXT_PUBLIC_RPC_HOST as string)
+  // .use(mplCandyMachine())
+  // .use(walletAdapterIdentity(wallet)));
+
   const wallet = useWallet();
   const publicAddress = useSelector(selectPublicAddress);
   const mx = useMemo(
@@ -113,10 +108,10 @@ export default function MetaplexProvider({
   useEffect(() => {
     if (publicAddress && publicAddress !== wallet.publicKey?.toBase58()) {
       mx.use(guestIdentity(new PublicKey(publicAddress)));
+      // umi.use(guestIdentity(new PublicKey(publicAddress)));
     }
   }, [mx, publicAddress, wallet]);
 
-  // const candyMutation = api.candyMachine.update.useMutation();
   const updateTotalMinted = api.candyMachine.updatetotalMinted.useMutation();
   const [solUsdPrice, setSolUsdPrice] = React.useState<number | null>(null);
   const [walletBalance, setWalletBalance] = React.useState<number | null>();
@@ -836,12 +831,167 @@ export default function MetaplexProvider({
     // return signedTransaction
   }
 
+  const createLookupTable = React.useCallback(async () => {
+    try {
+      if (!publicAddress || !wallet) return;
+      const slot = await connection.getSlot();
+
+      // Assumption:
+      // `payer` is a valid `Keypair` with enough SOL to pay for the execution
+
+      const [lookupTableInst, lookupTableAddress] =
+        web3.AddressLookupTableProgram.createLookupTable({
+          authority: new PublicKey(publicAddress),
+          payer: new PublicKey(publicAddress),
+          recentSlot: slot,
+        });
+
+      console.log("lookup table address:", lookupTableAddress.toBase58());
+
+      const tx = new web3.Transaction();
+      tx.add(lookupTableInst);
+      tx.feePayer = new PublicKey(publicAddress);
+      tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+      const signed = await wallet.signTransaction(tx);
+      await mx
+        .rpc()
+        .sendAndConfirmTransaction(signed, { commitment: "finalized" })
+        .then((tx) => {
+          console.log({ txthen: tx });
+        });
+      // mx
+      //               .rpc()
+      //               .sendAndConfirmTransaction(tx, { commitment: "finalized" })
+      //               .then((tx) => {
+      //                 console.log({ txthen: tx });
+      //                 return {
+      //                   ...tx,
+      //                   context: transactionBuilders[i]?.getContext() as unknown,
+      //                 };
+      //               })
+      return lookupTableAddress.toBase58();
+    } catch (error) {
+      console.log({ error });
+      throw new Error("Error creating lookup table");
+    }
+  }, [connection, mx, publicAddress]);
+
+  async function createAndSendV0Tx(
+    txInstructions: web3.TransactionInstruction[]
+  ) {
+    if (!publicAddress || !wallet) return;
+    // Step 1 - Fetch Latest Blockhash
+    const latestBlockhash = await connection.getLatestBlockhash("finalized");
+    console.log(
+      "   ✅ - Fetched latest blockhash. Last valid height:",
+      latestBlockhash.lastValidBlockHeight
+    );
+
+    // Step 2 - Generate Transaction Message
+    const messageV0 = new web3.TransactionMessage({
+      payerKey: new PublicKey(publicAddress),
+      recentBlockhash: latestBlockhash.blockhash,
+      instructions: txInstructions,
+    }).compileToV0Message();
+    console.log("   ✅ - Compiled transaction message");
+    const transaction = new VersionedTransaction(messageV0);
+
+    // Step 3 - Sign your transaction with the required `Signers`
+    const signed = await wallet.signTransaction(transaction);
+
+    // transaction.sign([SIGNER_WALLET]);
+    console.log("   ✅ - Transaction Signed");
+
+    // Step 4 - Send our v0 transaction to the cluster
+    // await mx
+    //     .rpc()
+    //     .sendTransaction(signed, { commitment: "finalized" })
+    //     .then((tx) => {
+    //       console.log({ txthen: tx });
+    //     });
+    const txid = await connection.sendTransaction(signed, {
+      maxRetries: 5,
+    });
+    console.log("   ✅ - Transaction sent to network");
+
+    // Step 5 - Confirm Transaction
+    const confirmation = await connection.confirmTransaction({
+      signature: txid,
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    });
+    if (confirmation.value.err) {
+      throw new Error("   ❌ - Transaction not confirmed.");
+    }
+    console.log(
+      "🎉 Transaction succesfully confirmed!",
+      "\n",
+      `https://explorer.solana.com/tx/${txid}?cluster=devnet`
+    );
+  }
+
+  const extendLookupTable = React.useCallback(async () => {
+    try {
+      if (!publicAddress || !wallet) return;
+
+      const extendInstruction =
+        web3.AddressLookupTableProgram.extendLookupTable({
+          payer: new PublicKey(publicAddress),
+          authority: new PublicKey(publicAddress),
+          lookupTable: new PublicKey(
+            "2daR6Grs1LcKYr2rYETFzDeUfdsUyjeuosaiW6bTv7n7"
+            // "Dwa9yxnzYW1nAJoVN4BEAc65d6X1YJSc54ra9QChbG7t"
+          ),
+          addresses: [
+            new PublicKey("5KMJJsx9RK2G7sCmtVTwUVzjAL1bx7yEzGDSHs6aQrKr"),
+            new PublicKey("BkXwtL4fgFc1BxaYwJ6iDYa3oNXBD6JcqTqz9dfpr7FU"),
+            new PublicKey("vevzhVDVsbnuunHzTZTXNNzfzc2Pf89TaDjtSSpbgPG"),
+            new PublicKey("2cVkpryQUN35Giwg1nHpGFbi3Gw4A7nYaR5c5pEeP6gx"),
+            new PublicKey("2V9b4tAG6VWqjLsciyjQWaWWvHgu7wGpNnjYzpSCV3EM"),
+            new PublicKey("H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg"),
+            new PublicKey("AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK"),
+            new PublicKey("3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H"),
+
+            // new PublicKey("11111111111111111111111111111111"),
+
+            // new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"),
+            // new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+            // new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
+            // new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
+            // new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+            // new PublicKey("Sysvar1nstructions1111111111111111111111111"),
+            // new PublicKey("SysvarRent111111111111111111111111111111111"),
+            // new PublicKey("SysvarS1otHashes111111111111111111111111111"),
+            // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+
+            // new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+            // new PublicKey("HzdseyCGneNv4SzyBgteppi1N8GawjWLSkBSTx82UTtL"),
+            // new PublicKey("SysvarC1ock11111111111111111111111111111111"),
+            // new PublicKey("FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9"),
+            // new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
+            // new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
+
+            // web3.Keypair.generate().publicKey,
+            // web3.Keypair.generate().publicKey,
+          ],
+        });
+      console.log({ extendInstruction });
+      await createAndSendV0Tx([extendInstruction]);
+      console.log("----DONE---");
+      return true;
+    } catch (error) {
+      console.log({ error });
+      throw new Error("Error extending lookup table");
+    }
+  }, [createAndSendV0Tx, publicAddress, wallet]);
+
   const mint = React.useCallback(
     async ({
       quantityString,
       label,
       candyMachineId,
       refetchTheseIds,
+      onlySign,
     }: MintType) => {
       if (!candyMachineId || !candyMachines)
         throw new Error("No candy machine id provided");
@@ -866,6 +1016,7 @@ export default function MetaplexProvider({
                 collectionUpdateAuthority: candy?.candyMachine
                   ?.authorityAddress as PublicKey,
                 group: label,
+
                 // guards: {
                 //   nftBurn: toGuardMintSettings(guardMintInfo.nftBurn),
                 //   nftGate: toGuardMintSettings(guardMintInfo.nftGate),
@@ -885,6 +1036,102 @@ export default function MetaplexProvider({
 
         const blockhash = await connection.getLatestBlockhash();
         let signedTransactions: web3.Transaction[] | undefined = [];
+        // if (onlySign) return signedTransactions;
+        if (onlySign) {
+          const txBuilder = transactionBuilders[0];
+          const signer = txBuilder?.getContext().mintSigner as Signer;
+          console.log({ signer });
+
+          const txs = transactionBuilders.map((t, ix) => {
+            const instructions = t.getInstructions();
+            const payer = mints[ix]?.mintSigner as Signer;
+
+            const tx = t.toTransaction(blockhash);
+            // console.log({ tx });
+            tx.sign(mints[ix]?.mintSigner as Signer);
+
+            // console.log({ tx, mintSigner: mints[ix]?.mintSigner });
+            return tx;
+          });
+          // const instructions = txs[0]?.instructions;
+          txs[0]?.signatures.forEach((s) => {
+            console.log({
+              signature: s,
+              pubkeyarray: s.publicKey.toBytes(),
+              key: s.publicKey.toBase58(),
+            });
+            //  const x = s.publicKey.toBytes()
+            //  const y = s.signature?.
+          });
+          // txs[0]?.signatures.
+
+          const instructions = txBuilder?.getInstructions();
+
+          console.log({ instructions });
+          if (!instructions) throw new Error("No instructions");
+
+          const lookupTableAccount = await connection
+            .getAddressLookupTable(
+              new PublicKey(
+                // "Dwa9yxnzYW1nAJoVN4BEAc65d6X1YJSc54ra9QChbG7t"
+                "2daR6Grs1LcKYr2rYETFzDeUfdsUyjeuosaiW6bTv7n7"
+              )
+            )
+            .then((res) => res.value);
+          console.log({ lookupTableAccount });
+          if (!lookupTableAccount) throw new Error("No lookup table account");
+
+          const messageV0 = new web3.TransactionMessage({
+            payerKey: wallet.publicKey as PublicKey, //payer.publicKey,
+            recentBlockhash: blockhash.blockhash,
+            instructions,
+          }).compileToV0Message([lookupTableAccount]);
+          const vtx = new web3.VersionedTransaction(messageV0);
+          console.log({ preSignvtx: vtx });
+
+          // signed.sign([signer]);
+
+          // console.log({ vtx: vtx.signatures[0]. });
+          // const allkey = [];
+          // const keys = instructions.map((i) => {
+          //   const keys = i.keys.map((k) => k.pubkey.toBase58());
+          //   allkey.push(...keys, i.programId.toBase58());
+          //   return keys;
+          // });
+          // console.log({ keys, allkey });
+          vtx.sign([signer]);
+          const signed = await wallet.signTransaction(vtx);
+
+          // console.log({ vtx, signed });
+
+          // const txid = await connection.sendTransaction(signed, {
+          //   maxRetries: 5,
+          // });
+          // console.log("   ✅ - Transaction sent to network");
+
+          // // Step 5 - Confirm Transaction
+          // const confirmation = await connection.confirmTransaction({
+          //   signature: txid,
+          //   blockhash: blockhash.blockhash,
+          //   lastValidBlockHeight: blockhash.lastValidBlockHeight,
+          // });
+          // if (confirmation.value.err) {
+          //   throw new Error("   ❌ - Transaction not confirmed.");
+          // }
+          // console.log(
+          //   "🎉 Transaction succesfully confirmed!",
+          //   "\n",
+          //   `https://explorer.solana.com/tx/${txid}?cluster=devnet`
+          // );
+// vtx
+          return [signed];
+
+          // if (versiontx) {
+          //   console.log({ versiontx: versiontx[0] });
+          //   return versiontx;
+          // }
+          // if (!versiontx) return null;
+        }
 
         if (magic && session?.user?.provider === authProviderNames.magic) {
           const payer = new web3.PublicKey(publicAddress || "");
@@ -1072,6 +1319,8 @@ export default function MetaplexProvider({
         ...memoedValue,
         candyMachines,
         mint,
+        createLookupTable,
+        extendLookupTable,
         // setPublicAddress,
         // candyMachineV3: {
         //   ...memoedValue,

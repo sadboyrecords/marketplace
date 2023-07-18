@@ -15,6 +15,7 @@ import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { useDispatch } from "react-redux";
 import { closeJoinBattleFansModal } from "@/lib/slices/appSlice";
+import Coinflow from "@/components/onRamp/Coinflow";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -29,8 +30,10 @@ type BuyProps = {
   competitorCandyId: string;
 };
 function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
+  console.log({ candyMachineId, competitorCandyId });
   const { data: session } = useSession();
   const { publicKey } = useWallet();
+  // console.log({ publicKey });
 
   const { fetchCandyMachineById, candyMachines, mint, solUsdPrice } =
     useMetaplex();
@@ -70,7 +73,7 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
         label: candyMachine?.guardsAndEligibility?.[0]?.label || "",
         refetchTheseIds: competitorCandyId ? [competitorCandyId] : undefined,
       });
-      setPurchasedNft(data);
+      setPurchasedNft(data as MintResponseType);
       setIsMinting(false);
       toast.done(toastId);
       dispatch(closeJoinBattleFansModal());
@@ -237,6 +240,12 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
             <AddFunds />
           </div>
         )}
+      <Coinflow
+        candyMachineId={candyMachineId}
+        quantityString={mintAmount}
+        label={candyMachine?.guardsAndEligibility?.[0]?.label || ""}
+        refetchTheseIds={competitorCandyId ? [competitorCandyId] : undefined}
+      />
     </>
   );
 }

@@ -50,3 +50,11 @@ interface StripeOnrampSessionRequest {
     };
   };
 }
+
+type MintType = {
+  quantityString: number;
+  label: string;
+  candyMachineId: string;
+  refetchTheseIds?: string[];
+  onlySign?: boolean;
+};
