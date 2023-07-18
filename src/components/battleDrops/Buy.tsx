@@ -237,15 +237,15 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
             <Typography size="body-xs" color="neutral-gray">
               {candyMachine?.guardsAndEligibility?.[0]?.inEligibleReasons?.[0]}
             </Typography>
-            <AddFunds />
+            {/* <AddFunds /> */}
           </div>
         )}
-      <Coinflow
+      {/* <Coinflow
         candyMachineId={candyMachineId}
         quantityString={mintAmount}
         label={candyMachine?.guardsAndEligibility?.[0]?.label || ""}
         refetchTheseIds={competitorCandyId ? [competitorCandyId] : undefined}
-      />
+      /> */}
     </>
   );
 }

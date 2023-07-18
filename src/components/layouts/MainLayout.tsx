@@ -241,6 +241,8 @@ export default function MainLayout({ children }: LayoutProps) {
       */}
 
       <ToastContainer theme={theme as "dark" | "light"} />
+
+      {/* <ThreeJsBg /> */}
       <div>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog

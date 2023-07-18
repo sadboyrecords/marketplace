@@ -852,6 +852,8 @@ export default function MetaplexProvider({
       tx.add(lookupTableInst);
       tx.feePayer = new PublicKey(publicAddress);
       tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const signed = await wallet.signTransaction(tx);
       await mx
         .rpc()
@@ -876,59 +878,62 @@ export default function MetaplexProvider({
     }
   }, [connection, mx, publicAddress]);
 
-  async function createAndSendV0Tx(
-    txInstructions: web3.TransactionInstruction[]
-  ) {
-    if (!publicAddress || !wallet) return;
-    // Step 1 - Fetch Latest Blockhash
-    const latestBlockhash = await connection.getLatestBlockhash("finalized");
-    console.log(
-      "   ✅ - Fetched latest blockhash. Last valid height:",
-      latestBlockhash.lastValidBlockHeight
-    );
+  const createAndSendV0Tx = useCallback(
+    async (txInstructions: web3.TransactionInstruction[]) => {
+      if (!publicAddress || !wallet) return;
+      // Step 1 - Fetch Latest Blockhash
+      const latestBlockhash = await connection.getLatestBlockhash("finalized");
+      console.log(
+        "   ✅ - Fetched latest blockhash. Last valid height:",
+        latestBlockhash.lastValidBlockHeight
+      );
 
-    // Step 2 - Generate Transaction Message
-    const messageV0 = new web3.TransactionMessage({
-      payerKey: new PublicKey(publicAddress),
-      recentBlockhash: latestBlockhash.blockhash,
-      instructions: txInstructions,
-    }).compileToV0Message();
-    console.log("   ✅ - Compiled transaction message");
-    const transaction = new VersionedTransaction(messageV0);
+      // Step 2 - Generate Transaction Message
+      const messageV0 = new web3.TransactionMessage({
+        payerKey: new PublicKey(publicAddress),
+        recentBlockhash: latestBlockhash.blockhash,
+        instructions: txInstructions,
+      }).compileToV0Message();
+      console.log("   ✅ - Compiled transaction message");
+      const transaction = new VersionedTransaction(messageV0);
 
-    // Step 3 - Sign your transaction with the required `Signers`
-    const signed = await wallet.signTransaction(transaction);
+      // Step 3 - Sign your transaction with the required `Signers`
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const signed = await wallet?.signTransaction(transaction);
 
-    // transaction.sign([SIGNER_WALLET]);
-    console.log("   ✅ - Transaction Signed");
+      // transaction.sign([SIGNER_WALLET]);
+      console.log("   ✅ - Transaction Signed");
 
-    // Step 4 - Send our v0 transaction to the cluster
-    // await mx
-    //     .rpc()
-    //     .sendTransaction(signed, { commitment: "finalized" })
-    //     .then((tx) => {
-    //       console.log({ txthen: tx });
-    //     });
-    const txid = await connection.sendTransaction(signed, {
-      maxRetries: 5,
-    });
-    console.log("   ✅ - Transaction sent to network");
+      // Step 4 - Send our v0 transaction to the cluster
+      // await mx
+      //     .rpc()
+      //     .sendTransaction(signed, { commitment: "finalized" })
+      //     .then((tx) => {
+      //       console.log({ txthen: tx });
+      //     });
+      const txid = await connection.sendTransaction(signed, {
+        maxRetries: 5,
+      });
+      console.log("   ✅ - Transaction sent to network");
 
-    // Step 5 - Confirm Transaction
-    const confirmation = await connection.confirmTransaction({
-      signature: txid,
-      blockhash: latestBlockhash.blockhash,
-      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-    });
-    if (confirmation.value.err) {
-      throw new Error("   ❌ - Transaction not confirmed.");
-    }
-    console.log(
-      "🎉 Transaction succesfully confirmed!",
-      "\n",
-      `https://explorer.solana.com/tx/${txid}?cluster=devnet`
-    );
-  }
+      // Step 5 - Confirm Transaction
+      const confirmation = await connection.confirmTransaction({
+        signature: txid,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+      });
+      if (confirmation.value.err) {
+        throw new Error("   ❌ - Transaction not confirmed.");
+      }
+      console.log(
+        "🎉 Transaction succesfully confirmed!",
+        "\n",
+        `https://explorer.solana.com/tx/${txid}?cluster=devnet`
+      );
+    },
+    [connection, publicAddress, wallet]
+  );
 
   const extendLookupTable = React.useCallback(async () => {
     try {
@@ -951,25 +956,22 @@ export default function MetaplexProvider({
             new PublicKey("H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg"),
             new PublicKey("AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK"),
             new PublicKey("3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H"),
-
-            // new PublicKey("11111111111111111111111111111111"),
-
-            // new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"),
-            // new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
-            // new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
-            // new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
-            // new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-            // new PublicKey("Sysvar1nstructions1111111111111111111111111"),
-            // new PublicKey("SysvarRent111111111111111111111111111111111"),
-            // new PublicKey("SysvarS1otHashes111111111111111111111111111"),
-            // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-
-            // new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
-            // new PublicKey("HzdseyCGneNv4SzyBgteppi1N8GawjWLSkBSTx82UTtL"),
-            // new PublicKey("SysvarC1ock11111111111111111111111111111111"),
-            // new PublicKey("FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9"),
-            // new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
-            // new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
+            new PublicKey("11111111111111111111111111111111"),
+            new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"),
+            new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+            new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
+            new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
+            new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+            new PublicKey("Sysvar1nstructions1111111111111111111111111"),
+            new PublicKey("SysvarRent111111111111111111111111111111111"),
+            new PublicKey("SysvarS1otHashes111111111111111111111111111"),
+            new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+            new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+            new PublicKey("HzdseyCGneNv4SzyBgteppi1N8GawjWLSkBSTx82UTtL"),
+            new PublicKey("SysvarC1ock11111111111111111111111111111111"),
+            new PublicKey("FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9"),
+            new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
+            new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
 
             // web3.Keypair.generate().publicKey,
             // web3.Keypair.generate().publicKey,
@@ -986,6 +988,310 @@ export default function MetaplexProvider({
   }, [createAndSendV0Tx, publicAddress, wallet]);
 
   const mint = React.useCallback(
+    async ({
+      quantityString,
+      label,
+      candyMachineId,
+      refetchTheseIds,
+    }: MintType) => {
+      if (!candyMachineId || !candyMachines)
+        throw new Error("No candy machine id provided");
+      const candy = candyMachines[candyMachineId];
+      // console.log({ candyMachines, candy });
+      if (!candy || !candy.candyMachine)
+        throw new Error("No candy machine found for id");
+
+      const found = candy.guardsAndEligibility?.find((g) => g.label === label);
+
+      if (!found) throw new Error("Unknown guard group label");
+
+      try {
+        if (!candy) throw new Error("Candy Machine not loaded yet!");
+        const transactionBuilders = await Promise.all(
+          new Array(quantityString).fill(0).map(() =>
+            mx
+              .candyMachines()
+              .builders()
+              .mint({
+                candyMachine: candy.candyMachine as CandyMachine,
+                collectionUpdateAuthority: candy?.candyMachine
+                  ?.authorityAddress as PublicKey,
+                group: label,
+
+                // guards: {
+                //   nftBurn: toGuardMintSettings(guardMintInfo.nftBurn),
+                //   nftGate: toGuardMintSettings(guardMintInfo.nftGate),
+                //   nftPayment: toGuardMintSettings(guardMintInfo.nftPayment),
+                // },
+              })
+          )
+        );
+
+        const mints = transactionBuilders.map((tb) => {
+          return {
+            mintSigner: tb.getContext().mintSigner as Signer,
+            mintAddress: tb.getContext().mintSigner.publicKey,
+            tokenAddress: tb.getContext().tokenAddress,
+          };
+        });
+
+        const blockhash = await connection.getLatestBlockhash();
+        let signedTransactions: web3.Transaction[] | undefined = [];
+        // if (onlySign) return signedTransactions;
+        // if (onlySign) {
+        //   const txBuilder = transactionBuilders[0];
+        //   const signer = txBuilder?.getContext().mintSigner as Signer;
+        //   console.log({ signer });
+
+        //   const txs = transactionBuilders.map((t, ix) => {
+        //     const instructions = t.getInstructions();
+        //     const payer = mints[ix]?.mintSigner as Signer;
+
+        //     const tx = t.toTransaction(blockhash);
+        //     // console.log({ tx });
+        //     tx.sign(mints[ix]?.mintSigner as Signer);
+
+        //     // console.log({ tx, mintSigner: mints[ix]?.mintSigner });
+        //     return tx;
+        //   });
+        //   // const instructions = txs[0]?.instructions;
+        //   txs[0]?.signatures.forEach((s) => {
+        //     console.log({
+        //       signature: s,
+        //       pubkeyarray: s.publicKey.toBytes(),
+        //       key: s.publicKey.toBase58(),
+        //     });
+        //     //  const x = s.publicKey.toBytes()
+        //     //  const y = s.signature?.
+        //   });
+        //   // txs[0]?.signatures.
+
+        //   const instructions = txBuilder?.getInstructions();
+
+        //   console.log({ instructions });
+        //   if (!instructions) throw new Error("No instructions");
+
+        //   const lookupTableAccount = await connection
+        //     .getAddressLookupTable(
+        //       new PublicKey(
+        //         // "Dwa9yxnzYW1nAJoVN4BEAc65d6X1YJSc54ra9QChbG7t"
+        //         "2daR6Grs1LcKYr2rYETFzDeUfdsUyjeuosaiW6bTv7n7"
+        //       )
+        //     )
+        //     .then((res) => res.value);
+        //   console.log({ lookupTableAccount });
+        //   if (!lookupTableAccount) throw new Error("No lookup table account");
+
+        //   const messageV0 = new web3.TransactionMessage({
+        //     payerKey: wallet.publicKey as PublicKey, //payer.publicKey,
+        //     recentBlockhash: blockhash.blockhash,
+        //     instructions,
+        //   }).compileToV0Message([lookupTableAccount]);
+        //   const vtx = new web3.VersionedTransaction(messageV0);
+        //   console.log({ preSignvtx: vtx });
+
+        //   // signed.sign([signer]);
+
+        //   // console.log({ vtx: vtx.signatures[0]. });
+        //   // const allkey = [];
+        //   // const keys = instructions.map((i) => {
+        //   //   const keys = i.keys.map((k) => k.pubkey.toBase58());
+        //   //   allkey.push(...keys, i.programId.toBase58());
+        //   //   return keys;
+        //   // });
+        //   // console.log({ keys, allkey });
+        //   vtx.sign([signer]);
+        //   const signed = await wallet.signTransaction(vtx);
+
+        //   // console.log({ vtx, signed });
+
+        //   // const txid = await connection.sendTransaction(signed, {
+        //   //   maxRetries: 5,
+        //   // });
+        //   // console.log("   ✅ - Transaction sent to network");
+
+        //   // // Step 5 - Confirm Transaction
+        //   // const confirmation = await connection.confirmTransaction({
+        //   //   signature: txid,
+        //   //   blockhash: blockhash.blockhash,
+        //   //   lastValidBlockHeight: blockhash.lastValidBlockHeight,
+        //   // });
+        //   // if (confirmation.value.err) {
+        //   //   throw new Error("   ❌ - Transaction not confirmed.");
+        //   // }
+        //   // console.log(
+        //   //   "🎉 Transaction succesfully confirmed!",
+        //   //   "\n",
+        //   //   `https://explorer.solana.com/tx/${txid}?cluster=devnet`
+        //   // );
+        //   // vtx
+        //   return [signed];
+
+        //   // if (versiontx) {
+        //   //   console.log({ versiontx: versiontx[0] });
+        //   //   return versiontx;
+        //   // }
+        //   // if (!versiontx) return null;
+        // }
+
+        if (magic && session?.user?.provider === authProviderNames.magic) {
+          const payer = new web3.PublicKey(publicAddress || "");
+
+          const tx = transactionBuilders.map((t, ix) => {
+            const tx = t.toTransaction(blockhash);
+            tx.feePayer = payer;
+            console.log({ tx });
+            tx.sign(mints[ix]?.mintSigner as Signer);
+            // debugger;
+            tx.signatures.forEach((s) =>
+              console.log({ sigPkey: s.publicKey.toBase58() })
+            );
+            return tx;
+          });
+          signedTransactions = await Promise.all(
+            tx.map(async (t) => {
+              console.log({ t });
+              return await signTransaction(t);
+            })
+          );
+        } else {
+          signedTransactions = await wallet?.signAllTransactions?.(
+            transactionBuilders.map((t, ix) => {
+              const tx = t.toTransaction(blockhash);
+              console.log({ tx });
+              tx.sign(mints[ix]?.mintSigner as Signer);
+              tx.signatures.forEach((s) =>
+                console.log({ sigPkey: s.publicKey.toBase58() })
+              );
+              console.log({ tx, mintSigner: mints[ix]?.mintSigner });
+              return tx;
+            })
+          );
+          console.log({ signedTransactions });
+        }
+
+        if (!signedTransactions) throw new Error("No signed transactions");
+
+        // for (let signer in signers) {
+        //   await signers[signer]?.signAllTransactions(transactions);
+        // }
+        // console.log({ signedTransactions, transactions, signers });
+        console.log("------------SIGNERS DONE------------");
+
+        const output = await Promise.all(
+          signedTransactions.map((tx, i) => {
+            console.log({ tx });
+            return mx
+              .rpc()
+              .sendAndConfirmTransaction(tx, { commitment: "finalized" })
+              .then((tx) => {
+                console.log({ txthen: tx });
+                return {
+                  ...tx,
+                  context: transactionBuilders[i]?.getContext() as unknown,
+                };
+              })
+              .catch(() => {
+                throw new Error("Error Sending Transaction");
+              });
+          })
+        );
+
+        const nfts = await Promise.all(
+          output.map(({ context }) => {
+            // console.log({ context });
+            // context: {
+            //   tokenAddress: PublicKey | undefined;
+            //   mintSigner: {
+            //     publicKey: PublicKey;
+            //   };
+            // }
+            const c = context as {
+              tokenAddress: PublicKey | undefined;
+              mintSigner: {
+                publicKey: PublicKey;
+              };
+            };
+            console.log({ c });
+            return mx
+              .nfts()
+              .findByMint({
+                mintAddress: c?.mintSigner?.publicKey,
+                tokenAddress: c?.tokenAddress,
+              })
+              .catch(() => null);
+          })
+        );
+
+        // await fetchCandyMachine();
+        const data = nfts.map((n) => ({
+          address: n?.address.toBase58(),
+          name: n?.name,
+        }));
+        console.log({ output, nfts, data });
+        const signatures = output.map((o) => o.signature);
+        try {
+          await updateTotalMinted.mutateAsync({
+            candyMachineId: candy.candyMachine.address.toBase58(),
+            totalMinted: quantityString,
+          });
+        } catch (error) {
+          console.log({ error });
+        }
+        await fetchCandyMachineById(candy.candyMachine.address.toBase58());
+        if (refetchTheseIds) {
+          await Promise.all(
+            refetchTheseIds.map((id) => fetchCandyMachineById(id))
+          );
+        }
+        return { nftData: data, signatures };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.log({ error });
+        let message = "Minting failed! Please try again!";
+        if (!error?.msg) {
+          if (!error.message) {
+            message = "Transaction Timeout! Please try again.";
+          } else if (error.message.indexOf("0x138")) {
+          } else if (error.message.indexOf("0x137")) {
+            message = `SOLD OUT!`;
+          } else if (error.message.indexOf("0x135")) {
+            message = `Insufficient funds to mint. Please fund your wallet.`;
+          }
+        } else {
+          if (error.code === 311) {
+            message = `SOLD OUT!`;
+          } else if (error.code === 312) {
+            message = `Minting period hasn't started yet.`;
+          }
+        }
+        console.error(error);
+        console.log("THROWING ERROR ", error);
+        // setStatus((x) => ({ ...x, minting: false }));
+        throw new Error(message);
+      }
+      // finally {
+      //   setStatus((x) => ({ ...x, minting: false }));
+      //   refresh();
+      //   return nfts.filter((a) => a);
+      // }
+    },
+    // candyMachines, guardsAndEligibility, mx, wallet?.publicKey
+    // fetchCandyMachineById
+    [
+      candyMachines,
+      connection,
+      fetchCandyMachineById,
+      mx,
+      publicAddress,
+      session?.user?.provider,
+      updateTotalMinted,
+      wallet,
+    ]
+    //  [candyMachines, mx, updateTotalMinted, wallet]
+  );
+
+  const mintCoin = React.useCallback(
     async ({
       quantityString,
       label,
@@ -1100,7 +1406,7 @@ export default function MetaplexProvider({
           // });
           // console.log({ keys, allkey });
           vtx.sign([signer]);
-          const signed = await wallet.signTransaction(vtx);
+          // const signed = await wallet.signTransaction(vtx);
 
           // console.log({ vtx, signed });
 
@@ -1123,8 +1429,8 @@ export default function MetaplexProvider({
           //   "\n",
           //   `https://explorer.solana.com/tx/${txid}?cluster=devnet`
           // );
-// vtx
-          return [signed];
+          // vtx
+          return [vtx];
 
           // if (versiontx) {
           //   console.log({ versiontx: versiontx[0] });

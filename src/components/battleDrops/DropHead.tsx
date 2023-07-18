@@ -4,6 +4,13 @@ import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
 import { api } from "@/utils/api";
 import LineUp from "@/components/battleDrops/LineUp";
 import React from "react";
+import dynamic from "next/dynamic";
+
+// import ThreeJsBg from "@/components/backgrounds/ThreejsBg";
+
+const ThreeJsBg = dynamic(() => import("@/components/backgrounds/ThreejsBg"), {
+  ssr: false,
+});
 
 function DropHead() {
   const { data: battle, isLoading } = api.battle.getHomePageBattle.useQuery();
@@ -44,52 +51,55 @@ function DropHead() {
 
   // if (!battle) return null;
   return (
-    <div className="flex min-h-[20rem] flex-col items-center justify-center space-y-10">
-      <Typography
-        size="display-lg"
-        className="text-center font-bold uppercase !tracking-[1rem]"
-      >
-        Battle Drops
-      </Typography>
-      <div className="h-32 w-32">
-        <ImageDisplay
-          alt="Thunder image"
-          url="images/lightning.png"
-          quality={80}
-          fill
-          width={300}
-          sizes="10vw"
-          hash={null}
-        />
-        {/* <Image
+    <div>
+      <ThreeJsBg />
+      <div className="flex min-h-[20rem] flex-col items-center justify-center space-y-10">
+        <Typography
+          size="display-lg"
+          className="text-center font-bold uppercase !tracking-[1rem]"
+        >
+          Battle Drops
+        </Typography>
+        <div className="h-32 w-32">
+          <ImageDisplay
+            alt="Thunder image"
+            url="images/lightning.png"
+            quality={80}
+            fill
+            width={300}
+            sizes="10vw"
+            hash={null}
+          />
+          {/* <Image
             src="/images/li.png"
         
         /> */}
-      </div>
-      <div className="flex flex-col items-center justify-center">
-        <Typography
-          size="body"
-          className="text-center uppercase tracking-[0.2rem]"
-        >
-          {!isLoading && <>{battle ? text : "Coming Soon"}</>}
-        </Typography>
-        {battle && (
-          <Countdown
-            fullWidth
-            fullSpread
-            startDate={battle.battleStartDate}
-            endDate={battle?.battleEndDate}
-          />
-        )}
-      </div>
-      {isLoading && (
-        <div className="min-h-20 flex w-full items-center justify-center gap-6">
-          <div className="h-56  w-5/12 max-w-md animate-pulse  bg-border-gray" />
-          <div className="h-56 w-1/12  animate-pulse bg-border-gray" />
-          <div className="h-56  w-5/12 max-w-md animate-pulse  bg-border-gray" />
         </div>
-      )}
-      {battle && <LineUp data={battle} />}
+        <div className="flex flex-col items-center justify-center">
+          <Typography
+            size="body"
+            className="text-center uppercase tracking-[0.2rem]"
+          >
+            {!isLoading && <>{battle ? text : "Coming Soon"}</>}
+          </Typography>
+          {battle && (
+            <Countdown
+              fullWidth
+              fullSpread
+              startDate={battle.battleStartDate}
+              endDate={battle?.battleEndDate}
+            />
+          )}
+        </div>
+        {isLoading && (
+          <div className="min-h-20 flex w-full items-center justify-center gap-6">
+            <div className="h-56  w-5/12 max-w-md animate-pulse  bg-border-gray" />
+            <div className="h-56 w-1/12  animate-pulse bg-border-gray" />
+            <div className="h-56  w-5/12 max-w-md animate-pulse  bg-border-gray" />
+          </div>
+        )}
+        {battle && <LineUp data={battle} />}
+      </div>
     </div>
   );
 }
