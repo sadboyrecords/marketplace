@@ -21,7 +21,8 @@ export default function OnrampModal() {
           id="on-ramp-modal"
           as="div"
           className="relative z-40"
-          onClose={() => dispatch(closeOnramp())}
+          onClose={() => null}
+          // onClose={() => dispatch(closeOnramp())}
         >
           <Transition.Child
             as={Fragment}

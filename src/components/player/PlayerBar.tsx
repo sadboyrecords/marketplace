@@ -47,6 +47,7 @@ function PlayerBar() {
                     : currentSong?.lossyAudioURL
                 }
                 volume={volume}
+                onBuffer={() => console.log("buffering")}
                 onPlay={() => {
                   console.log("onPlay");
                 }}

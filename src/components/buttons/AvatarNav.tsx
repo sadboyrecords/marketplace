@@ -181,9 +181,9 @@ function AvatarNav() {
                         {walletBalance?.toFixed(2)} SOL
                       </Typography>
                     </div>
-                    <div>
+                    {/* <div>
                       <AddFunds close={close} />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               )}

@@ -172,6 +172,7 @@ function BattleCard({
 
   React.useMemo(() => {
     if (candyMachineId) {
+      console.log({ candyMachineId });
       void fetchCandyMachineById(candyMachineId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

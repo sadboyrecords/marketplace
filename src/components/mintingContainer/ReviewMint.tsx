@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { api } from "@/utils/api";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
-import { type IMint } from "@/utils/types";
+import type { IMint } from "@/utils/types";
 import { Label } from "@/components/formFields/Label";
 import Typography from "@/components/typography";
 import type { Steps } from "@/components/mintingStepper/Stepper";
@@ -23,8 +23,8 @@ import {
   sol,
   toDateTime,
   PublicKey,
-  type Signer,
 } from "@metaplex-foundation/js";
+import type { Signer } from "@metaplex-foundation/js";
 import {
   ExclamationCircleIcon,
   CheckCircleIcon,
