@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/*  ts-ignore */
+
 import React, { useEffect, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { CoinflowPurchase } from "@coinflowlabs/react";
@@ -107,9 +110,9 @@ function CoinflowContent({
 
   return (
     <>
-      <button onClick={handleMint}>test coin</button>
+      {/* <button onClick={handleMint}>test coin</button> */}
       {/* <button onClick={handleCreateLookup}>create lookup</button> */}
-      <button onClick={extendLookupTable}> extend</button>
+      {/* <button onClick={extendLookupTable}> extend</button> */}
       <Transition key="on-ramp" show={isOpen} as={Fragment}>
         <Dialog
           id="on-ramp-modal"

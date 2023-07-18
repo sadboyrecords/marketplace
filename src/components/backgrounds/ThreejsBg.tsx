@@ -28,7 +28,7 @@ function Triangle({ color, ...props }) {
         path.subPaths[0].getPoints(),
         path.userData.style
       ),
-    []
+    [path.subPaths, path.userData.style]
   );
   return (
     <group ref={ref}>
