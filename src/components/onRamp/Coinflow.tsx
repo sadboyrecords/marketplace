@@ -5,10 +5,12 @@ import React, { useEffect, useState, Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { CoinflowPurchase } from "@coinflowlabs/react";
 import { XMarkIcon as XIcon } from "@heroicons/react/24/solid";
+import type { Signer } from "@solana/web3.js";
 
 import type { CoinflowEnvs } from "@coinflowlabs/react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import type { Transaction, VersionedTransaction } from "@solana/web3.js";
+import { Keypair, type VersionedTransaction } from "@solana/web3.js";
+import type { Transaction } from "@solana/web3.js";
 import {
   createTransferCheckedInstruction,
   getAssociatedTokenAddressSync,
@@ -29,11 +31,12 @@ function CoinflowContent({
   // console.log({ wallet });
   // console.log({ candyMachineId });
   const [isOpen, setIsOpen] = useState(false);
+  const [partialSigners, setPartialSigners] = useState<Signer[]>([]);
   const [transaction, setTransaction] = useState<
     Transaction | VersionedTransaction | undefined
   >(undefined);
 
-  const amount = 10;
+  const amount = 0.5;
 
   const handleMint = async () => {
     try {
@@ -43,10 +46,14 @@ function CoinflowContent({
         label,
         refetchTheseIds,
         onlySign: true,
-      })) as Transaction[] | VersionedTransaction[];
-      console.log({ txCoin: tx });
+      })) as {
+        tx: Transaction | VersionedTransaction;
+        signers: Signer[] | undefined;
+      };
+      console.log({ txCoin: tx, signerKey: tx.signers });
 
-      setTransaction(tx[0]);
+      setTransaction(tx.tx);
+      setPartialSigners(tx.signers || []);
       setIsOpen(true);
     } catch (error) {
       console.log({ errorcoin: error });
@@ -110,7 +117,7 @@ function CoinflowContent({
 
   return (
     <>
-      {/* <button onClick={handleMint}>test coin</button> */}
+      <button onClick={handleMint}>test coin</button>
       {/* <button onClick={handleCreateLookup}>create lookup</button> */}
       {/* <button onClick={extendLookupTable}> extend</button> */}
       <Transition key="on-ramp" show={isOpen} as={Fragment}>
@@ -183,12 +190,14 @@ function CoinflowContent({
                           onSuccess={() => {
                             console.log("Purchase Success");
                           }}
-                          debugTx
+                          partialSigners={partialSigners}
+                          // debugTx
                           blockchain={"solana"}
                           webhookInfo={{ item: "sword" }}
                           email={"nyramuzik@gmail.com"}
                           transaction={transaction}
                           amount={amount}
+                          // token={"So11111111111111111111111111111111111111112"}
                         />
                       </div>
                     </div>

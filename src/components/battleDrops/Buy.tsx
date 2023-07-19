@@ -30,7 +30,7 @@ type BuyProps = {
   competitorCandyId: string;
 };
 function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
-  console.log({ candyMachineId, competitorCandyId });
+  // console.log({ candyMachineId, competitorCandyId });
   const { data: session } = useSession();
   const { publicKey } = useWallet();
   // console.log({ publicKey });
@@ -240,12 +240,12 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
             {/* <AddFunds /> */}
           </div>
         )}
-      {/* <Coinflow
+      <Coinflow
         candyMachineId={candyMachineId}
         quantityString={mintAmount}
         label={candyMachine?.guardsAndEligibility?.[0]?.label || ""}
         refetchTheseIds={competitorCandyId ? [competitorCandyId] : undefined}
-      /> */}
+      />
     </>
   );
 }

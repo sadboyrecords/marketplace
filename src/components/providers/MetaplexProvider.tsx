@@ -81,6 +81,9 @@ const MetaplexContext = createContext({
   mint: async (
     _input: MintType
   ): Promise<MintResponseType | web3.Transaction[] | undefined> => undefined,
+  mintCoinflow: async (
+    _input: MintType
+  ): Promise<MintResponseType | web3.Transaction[] | undefined> => undefined,
 });
 
 export function useMetaplex() {
@@ -993,6 +996,7 @@ export default function MetaplexProvider({
       label,
       candyMachineId,
       refetchTheseIds,
+      onlySign,
     }: MintType) => {
       if (!candyMachineId || !candyMachines)
         throw new Error("No candy machine id provided");
@@ -1038,101 +1042,101 @@ export default function MetaplexProvider({
         const blockhash = await connection.getLatestBlockhash();
         let signedTransactions: web3.Transaction[] | undefined = [];
         // if (onlySign) return signedTransactions;
-        // if (onlySign) {
-        //   const txBuilder = transactionBuilders[0];
-        //   const signer = txBuilder?.getContext().mintSigner as Signer;
-        //   console.log({ signer });
+        if (onlySign) {
+          const txBuilder = transactionBuilders[0];
+          const signer = txBuilder?.getContext().mintSigner as Signer;
+          console.log({ signer });
 
-        //   const txs = transactionBuilders.map((t, ix) => {
-        //     const instructions = t.getInstructions();
-        //     const payer = mints[ix]?.mintSigner as Signer;
+          const txs = transactionBuilders.map((t, ix) => {
+            const instructions = t.getInstructions();
+            const payer = mints[ix]?.mintSigner as Signer;
 
-        //     const tx = t.toTransaction(blockhash);
-        //     // console.log({ tx });
-        //     tx.sign(mints[ix]?.mintSigner as Signer);
+            const tx = t.toTransaction(blockhash);
+            // console.log({ tx });
+            tx.sign(mints[ix]?.mintSigner as Signer);
 
-        //     // console.log({ tx, mintSigner: mints[ix]?.mintSigner });
-        //     return tx;
-        //   });
-        //   // const instructions = txs[0]?.instructions;
-        //   txs[0]?.signatures.forEach((s) => {
-        //     console.log({
-        //       signature: s,
-        //       pubkeyarray: s.publicKey.toBytes(),
-        //       key: s.publicKey.toBase58(),
-        //     });
-        //     //  const x = s.publicKey.toBytes()
-        //     //  const y = s.signature?.
-        //   });
-        //   // txs[0]?.signatures.
+            // console.log({ tx, mintSigner: mints[ix]?.mintSigner });
+            return tx;
+          });
+          // const instructions = txs[0]?.instructions;
+          txs[0]?.signatures.forEach((s) => {
+            console.log({
+              signature: s,
+              pubkeyarray: s.publicKey.toBytes(),
+              key: s.publicKey.toBase58(),
+            });
+            //  const x = s.publicKey.toBytes()
+            //  const y = s.signature?.
+          });
+          // txs[0]?.signatures.
 
-        //   const instructions = txBuilder?.getInstructions();
+          const instructions = txBuilder?.getInstructions();
 
-        //   console.log({ instructions });
-        //   if (!instructions) throw new Error("No instructions");
+          console.log({ instructions });
+          if (!instructions) throw new Error("No instructions");
 
-        //   const lookupTableAccount = await connection
-        //     .getAddressLookupTable(
-        //       new PublicKey(
-        //         // "Dwa9yxnzYW1nAJoVN4BEAc65d6X1YJSc54ra9QChbG7t"
-        //         "2daR6Grs1LcKYr2rYETFzDeUfdsUyjeuosaiW6bTv7n7"
-        //       )
-        //     )
-        //     .then((res) => res.value);
-        //   console.log({ lookupTableAccount });
-        //   if (!lookupTableAccount) throw new Error("No lookup table account");
+          const lookupTableAccount = await connection
+            .getAddressLookupTable(
+              new PublicKey(
+                // "Dwa9yxnzYW1nAJoVN4BEAc65d6X1YJSc54ra9QChbG7t"
+                "2daR6Grs1LcKYr2rYETFzDeUfdsUyjeuosaiW6bTv7n7"
+              )
+            )
+            .then((res) => res.value);
+          console.log({ lookupTableAccount });
+          if (!lookupTableAccount) throw new Error("No lookup table account");
 
-        //   const messageV0 = new web3.TransactionMessage({
-        //     payerKey: wallet.publicKey as PublicKey, //payer.publicKey,
-        //     recentBlockhash: blockhash.blockhash,
-        //     instructions,
-        //   }).compileToV0Message([lookupTableAccount]);
-        //   const vtx = new web3.VersionedTransaction(messageV0);
-        //   console.log({ preSignvtx: vtx });
+          const messageV0 = new web3.TransactionMessage({
+            payerKey: wallet.publicKey as PublicKey, //payer.publicKey,
+            recentBlockhash: blockhash.blockhash,
+            instructions,
+          }).compileToV0Message([lookupTableAccount]);
+          const vtx = new web3.VersionedTransaction(messageV0);
+          console.log({ preSignvtx: vtx });
 
-        //   // signed.sign([signer]);
+          // signed.sign([signer]);
 
-        //   // console.log({ vtx: vtx.signatures[0]. });
-        //   // const allkey = [];
-        //   // const keys = instructions.map((i) => {
-        //   //   const keys = i.keys.map((k) => k.pubkey.toBase58());
-        //   //   allkey.push(...keys, i.programId.toBase58());
-        //   //   return keys;
-        //   // });
-        //   // console.log({ keys, allkey });
-        //   vtx.sign([signer]);
-        //   const signed = await wallet.signTransaction(vtx);
+          // console.log({ vtx: vtx.signatures[0]. });
+          // const allkey = [];
+          // const keys = instructions.map((i) => {
+          //   const keys = i.keys.map((k) => k.pubkey.toBase58());
+          //   allkey.push(...keys, i.programId.toBase58());
+          //   return keys;
+          // });
+          // console.log({ keys, allkey });
+          // vtx.sign([signer]);
+          // const signed = await wallet.signTransaction(vtx);
 
-        //   // console.log({ vtx, signed });
+          // console.log({ vtx, signed });
 
-        //   // const txid = await connection.sendTransaction(signed, {
-        //   //   maxRetries: 5,
-        //   // });
-        //   // console.log("   ✅ - Transaction sent to network");
+          // const txid = await connection.sendTransaction(signed, {
+          //   maxRetries: 5,
+          // });
+          // console.log("   ✅ - Transaction sent to network");
 
-        //   // // Step 5 - Confirm Transaction
-        //   // const confirmation = await connection.confirmTransaction({
-        //   //   signature: txid,
-        //   //   blockhash: blockhash.blockhash,
-        //   //   lastValidBlockHeight: blockhash.lastValidBlockHeight,
-        //   // });
-        //   // if (confirmation.value.err) {
-        //   //   throw new Error("   ❌ - Transaction not confirmed.");
-        //   // }
-        //   // console.log(
-        //   //   "🎉 Transaction succesfully confirmed!",
-        //   //   "\n",
-        //   //   `https://explorer.solana.com/tx/${txid}?cluster=devnet`
-        //   // );
-        //   // vtx
-        //   return [signed];
+          // // Step 5 - Confirm Transaction
+          // const confirmation = await connection.confirmTransaction({
+          //   signature: txid,
+          //   blockhash: blockhash.blockhash,
+          //   lastValidBlockHeight: blockhash.lastValidBlockHeight,
+          // });
+          // if (confirmation.value.err) {
+          //   throw new Error("   ❌ - Transaction not confirmed.");
+          // }
+          // console.log(
+          //   "🎉 Transaction succesfully confirmed!",
+          //   "\n",
+          //   `https://explorer.solana.com/tx/${txid}?cluster=devnet`
+          // );
+          // vtx
+          return { tx: vtx, signers: [signer] };
 
-        //   // if (versiontx) {
-        //   //   console.log({ versiontx: versiontx[0] });
-        //   //   return versiontx;
-        //   // }
-        //   // if (!versiontx) return null;
-        // }
+          // if (versiontx) {
+          //   console.log({ versiontx: versiontx[0] });
+          //   return versiontx;
+          // }
+          // if (!versiontx) return null;
+        }
 
         if (magic && session?.user?.provider === authProviderNames.magic) {
           const payer = new web3.PublicKey(publicAddress || "");
