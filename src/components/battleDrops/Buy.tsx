@@ -15,6 +15,7 @@ import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { useDispatch } from "react-redux";
 import { closeJoinBattleFansModal } from "@/lib/slices/appSlice";
+import Coinflow from "@/components/onRamp/Coinflow";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -29,8 +30,10 @@ type BuyProps = {
   competitorCandyId: string;
 };
 function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
+  console.log({ candyMachineId, competitorCandyId });
   const { data: session } = useSession();
   const { publicKey } = useWallet();
+  // console.log({ publicKey });
 
   const { fetchCandyMachineById, candyMachines, mint, solUsdPrice } =
     useMetaplex();
@@ -70,7 +73,7 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
         label: candyMachine?.guardsAndEligibility?.[0]?.label || "",
         refetchTheseIds: competitorCandyId ? [competitorCandyId] : undefined,
       });
-      setPurchasedNft(data);
+      setPurchasedNft(data as MintResponseType);
       setIsMinting(false);
       toast.done(toastId);
       dispatch(closeJoinBattleFansModal());
@@ -198,32 +201,34 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                     />
                   </Button>
                 </div>
-
-                <Button
-                  disabled={
-                    !candyMachine?.guardsAndEligibility?.[0]?.isEligible
-                  }
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  onClick={handleMint}
-                  loading={isMinting}
-                  // rounded="lg"
-                >
-                  Buy
-                  {/* {isMinting ? 'Minting...' : 'Mint'} */}
-                </Button>
+                <div className="flex flex-col space-y-2">
+                  {" "}
+                  <Button
+                    disabled={
+                      !candyMachine?.guardsAndEligibility?.[0]?.isEligible
+                    }
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    onClick={handleMint}
+                    loading={isMinting}
+                    // rounded="lg"
+                  >
+                    Buy
+                    {/* {isMinting ? 'Minting...' : 'Mint'} */}
+                  </Button>
+                </div>
               </div>
             </>
           ) : (
             <>Connect your wallet</>
           )}
         </div>
-        {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
+        {/* {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
           <Typography color="neutral-gray">
             You can buy up to{" "}
             {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity}. Buy
             more sol to purchase more
           </Typography>
-        )}
+        )} */}
       </div>
       {(publicKey || session) &&
         candyMachine &&
@@ -232,9 +237,15 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
             <Typography size="body-xs" color="neutral-gray">
               {candyMachine?.guardsAndEligibility?.[0]?.inEligibleReasons?.[0]}
             </Typography>
-            <AddFunds />
+            {/* <AddFunds /> */}
           </div>
         )}
+      {/* <Coinflow
+        candyMachineId={candyMachineId}
+        quantityString={mintAmount}
+        label={candyMachine?.guardsAndEligibility?.[0]?.label || ""}
+        refetchTheseIds={competitorCandyId ? [competitorCandyId] : undefined}
+      /> */}
     </>
   );
 }

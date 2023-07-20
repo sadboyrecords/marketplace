@@ -22,7 +22,7 @@ function PlaylistCard({ songs, playlist, hideBottom, fullWidth }: Props) {
     pinnedStatus?: string;
     id: string;
     isPublic?: boolean;
-  }[] = songs?.map((track, i) => {
+  }[] = songs?.slice(0, 4).map((track, i) => {
     return {
       url: track?.lossyArtworkURL,
       hash: track?.lossyArtworkIPFSHash,
