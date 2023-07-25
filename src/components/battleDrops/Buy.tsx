@@ -204,9 +204,9 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                 <div className="flex flex-col space-y-2">
                   {" "}
                   <Button
-                    disabled={
-                      !candyMachine?.guardsAndEligibility?.[0]?.isEligible
-                    }
+                    // disabled={
+                    //   !candyMachine?.guardsAndEligibility?.[0]?.isEligible
+                    // }
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
                     onClick={handleMint}
                     loading={isMinting}

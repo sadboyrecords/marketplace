@@ -27,7 +27,7 @@ import { useSession } from "next-auth/react";
 import * as web3 from "@solana/web3.js";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { useSelector } from "react-redux";
-import { authProviderNames } from "@/utils/constants";
+import { authProviderNames, solanaUsdToken } from "@/utils/constants";
 import { magic } from "@/lib/magic";
 import {
   Metaplex,
@@ -35,26 +35,6 @@ import {
   walletAdapterIdentity,
   guestIdentity,
 } from "@metaplex-foundation/js";
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import {
-  mplCandyMachine,
-  mintV2,
-  fetchCandyMachine,
-} from "@metaplex-foundation/mpl-candy-machine";
-import type { DefaultGuardSetMintArgs } from "@metaplex-foundation/mpl-candy-machine";
-import {
-  createMintWithAssociatedToken,
-  setComputeUnitLimit,
-  fetchMint,
-} from "@metaplex-foundation/mpl-toolbox";
-import {
-  transactionBuilder,
-  generateSigner,
-  publicKey,
-  some,
-} from "@metaplex-foundation/umi";
-import { walletAdapterIdentity as walletIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
-import { TokenStandard } from "@metaplex-foundation/mpl-token-metadata";
 
 interface CandyMachineState {
   isLoading?: boolean;
@@ -66,12 +46,17 @@ interface CandyMachineState {
   };
   guardsAndEligibility?: GuardsAndEligibilityType[];
 }
+interface UsdcInfoType {
+  balance: number;
+  address: string;
+}
 
 const MetaplexContext = createContext({
   metaplex: null as Metaplex | null,
   // publicAddress: null as string | null | undefined,
   // setPublicAddress: (_publicAddress: string | null) => {},
   walletBalance: null as number | null | undefined,
+  usdcInfo: null as UsdcInfoType | null | undefined,
   solUsdPrice: null as number | null,
   getUserBalance: async (_publicAddress?: string): Promise<void> => undefined,
   candyMachines: {} as Record<string, CandyMachineState> | null,
@@ -118,6 +103,7 @@ export default function MetaplexProvider({
   const updateTotalMinted = api.candyMachine.updatetotalMinted.useMutation();
   const [solUsdPrice, setSolUsdPrice] = React.useState<number | null>(null);
   const [walletBalance, setWalletBalance] = React.useState<number | null>();
+  const [usdcTokenInfo, setUsdcTokenInfo] = React.useState<UsdcInfoType>();
   const [initalStateSet, setInitalStateSet] = React.useState(false); //using this to avoid firing off fetching candy machine before wallet has been loaded
   const [candyMachines, setCandyMachines] = React.useState<Record<
     string,
@@ -162,7 +148,21 @@ export default function MetaplexProvider({
       );
       const userBalance = userBalanceLamport / LAMPORTS_PER_SOL;
 
+      const pda = mx
+        .tokens()
+        .pdas()
+        .associatedTokenAccount({
+          mint: new PublicKey(solanaUsdToken),
+          owner: new web3.PublicKey(session.user.walletAddress),
+        });
+      const tokenBalance = await connection.getTokenAccountBalance(pda);
+      console.log({ tokenBalance, key: pda.toBase58() });
+
       setWalletBalance(Number(userBalance.toFixed(2)));
+      setUsdcTokenInfo({
+        address: pda.toBase58(),
+        balance: Number(tokenBalance.value.uiAmountString),
+      });
       // return userBalance;
       setInitalStateSet(true);
     } catch (error) {
@@ -396,11 +396,19 @@ export default function MetaplexProvider({
       }
     }
     if (guard.tokenPayment != null) {
-      const ata = mx.tokens().pdas().associatedTokenAccount({
-        mint: guard.tokenPayment.mint,
-        owner: mx.identity().publicKey,
-      });
+      const ata = mx
+        .tokens()
+        .pdas()
+        .associatedTokenAccount({
+          mint: guard.tokenPayment.mint,
+          owner: new web3.PublicKey(session?.user?.walletAddress), // mx.identity().publicKey,
+        });
       const balance = await mx.connection.getTokenAccountBalance(ata);
+      console.log("balance", balance, {
+        tokenPayment: guard.tokenPayment,
+        basic: guard.tokenPayment.amount.basisPoints.toNumber(),
+      });
+
       if (
         Number(balance.value.amount) <
         guard.tokenPayment.amount.basisPoints.toNumber()
@@ -951,31 +959,45 @@ export default function MetaplexProvider({
             // "Dwa9yxnzYW1nAJoVN4BEAc65d6X1YJSc54ra9QChbG7t"
           ),
           addresses: [
-            new PublicKey("5KMJJsx9RK2G7sCmtVTwUVzjAL1bx7yEzGDSHs6aQrKr"),
-            new PublicKey("BkXwtL4fgFc1BxaYwJ6iDYa3oNXBD6JcqTqz9dfpr7FU"),
-            new PublicKey("vevzhVDVsbnuunHzTZTXNNzfzc2Pf89TaDjtSSpbgPG"),
-            new PublicKey("2cVkpryQUN35Giwg1nHpGFbi3Gw4A7nYaR5c5pEeP6gx"),
-            new PublicKey("2V9b4tAG6VWqjLsciyjQWaWWvHgu7wGpNnjYzpSCV3EM"),
-            new PublicKey("H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg"),
-            new PublicKey("AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK"),
-            new PublicKey("3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H"),
-            new PublicKey("11111111111111111111111111111111"),
-            new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"),
-            new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
-            new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
-            new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
-            new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-            new PublicKey("Sysvar1nstructions1111111111111111111111111"),
-            new PublicKey("SysvarRent111111111111111111111111111111111"),
-            new PublicKey("SysvarS1otHashes111111111111111111111111111"),
-            new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-            new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
-            new PublicKey("HzdseyCGneNv4SzyBgteppi1N8GawjWLSkBSTx82UTtL"),
-            new PublicKey("SysvarC1ock11111111111111111111111111111111"),
-            new PublicKey("FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9"),
-            new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
-            new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
+            new PublicKey("26rDHLqb21a5EqWiWYVm3enXbBuXiDUn1MJhTqVyA98h"),
+            new PublicKey("J3GuLGfJLbxHv5raBt53rNDi3P1mrxQk5CvG8LkLioR6"),
+            new PublicKey("2AcwbunbcHg3A6zAp56hQeuJjm7391Vgpod21kTvevUu"),
+            new PublicKey("4bybQid1XVE2eUJbs2wtkgTSAkX7k9e2iZNR66jS14Fs"),
+            new PublicKey("G4pBimXLA1ULCEoLB2BvHk4c9TzQnsQEMV9fWWCyfkeS"),
+            new PublicKey("GfHSggRTgyVA9QF1Gai1iaPvzvnkUWRnwyzgv8cCPn78"),
+            new PublicKey("5ZM6EDXDHqbESpBTBfecXb2o12wxg4nYBuX6dxz1YvwV"),
+            new PublicKey("2ZovPCyn4VFKiNZpfJJghiEjLTHfGqyh1H7Qiec9Q6ec"),
+            new PublicKey("3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh"),
 
+            // new PublicKey("11111111111111111111111111111111"),
+            // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+            // new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+            // new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
+
+            // new PublicKey("5KMJJsx9RK2G7sCmtVTwUVzjAL1bx7yEzGDSHs6aQrKr"),
+            // new PublicKey("BkXwtL4fgFc1BxaYwJ6iDYa3oNXBD6JcqTqz9dfpr7FU"),
+            // new PublicKey("vevzhVDVsbnuunHzTZTXNNzfzc2Pf89TaDjtSSpbgPG"),
+            // new PublicKey("2cVkpryQUN35Giwg1nHpGFbi3Gw4A7nYaR5c5pEeP6gx"),
+            // new PublicKey("2V9b4tAG6VWqjLsciyjQWaWWvHgu7wGpNnjYzpSCV3EM"),
+            // new PublicKey("H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg"),
+            // new PublicKey("AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK"),
+            // new PublicKey("3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H"),
+
+            // new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"),
+
+            // new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
+
+            // new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+            // new PublicKey("Sysvar1nstructions1111111111111111111111111"),
+            // new PublicKey("SysvarRent111111111111111111111111111111111"),
+            // new PublicKey("SysvarS1otHashes111111111111111111111111111"),
+
+            // new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+            // new PublicKey("HzdseyCGneNv4SzyBgteppi1N8GawjWLSkBSTx82UTtL"),
+            // new PublicKey("SysvarC1ock11111111111111111111111111111111"),
+            // new PublicKey("FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9"),
+            // new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
+            // new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
             // web3.Keypair.generate().publicKey,
             // web3.Keypair.generate().publicKey,
           ],
@@ -1607,6 +1629,7 @@ export default function MetaplexProvider({
       // guardsAndEligibility,
       walletBalance,
       solUsdPrice,
+      usdcInfo: usdcTokenInfo,
       // publicAddress
       // updateCandyMachine,
     };
@@ -1617,6 +1640,7 @@ export default function MetaplexProvider({
     // publicAddress,
     walletBalance,
     solUsdPrice,
+    usdcTokenInfo,
   ]);
   // console.log({ providerCM: candyMachine, providerGE: guardsAndEligibility });
 

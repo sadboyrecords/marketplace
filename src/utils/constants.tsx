@@ -1,5 +1,26 @@
 export const env = process.env.NEXT_PUBLIC_ENV;
 
+export const socialMediaPrefix = {
+  twitter: "https://twitter.com/",
+  facebook: "https://www.facebook.com/",
+  instagram: "https://www.instagram.com/",
+  discord: "https://discord.gg/", //https://discordapp.com/users https://discord.com/invite/myWKuNQF7V
+  tiktok: "https://www.tiktok.com/@",
+  youtube: "https://www.youtube.com/",
+  spotify: "https://open.spotify.com/artist/",
+  // telegram: "https://t.me/niftytunesnft",
+  // medium: "https://niftytunesnft.medium.com/",
+  // github: "",
+};
+
+export const solanaUsdToken =
+  env === "prod"
+    ? "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+    : "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+
+export const battleDropsTreasury = process.env.NEXT_PUBLIC_BATTLE_TREASURY;
+// export const splTokenAccount = process.env.NEXT_PUBLIC_SPL_TOKEN_ACCOUNT; //Simalar to treasury, this is the address that will receive the USDC
+
 export const imageDomains = [
   "placekitten.com",
   "spinamp.mypinata.cloud",
@@ -11,8 +32,6 @@ export const imageDomains = [
   "niftytunes.b-cdn.net",
   "niftytunes.myfilebase.com",
 ];
-
-export const battleDropsTreasury = process.env.NEXT_PUBLIC_BATTLE_TREASURY;
 
 export const globalMeta = {
   siteName: "NiftyTunes",
@@ -87,6 +106,7 @@ export const adminWallets = [
   "A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf",
   "ESoydi4GMD3o4KU7Mm1Fn5RoY4kKf2VyDWJzGMBBXg4c",
   "5SBznwYE5GxtcoQjwsthjN9jrb7xuXJCufJmLvVBeR6B", // sadboy wallet
+  "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
 ];
 
 export const addresses = {

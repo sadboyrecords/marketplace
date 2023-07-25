@@ -360,6 +360,11 @@ export type GuardFormType = {
   endDate?: Date;
   label: string;
   solPayment?: { amount: number; destination: string };
+  tokenPayment?: {
+    amount: number;
+    destination: string;
+    splTokenAddress: string; // token address we want to pay with like usdc
+  };
   redeemAmount?: number;
   mintLimit?: number;
 };

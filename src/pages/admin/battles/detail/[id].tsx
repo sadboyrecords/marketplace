@@ -155,7 +155,7 @@ function BattleDetails() {
           End Date: {dayjs(data?.battleEndDate).format("MMM DD, YYYY h:mm A")}
         </Typography>
 
-        <Typography>Price: {data?.battlePrice} SOL</Typography>
+        <Typography>Price: {data?.battlePrice} USDC</Typography>
         {/* <Typography>Price: {data?.battleDescription} </Typography> */}
       </div>
       {data && <LineUp data={data} />}

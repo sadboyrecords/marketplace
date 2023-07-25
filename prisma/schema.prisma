@@ -132,6 +132,18 @@ model User {
     magicSolanaAddress   String?             @unique
     sentTransactions     Transactions[]      @relation("SentTransactions")
     receivedTransactions Transactions[]      @relation("ReceivedTransactions")
+    instagram            String?
+    twitter              String?
+    facebook             String?
+    youtube              String?
+    spotify              String?
+    apple                String?
+    tiktok               String?
+    soundcloud           String?
+    discord              String?
+    telegram             String?
+    reddit               String?
+    website              String?
     // creationEvents CreationEvents[]
     // battles              Battle[]
 }
@@ -192,6 +204,8 @@ model SocialAccount {
     userId   String
     verified DateTime?
     user     User       @relation(fields: [userId], references: [id])
+
+    @@unique([type, userId], name: "userAndSocialType")
 }
 
 enum SocialType {
@@ -268,8 +282,6 @@ model BattleContestants {
     candymachine      CandyMachines?    @relation(fields: [candyMachineId], references: [candyMachineId])
     battleId          String
     battle            Battle            @relation(fields: [battleId], references: [id])
-    // c1            Battle
-    // c2            Battle
 
     @@unique([battleId, walletAddress], name: "battleAndArtist")
 }

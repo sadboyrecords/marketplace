@@ -412,6 +412,15 @@ export const userRouter = createTRPCRouter({
         description: z.string().max(160).optional(),
         socialWebLinks: z.array(z.string()).optional(),
         magicSolanaAddress: z.string().optional(),
+        instagram: z.string().optional(),
+        tiktok: z.string().optional(),
+        twitter: z.string().optional(),
+        facebook: z.string().optional(),
+        youtube: z.string().optional(),
+        soundcloud: z.string().optional(),
+        spotify: z.string().optional(),
+        discord: z.string().optional(),
+        // magicSolanaAddress: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -436,6 +445,32 @@ export const userRouter = createTRPCRouter({
           profileBannerYAxis: input.profileBannerYAxis,
           socialWebLinks: input.socialWebLinks,
           magicSolanaAddress: input.magicSolanaAddress,
+          instagram: input.instagram,
+          tiktok: input.tiktok,
+          twitter: input.twitter,
+          facebook: input.facebook,
+          spotify: input.spotify,
+          discord: input.discord,
+          youtube: input.youtube,
+          soundcloud: input.soundcloud,
+
+          // socials: {
+          //   upsert: {
+          //     where: {
+          //       userAndSocialType: {
+          //         userId: ctx?.session?.user.walletAddress,
+          //         type: "INSTAGRAM",
+          //       },
+          //     },
+          //     update: {
+          //       url: input.instagram,
+          //     },
+          //     create: {
+          //       url: "input.instagram",
+          //       type: "INSTAGRAM",
+          //     },
+          //   },
+          // },
         },
       });
       return {

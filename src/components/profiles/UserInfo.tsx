@@ -14,11 +14,31 @@ import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import Input from "@/components/formFields/Input";
 import TextArea from "@/components/formFields/TextArea";
+import {
+  SpotifyIcon,
+  InstagramIcon,
+  FacebookIcon,
+  TwitterIcon,
+  DiscordIcon,
+  TikTokIcon,
+} from "@/components/iconComponents";
 import { type SubmitHandler, useForm } from "react-hook-form";
+import { socialMediaPrefix } from "@/utils/constants";
 
 type UserInfoProps = {
   walletAddress?: string;
 };
+
+interface ProfileUpdateType {
+  name?: string;
+  description?: string;
+  instagram?: string;
+  spotify?: string;
+  facebook?: string;
+  twitter?: string;
+  discord?: string;
+  tiktok?: string;
+}
 
 function UserInfo({ walletAddress }: UserInfoProps) {
   const userData = api.user.getUser.useQuery(
@@ -107,19 +127,23 @@ function UserInfo({ walletAddress }: UserInfoProps) {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<{
-    name?: string;
-    description?: string;
-  }>();
+    reset,
+  } = useForm<ProfileUpdateType>();
+
+  // SpotifyIcon,
+  // InstagramIcon,
+  // FacebookIcon,
+  // TwitterIcon,
+  // DiscordIcon,
+  // TikTokIcon,
 
   const watchDescription = watch("description");
   const utils = api.useContext();
   const userMutations = api.user.updateUser.useMutation();
 
-  const handleUpdateProfile: SubmitHandler<{
-    name?: string;
-    description?: string;
-  }> = async (data) => {
+  const handleUpdateProfile: SubmitHandler<ProfileUpdateType> = async (
+    data
+  ) => {
     try {
       setIsLoading(true);
       const updatedProfile = {
@@ -134,6 +158,12 @@ function UserInfo({ walletAddress }: UserInfoProps) {
         profileBannerYAxis: axis?.y,
         profilePictureXAxis: avatarAxis?.x,
         profilePictureYAxis: avatarAxis?.y,
+        instagram: data.instagram,
+        facebook: data.facebook,
+        twitter: data.twitter,
+        tiktok: data.tiktok,
+        discord: data.discord,
+        spotify: data.spotify,
       };
       await userMutations.mutateAsync(updatedProfile);
 
@@ -141,6 +171,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
       await refetch();
       setIsLoading(false);
       setEditing(false);
+      reset();
       toast.success("Profile updated");
     } catch (error) {
       toast.error("Something went wrong. Please try again later");
@@ -157,11 +188,23 @@ function UserInfo({ walletAddress }: UserInfoProps) {
   useMemo(() => {
     setValue("name", userData?.data?.name || userData?.data?.firstName || "");
     setValue("description", userData?.data?.description || "");
+    setValue("instagram", userData?.data?.instagram || "");
+    setValue("facebook", userData?.data?.facebook || "");
+    setValue("twitter", userData?.data?.twitter || "");
+    setValue("tiktok", userData?.data?.tiktok || "");
+    setValue("discord", userData?.data?.discord || "");
+    setValue("spotify", userData?.data?.spotify || "");
   }, [
     setValue,
     userData?.data?.description,
+    userData?.data?.discord,
+    userData?.data?.facebook,
     userData?.data?.firstName,
+    userData?.data?.instagram,
     userData?.data?.name,
+    userData?.data?.spotify,
+    userData?.data?.tiktok,
+    userData?.data?.twitter,
   ]);
 
   return (
@@ -301,6 +344,71 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             }),
                           }}
                         />
+                        <div className="flex flex-col space-y-2">
+                          <p className="font-bold"> Socials</p>
+                          <Input
+                            // label="Name"
+                            // type=""
+                            beginAddOn="@"
+                            iconEnd={
+                              <span className="flex">
+                                <InstagramIcon className="h-5 w-5 text-base-content" />
+                              </span>
+                            }
+                            inputProps={{
+                              ...register("instagram", {}),
+                            }}
+                          />
+                          <Input
+                            beginAddOn="@"
+                            iconEnd={
+                              <TikTokIcon className="h-6 w-6 text-base-content" />
+                            }
+                            inputProps={{
+                              ...register("tiktok", {}),
+                            }}
+                          />
+
+                          <Input
+                            beginAddOn="@"
+                            iconEnd={
+                              <TwitterIcon className="h-6 w-6 text-base-content" />
+                            }
+                            inputProps={{
+                              ...register("twitter", {}),
+                            }}
+                          />
+                          <Input
+                            // type=""
+                            beginAddOn="@"
+                            iconEnd={
+                              <FacebookIcon className="h-5 w-5 text-base-content" />
+                            }
+                            inputProps={{
+                              ...register("facebook", {}),
+                            }}
+                          />
+                          <Input
+                            type="url"
+                            beginAddOn="url"
+                            iconEnd={
+                              <DiscordIcon className="h-6 w-6 text-base-content" />
+                            }
+                            inputProps={{
+                              ...register("discord", {}),
+                            }}
+                          />
+
+                          <Input
+                            beginAddOn="url"
+                            iconEnd={
+                              <SpotifyIcon className="h-6 w-6 text-base-content" />
+                            }
+                            inputProps={{
+                              ...register("spotify", {}),
+                            }}
+                          />
+                        </div>
                         {/* upload profile image */}
                         {/* <div className="flex flex-col gap-2">
                   <label className="text-sm font-bold text-neutral-900">
@@ -411,6 +519,51 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                   >
                     {user?.description}
                   </Typography>
+                  {/* SOCIALS */}
+                  <div className="mt-4 flex flex-row flex-wrap items-center gap-4">
+                    {user?.instagram && (
+                      <a
+                        target="_blank"
+                        href={socialMediaPrefix.instagram + user?.instagram}
+                      >
+                        <InstagramIcon className="h-4 w-4 cursor-pointer" />
+                      </a>
+                    )}
+                    {user?.twitter && (
+                      <a
+                        target="_blank"
+                        href={socialMediaPrefix.twitter + user?.twitter}
+                      >
+                        <TwitterIcon className="h-5 w-5 cursor-pointer" />
+                      </a>
+                    )}
+                    {user?.tiktok && (
+                      <a
+                        target="_blank"
+                        href={socialMediaPrefix.tiktok + user?.tiktok}
+                      >
+                        <TikTokIcon className=" cursor-pointer" />
+                      </a>
+                    )}
+                    {user?.facebook && (
+                      <a
+                        target="_blank"
+                        href={socialMediaPrefix.facebook + user?.facebook}
+                      >
+                        <FacebookIcon className=" cursor-pointer" />
+                      </a>
+                    )}
+                    {user?.spotify && (
+                      <a target="_blank" href={user?.spotify}>
+                        <SpotifyIcon className="h-5 w-5 cursor-pointer" />
+                      </a>
+                    )}
+                    {user?.discord && (
+                      <a target="_blank" href={user?.discord}>
+                        <DiscordIcon className=" h-5 w-5 cursor-pointer" />
+                      </a>
+                    )}
+                  </div>
                 </>
               )}
             </div>

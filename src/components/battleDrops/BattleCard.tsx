@@ -170,6 +170,8 @@ function BattleCard({
     }
   }, [candyMachine?.items?.redeemed, totalPot?.items]);
 
+  // console.log({ candyMachine });
+
   React.useMemo(() => {
     if (candyMachineId) {
       // console.log({ candyMachineId });
