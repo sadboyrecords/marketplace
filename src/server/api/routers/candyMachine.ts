@@ -294,6 +294,7 @@ export const candyMachineRouter = createTRPCRouter({
                   height: true,
                   path: true,
                   status: true,
+                  ipfsHash: true,
                 },
               },
             },

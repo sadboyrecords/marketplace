@@ -1,9 +1,19 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+interface BattleWinner {
+  collectionName?: string;
+  artistName?: string;
+  walletAddress?: string;
+  imagePath?: string;
+  pinnedStatus?: string;
+  imageHash?: string;
+}
 export interface RootState {
   authModal: boolean;
   publicAddress: string | undefined | null;
   joinBattleFansModal: boolean;
+  topFansModal: boolean;
+  battleWinner: BattleWinner | null;
   battleDetailsAndSupporters: {
     battleName?: string;
     artistName?: string;
@@ -11,6 +21,7 @@ export interface RootState {
     candymachineId?: string;
     competitorCandyId?: string;
     supporters: ISupporters | undefined | null;
+    isEnded?: boolean;
   } | null;
   onRamperModal: boolean;
 }
@@ -21,6 +32,8 @@ const initialState: RootState = {
   joinBattleFansModal: false,
   battleDetailsAndSupporters: null,
   onRamperModal: false,
+  topFansModal: false,
+  battleWinner: null,
 };
 
 export const appSlice = createSlice({
@@ -36,6 +49,9 @@ export const appSlice = createSlice({
     setPublicAddress: (state, action: PayloadAction<string | null>) => {
       state.publicAddress = action.payload;
     },
+    setBattleWinner: (state, action: PayloadAction<BattleWinner | null>) => {
+      state.battleWinner = action.payload;
+    },
     openJoinBattleFansModal: (
       state,
       action: PayloadAction<{
@@ -50,8 +66,27 @@ export const appSlice = createSlice({
       state.joinBattleFansModal = true;
       state.battleDetailsAndSupporters = action.payload;
     },
+    openTopFansModal: (
+      state,
+      action: PayloadAction<{
+        battleName?: string;
+        artistName?: string;
+        collectionName?: string;
+        supporters: ISupporters | undefined | null;
+        candymachineId?: string;
+        competitorCandyId?: string;
+        isEnded?: boolean;
+      }>
+    ) => {
+      state.topFansModal = true;
+      state.battleDetailsAndSupporters = action.payload;
+    },
     closeJoinBattleFansModal: (state) => {
       state.joinBattleFansModal = false;
+      state.battleDetailsAndSupporters = null;
+    },
+    closeTopFansModal: (state) => {
+      state.topFansModal = false;
       state.battleDetailsAndSupporters = null;
     },
     openOnramp: (state) => {
@@ -72,13 +107,22 @@ export const {
   closeJoinBattleFansModal,
   openOnramp,
   closeOnramp,
+  closeTopFansModal,
+  openTopFansModal,
+  setBattleWinner,
 } = appSlice.actions;
 
 export const selectOnrampModal = (state: { app: RootState }) =>
   state.app.onRamperModal;
 
+export const selectBattleWinner = (state: { app: RootState }) =>
+  state.app.battleWinner;
+
 export const selectJoinBattleFansModal = (state: { app: RootState }) =>
   state.app.joinBattleFansModal;
+
+export const selectTopFansModal = (state: { app: RootState }) =>
+  state.app.topFansModal;
 
 export const selectBattleDetailsAndSupporters = (state: { app: RootState }) =>
   state.app.battleDetailsAndSupporters;

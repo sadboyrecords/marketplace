@@ -35,6 +35,15 @@ export const battleRouter = createTRPCRouter({
                   firstName: true,
                   description: true,
                   walletAddress: true,
+                  pinnedProfilePicture: {
+                    select: {
+                      path: true,
+                      width: true,
+                      height: true,
+                      status: true,
+                      ipfsHash: true,
+                    },
+                  },
                 },
               },
               candyMachineDraft: {
@@ -115,6 +124,15 @@ export const battleRouter = createTRPCRouter({
                   firstName: true,
                   description: true,
                   walletAddress: true,
+                  pinnedProfilePicture: {
+                    select: {
+                      path: true,
+                      width: true,
+                      height: true,
+                      status: true,
+                      ipfsHash: true,
+                    },
+                  },
                 },
               },
               candyMachineDraft: {
@@ -197,6 +215,15 @@ export const battleRouter = createTRPCRouter({
                 firstName: true,
                 description: true,
                 walletAddress: true,
+                pinnedProfilePicture: {
+                  select: {
+                    path: true,
+                    width: true,
+                    height: true,
+                    status: true,
+                    ipfsHash: true,
+                  },
+                },
               },
             },
             candyMachineDraft: {

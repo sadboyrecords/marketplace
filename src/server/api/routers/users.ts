@@ -37,6 +37,7 @@ export const userRouter = createTRPCRouter({
             width: true,
             height: true,
             status: true,
+            ipfsHash: true,
           },
         },
         likedTracks: {
@@ -101,6 +102,7 @@ export const userRouter = createTRPCRouter({
               width: true,
               height: true,
               status: true,
+              ipfsHash: true,
             },
           },
 
@@ -153,6 +155,7 @@ export const userRouter = createTRPCRouter({
               select: {
                 path: true,
                 status: true,
+                ipfsHash: true,
               },
             },
             likedTracks: {
