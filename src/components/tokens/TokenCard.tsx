@@ -81,14 +81,14 @@ function TokenCard({ hideBottom, fullWidth, nft }: Props) {
                         onClick={handlePlay}
                       >
                         <ImageDisplay
-                          className={`brightness-85 aspect-1  h-full rounded-full object-cover text-base-content group-hover:brightness-50 ${
+                          className={`brightness-85 aspect-1   h-full rounded-full object-cover text-base-content group-hover:brightness-50 ${
                             currentSong?.id === track?.id ? "brightness-50" : ""
                           }`}
                           url={nft?.json?.image || "/placeholder/triangle.svg"}
                           hash={null} //track?.lossyArtworkIPFSHash
                           width={200}
                           height={200}
-                          imgTagClassName="rounded-full aspect-1 object-cover hover:brightness-50 brightness-80 group-hover:brightness-50"
+                          imgTagClassName="rounded-full w-52 aspect-1 object-cover hover:brightness-50 brightness-80 group-hover:brightness-50"
                           //   path={track?.path || undefined}
                           //   pinnedStatus={track?.pinnedStatus}
                           //   publicImage={track?.isPublic}
