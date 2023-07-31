@@ -113,6 +113,7 @@ export const adminWallets = [
   "ESoydi4GMD3o4KU7Mm1Fn5RoY4kKf2VyDWJzGMBBXg4c",
   "5SBznwYE5GxtcoQjwsthjN9jrb7xuXJCufJmLvVBeR6B", // sadboy wallet
   "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
+  "8miKAoCCf13Ui7e4Tphh2GYboe6kCRhuvw7mS8oAzPFH", // brave
 ];
 
 export const addresses = {
