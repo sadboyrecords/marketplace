@@ -26,12 +26,12 @@ function PlayerBar() {
   // const audioUrl = audioIpfsUrl({ hash: currentSong?.lossyAudioIPFSHash });
   const dispatch = useDispatch();
 
-  // console.log({
-  //   currentSong,
-  //   isPlaying,
-  //   hash: currentSong?.lossyAudioIPFSHash,
-  //   audioUrl,
-  // });
+  console.log({
+    currentSong,
+    // isPlaying,
+    // hash: currentSong?.lossyAudioIPFSHash,
+    // audioUrl,
+  });
 
   return (
     <>
@@ -73,6 +73,7 @@ function PlayerBar() {
               />
             </div>
           )}
+
           <div className=" relative flex h-full w-full  items-center border-t border-base-300 bg-base-100 align-middle">
             {currentSong && (
               <div className=" w-full">
@@ -83,15 +84,17 @@ function PlayerBar() {
                   {/* IMAGE + TITLE + NAMES LG */}
                   <div className="flex max-w-sm items-center lg:min-w-[20rem] ">
                     {/* IMAGE */}
-                    <div className="relative  h-16  w-16 rounded bg-neutral-800 p-0">
+                    <div className="relative  h-16  w-16 rounded bg-neutral-800 p-0 ">
                       <ImageDisplay
                         url={currentSong?.lossyArtworkURL || undefined}
                         hash={currentSong?.lossyArtworkIPFSHash || null}
+                        pinnedStatus={currentSong?.pinnedImage?.status}
+                        path={currentSong?.pinnedImage?.path}
                         width={40}
                         quality={50}
                         alt={currentSong?.title || "Track"}
                         className="m-0  rounded p-0 opacity-90"
-                        imgTagClassName="w-16 rounded opacity-90 p-0 m-0"
+                        imgTagClassName="w-16 h-16 object-cover rounded opacity-90 p-0 m-0"
                         // layout="fill"
                         fill
                       />
