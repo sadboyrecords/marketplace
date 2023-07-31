@@ -1,18 +1,17 @@
 import React from "react";
 // import MintingContainer from '@/components/MintingContainer';
-import { addresses } from "@/utils/constants";
-import { useWallet } from "@solana/wallet-adapter-react";
+
 import Typography from "@/components/typography";
 import TextLoader from "@/components/loaders/TextLoader";
 import NewBattle from "@/components/forms/NewBattle";
+import { useSession } from "next-auth/react";
 
 function CreateToken() {
-  const { publicKey } = useWallet();
-  console.log("publicKey", publicKey?.toBase58());
+  const { data: session } = useSession();
 
   return (
     <div>
-      {addresses.allowedWallets.find((a) => a === publicKey?.toBase58()) ? (
+      {session?.user?.isAdmin ? (
         <>
           <Typography type="h1" size="display-md" className="font-bold">
             New Battle

@@ -36,6 +36,7 @@ function NewPlaylistButton({ isNav }: { isNav?: boolean }) {
         walletAddress: session?.user?.walletAddress,
       });
       void router.push(routes.playlistDetail(playlist.id) + "?isCurated=true");
+      setIsCreating(false);
     } catch (error) {
       console.log({ error });
       toast.error("Something went wrong");

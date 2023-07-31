@@ -1,5 +1,5 @@
 import { type MintResponseType } from "@/utils/types";
-import { SolIcon } from "@/components/iconComponents";
+import { SolIcon, UsdcIcon } from "@/components/iconComponents";
 import Typography from "@/components/typography";
 import Button from "@/components/buttons/Button";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
@@ -15,14 +15,15 @@ import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { useDispatch } from "react-redux";
 import { closeJoinBattleFansModal } from "@/lib/slices/appSlice";
+import Coinflow from "@/components/onRamp/Coinflow";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
 });
 
-const AddFunds = dynamic(() => import("@/components/onRamp/AddFunds"), {
-  ssr: false,
-});
+// const AddFunds = dynamic(() => import("@/components/onRamp/AddFunds"), {
+//   ssr: false,
+// });
 
 type BuyProps = {
   candyMachineId: string;
@@ -70,7 +71,7 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
         label: candyMachine?.guardsAndEligibility?.[0]?.label || "",
         refetchTheseIds: competitorCandyId ? [competitorCandyId] : undefined,
       });
-      setPurchasedNft(data);
+      setPurchasedNft(data as MintResponseType);
       setIsMinting(false);
       toast.done(toastId);
       dispatch(closeJoinBattleFansModal());
@@ -130,16 +131,22 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
           Close
         </Button>
       </GenericModal>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-2 ">
+        {/* flex flex-wrap items-center justify-between gap-3 */}
         <div>
           <div className="flex items-center space-x-2 ">
-            <SolIcon height={20} />
-            <Typography size="body-xl" className="">
-              {candyMachine?.guardsAndEligibility?.[0]?.payment?.sol?.amount}
-              {/* //battle?.battlePrice || */}
-              {solUsdPrice && (
+            {candyMachine?.guardsAndEligibility?.[0]?.payment?.sol && (
+              <>
+                <SolIcon height={20} />
+                <Typography size="body-xl" className="">
+                  {
+                    candyMachine?.guardsAndEligibility?.[0]?.payment?.sol
+                      ?.amount
+                  }
+                  {/* //battle?.battlePrice || */}
+                  {/* {solUsdPrice && (
                 <span className="ml-2 text-sm text-neutral-content">
-                  {/* battle?.battlePrice  */}(
+                (
                   {(
                     solUsdPrice *
                     (candyMachine?.guardsAndEligibility?.[0]?.payment?.sol
@@ -147,94 +154,144 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                   ).toFixed(2)}{" "}
                   usd)
                 </span>
-              )}
-            </Typography>
+              )} */}
+                </Typography>
+              </>
+            )}
+            {candyMachine?.guardsAndEligibility?.[0]?.payment?.token && (
+              <div className="flex items-center space-x-1 ">
+                <UsdcIcon className="h-11 w-11" />
+                <Typography size="body-xl" className="">
+                  {
+                    candyMachine?.guardsAndEligibility?.[0]?.payment?.token
+                      ?.amount
+                  }
+                  <span className="ml-2 text-xs text-neutral-content">
+                    (SOL-USDC)
+                  </span>
+                </Typography>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="text-center ">
+        <div className=" ">
           {publicKey || session ? (
             <>
-              <div className="flex flex-wrap items-center justify-center space-x-3">
-                <div className="flex items-center justify-between space-x-3">
-                  <Button
-                    className="!p-1"
-                    color="neutral"
-                    size="sm"
-                    // rounded="full"
-                    onClick={handleIncrease}
-                    variant="outlined"
+              <div className="mt-4 items-center justify-between space-x-4 space-y-3 rounded-md border border-border-gray p-4 sm:flex sm:flex-wrap sm:space-y-0">
+                <div>
+                  <Typography
+                    size="body"
+                    className="text-center text-neutral-content"
                   >
-                    <PlusIcon
-                      className="h-4 w-4 text-neutral-content"
-                      aria-hidden="true"
-                    />
-                  </Button>
-                  <div id="custom-canvas" className="flex w-16">
-                    <Input
-                      type="number"
-                      // onChange={(e) =>
-                      //   setMintAmount(Number(e.target.value))
-                      // }
-                      inputProps={{
-                        onChange: (e) => setMintAmount(Number(e.target.value)),
-                      }}
-                      className="w-10"
-                      value={mintAmount.toString()}
-                    />
-                    {/* <Input /> */}
-                  </div>
-                  <Button
-                    className="!p-1"
-                    color="neutral"
-                    disabled={mintAmount === 1}
-                    size="sm"
-                    variant="outlined"
-                    onClick={handleDecrease}
-                  >
-                    <MinusIcon
-                      className="h-4 w-4 text-neutral-content"
-                      aria-hidden="true"
-                    />
-                  </Button>
+                    Use your credit card
+                  </Typography>
                 </div>
-
-                <Button
-                  disabled={
-                    !candyMachine?.guardsAndEligibility?.[0]?.isEligible
-                  }
-                  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                  onClick={handleMint}
-                  loading={isMinting}
-                  // rounded="lg"
-                >
-                  Buy
-                  {/* {isMinting ? 'Minting...' : 'Mint'} */}
-                </Button>
+                <div className="flex flex-col sm:flex-row">
+                  <Coinflow
+                    candyMachineId={candyMachineId}
+                    quantityString={mintAmount}
+                    label={candyMachine?.guardsAndEligibility?.[0]?.label || ""}
+                    refetchTheseIds={
+                      competitorCandyId ? [competitorCandyId] : undefined
+                    }
+                  />
+                </div>
+              </div>
+              <div className="mt-6 rounded-md border border-border-gray p-4">
+                {(publicKey || session) &&
+                  candyMachine &&
+                  !candyMachine?.guardsAndEligibility?.[0]?.isEligible && (
+                    <div className="mt-3 flex items-center justify-between space-x-2">
+                      <Typography size="body-xs" color="neutral-gray">
+                        {
+                          candyMachine?.guardsAndEligibility?.[0]
+                            ?.inEligibleReasons?.[0]
+                        }
+                      </Typography>
+                      {/* <AddFunds /> */}
+                    </div>
+                  )}
+                <div className="mt-2 flex flex-col flex-wrap justify-between space-x-3 sm:flex-row sm:items-center ">
+                  <div className="mt-2">
+                    <Typography size="body" className="text-neutral-content">
+                      Use your wallet
+                    </Typography>
+                  </div>
+                  <div className="sm:flex ">
+                    <div className="mt-3 flex items-center space-x-3 sm:mt-0 sm:justify-between">
+                      <Button
+                        className="!p-1"
+                        color="neutral"
+                        size="sm"
+                        // rounded="full"
+                        onClick={handleIncrease}
+                        variant="outlined"
+                      >
+                        <PlusIcon
+                          className="h-4 w-4 text-neutral-content"
+                          aria-hidden="true"
+                        />
+                      </Button>
+                      <div id="custom-canvas" className="flex w-16">
+                        <Input
+                          type="number"
+                          // onChange={(e) =>
+                          //   setMintAmount(Number(e.target.value))
+                          // }
+                          inputProps={{
+                            onChange: (e) =>
+                              setMintAmount(Number(e.target.value)),
+                          }}
+                          className="w-10"
+                          value={mintAmount.toString()}
+                        />
+                        {/* <Input /> */}
+                      </div>
+                      <Button
+                        className="!p-1"
+                        color="neutral"
+                        disabled={mintAmount === 1}
+                        size="sm"
+                        variant="outlined"
+                        onClick={handleDecrease}
+                      >
+                        <MinusIcon
+                          className="h-4 w-4 text-neutral-content"
+                          aria-hidden="true"
+                        />
+                      </Button>
+                    </div>
+                    <div className="mt-3 flex flex-col space-y-2 sm:ml-4 sm:mt-0">
+                      <Button
+                        disabled={
+                          !candyMachine?.guardsAndEligibility?.[0]?.isEligible
+                        }
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                        onClick={handleMint}
+                        loading={isMinting}
+                        // rounded="lg"
+                      >
+                        Buy with wallet
+                        {/* {isMinting ? 'Minting...' : 'Mint'} */}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </>
           ) : (
-            <>Connect your wallet</>
+            <>You need to sign in to buy</>
           )}
         </div>
-        {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
+        {/* {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
           <Typography color="neutral-gray">
             You can buy up to{" "}
             {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity}. Buy
             more sol to purchase more
           </Typography>
-        )}
+        )} */}
       </div>
-      {(publicKey || session) &&
-        candyMachine &&
-        !candyMachine?.guardsAndEligibility?.[0]?.isEligible && (
-          <div className="mt-3 flex items-center justify-between space-x-2">
-            <Typography size="body-xs" color="neutral-gray">
-              {candyMachine?.guardsAndEligibility?.[0]?.inEligibleReasons?.[0]}
-            </Typography>
-            <AddFunds />
-          </div>
-        )}
     </>
   );
 }

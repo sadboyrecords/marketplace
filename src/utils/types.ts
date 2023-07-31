@@ -8,13 +8,28 @@ import {
   type Pda,
   type DefaultCandyGuardSettings,
 } from "@metaplex-foundation/js";
-import { type AccountInfo, type PublicKey } from "@solana/web3.js";
+import {
+  type BlockhashWithExpiryBlockHeight,
+  type AccountInfo,
+  type PublicKey,
+} from "@solana/web3.js";
 // import { type MintCounterBorsh } from "@/components/borsh/mintCounter";
 import { type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import { type Session } from "next-auth";
 import { type NextPage } from "next";
 import { type ReactElement, type ReactNode } from "react";
+import type * as web3 from "@solana/web3.js";
+
+export interface CoinflowResp {
+  tx: web3.Transaction | web3.VersionedTransaction;
+  signers: web3.Signer[];
+  amount: number;
+  tokenAddress: PublicKey;
+  mintSigner: PublicKey;
+  candymachineIds: string[];
+  blockhash: BlockhashWithExpiryBlockHeight;
+}
 
 export type NextPageWithLayout<
   TProps = Record<string, unknown>,
@@ -360,6 +375,11 @@ export type GuardFormType = {
   endDate?: Date;
   label: string;
   solPayment?: { amount: number; destination: string };
+  tokenPayment?: {
+    amount: number;
+    destination: string;
+    splTokenAddress: string; // token address we want to pay with like usdc
+  };
   redeemAmount?: number;
   mintLimit?: number;
 };

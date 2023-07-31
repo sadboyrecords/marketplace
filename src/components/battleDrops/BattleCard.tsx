@@ -11,6 +11,7 @@ import Link from "next/link";
 import { routes } from "@/utils/constants";
 import Buy from "@/components/battleDrops/Buy";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
+import TrophyIcon from "@heroicons/react/24/solid/TrophyIcon";
 
 import type {
   BattleType,
@@ -21,7 +22,11 @@ import type {
 import { api } from "@/utils/api";
 import { getSupporters } from "@/utils/audioHelpers";
 import { useDispatch } from "react-redux";
-import { openJoinBattleFansModal } from "@/lib/slices/appSlice";
+import {
+  openTopFansModal,
+  openJoinBattleFansModal,
+  setBattleWinner,
+} from "@/lib/slices/appSlice";
 
 type BattleCardProps = {
   index: number;
@@ -102,6 +107,20 @@ function BattleCard({
       );
     }
   };
+  const handleOpenTopFans = () => {
+    console.log({ supporters });
+    if (supporters) {
+      dispatch(
+        openTopFansModal({
+          supporters,
+          competitorCandyId,
+          candymachineId: candyMachineId || "",
+          artistName,
+          isEnded: candyMachine?.guardsAndEligibility?.[0]?.hasEnded,
+        })
+      );
+    }
+  };
 
   const updateTransactions = api.transaction.updateCandy.useMutation();
 
@@ -111,6 +130,7 @@ function BattleCard({
   const handleUpdateTransaction = useCallback(async () => {
     if (!candyMachineId || !candyMachine?.items?.redeemed) return null;
     try {
+      console.log({ candyMachineId });
       const update = await updateTransactions.mutateAsync({
         candymachineId: candyMachineId,
         redeemed: candyMachine?.items?.redeemed,
@@ -161,17 +181,67 @@ function BattleCard({
   const drop = battle?.battleContestants[index]?.candyMachineDraft?.drop;
 
   const [percentagePot, setPercentagePot] = React.useState<number>();
+  const [isWinner, setIsWinner] = React.useState<boolean>(false);
 
   React.useMemo(() => {
     if (candyMachine?.items?.redeemed && totalPot?.items) {
       const percent = (candyMachine?.items?.redeemed / totalPot?.items) * 100;
 
       setPercentagePot(percent);
+      if (percent > 50 && candyMachine.guardsAndEligibility?.[0]?.hasEnded) {
+        setIsWinner(true);
+      }
     }
-  }, [candyMachine?.items?.redeemed, totalPot?.items]);
+  }, [
+    candyMachine?.guardsAndEligibility,
+    candyMachine?.items?.redeemed,
+    totalPot?.items,
+  ]);
+
+  React.useEffect(() => {
+    if (isWinner) {
+      // path={
+      //   // "nft/images/4498f8916495fea715290d532eeb204429b8f02cd33621a8ced3d5a1c318ef80.jpeg"
+      //   battle?.battleContestants[index]?.user?.pinnedProfilePicture?.path
+      // }
+      // pinnedStatus="PINNED"
+      // imageHash="QmP9aaxBnGdaUPKyf1ZQYScZcBbzDYC38751JM77pHzgop"
+      dispatch(
+        setBattleWinner({
+          artistName,
+          collectionName:
+            battle?.battleContestants[index]?.candyMachineDraft?.dropName || "",
+          walletAddress:
+            battle?.battleContestants[index]?.user?.walletAddress || "",
+          pinnedStatus:
+            battle?.battleContestants[index]?.user?.pinnedProfilePicture
+              ?.status,
+          imageHash:
+            battle?.battleContestants[index]?.user?.pinnedProfilePicture
+              ?.ipfsHash,
+          imagePath:
+            battle?.battleContestants[index]?.user?.pinnedProfilePicture?.path,
+        })
+      );
+    }
+
+    if (!candyMachine?.guardsAndEligibility?.[0]?.hasEnded) {
+      dispatch(setBattleWinner(null));
+    }
+  }, [
+    artistName,
+    battle?.battleContestants,
+    candyMachine?.guardsAndEligibility,
+    dispatch,
+    index,
+    isWinner,
+  ]);
+
+  // console.log({ candyMachine });
 
   React.useMemo(() => {
     if (candyMachineId) {
+      // console.log({ candyMachineId });
       void fetchCandyMachineById(candyMachineId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,9 +265,6 @@ function BattleCard({
         {battle?.battleContestants[index]?.candyMachineDraft?.dropName}
       </Typography>
       <div className="relative aspect-1 w-full flex-1 lg:h-full ">
-        {/*  h-[30rem] */}
-        {/* max-h-[36rem]  */}
-        {/* [30rem]/ */}
         <ImageDisplay
           className="aspect-1 h-full w-full rounded-xl object-cover"
           // object-cover
@@ -218,16 +285,44 @@ function BattleCard({
               ?.pinnedImage?.height || 500
           }
         />
+        {/* -translate-y-1/2 */}
+        {isWinner && (
+          <div className="absolute  -bottom-4 left-1/2 -translate-x-1/2  transform rounded-full bg-yellow-600 p-3 shadow-md sm:p-3">
+            <div className="relative">
+              <div className="absolute top-0 animate-ping rounded-full border border-yellow-100 p-4" />
+              <div className="absolute top-0 animate-ping rounded-full border border-yellow-300 p-5" />
+
+              <TrophyIcon className="h-7 w-7 text-white sm:h-8 sm:w-8" />
+            </div>
+          </div>
+        )}
       </div>
       <div className="flex flex-shrink items-center justify-between">
-        <div className="flex items-center space-x-2">
+        <Link
+          href={routes.userProfile(
+            battle?.battleContestants[index]?.user?.walletAddress || ""
+          )}
+          className="flex items-center space-x-2"
+        >
           <AvatarImage
             alt="artist profile picture"
             username={artistName}
             type="squircle"
+            quality={50}
+            path={
+              battle?.battleContestants[index]?.user?.pinnedProfilePicture?.path
+            }
+            pinnedStatus={
+              battle?.battleContestants[index]?.user?.pinnedProfilePicture
+                ?.status
+            }
+            imageHash={
+              battle?.battleContestants[index]?.user?.pinnedProfilePicture
+                ?.ipfsHash
+            }
           />
           <Typography> {artistName} </Typography>
-        </div>
+        </Link>
         <div className=" hidden flex-col items-center sm:flex">
           <Typography size="body-xs">Total </Typography>
           <Typography size="display-xs" className="font-bold">
@@ -257,81 +352,85 @@ function BattleCard({
         </Typography>
         <Typography size="body-xs">(Collectables Redeemed by fans) </Typography>
       </div>
-      {candyMachine &&
-        candyMachine.guardsAndEligibility?.[0]?.hasStarted &&
-        !candyMachine.guardsAndEligibility?.[0]?.hasEnded && (
-          <div>
-            <div className="">
-              <div
-                onClick={handleOpenSupporters}
-                className="flex h-8 cursor-pointer  items-center justify-between space-x-1"
-              >
-                <Typography size="body-xs" className="text-neutral-content">
-                  Supporters
-                </Typography>
-                <div className="flex flex-1 items-center overflow-scroll">
-                  <div className="isolate flex flex-shrink cursor-pointer -space-x-3 overflow-scroll">
-                    {supporters &&
-                      Object?.keys(supporters).map((key) => (
-                        <div
-                          key={key}
-                          // href={routes.userProfile(key)}
-                          // target="_blank"
-                        >
-                          <AvatarImage
-                            alt="artist profile picture"
-                            username={key}
-                            height={supporters[
-                              key
-                            ]?.[0]?.user?.pinnedProfilePicture?.height?.toString()}
-                            width={supporters[
-                              key
-                            ]?.[0]?.user?.pinnedProfilePicture?.width?.toString()}
-                            path={
-                              supporters[key]?.[0]?.user?.pinnedProfilePicture
-                                ?.path
-                            }
-                            pinnedStatus={
-                              supporters[key]?.[0]?.user?.pinnedProfilePicture
-                                ?.status
-                            }
-                            imageHash={
-                              supporters[key]?.[0]?.user?.pinnedProfilePicture
-                                ?.ipfsHash
-                            }
-                            type="circle"
-                            // className="h-6"
-                            widthNumber={30}
-                            heightNumber={30}
-                          />
-                        </div>
-                      ))}
-                  </div>
+      {candyMachine && candyMachine.guardsAndEligibility?.[0]?.hasStarted && (
+        <div>
+          <div className="">
+            <div
+              onClick={
+                candyMachine.guardsAndEligibility?.[0]?.hasEnded
+                  ? handleOpenTopFans
+                  : handleOpenSupporters
+              }
+              className="flex h-8 cursor-pointer  items-center justify-between space-x-1"
+            >
+              <Typography size="body-xs" className="text-neutral-content">
+                Supporters
+              </Typography>
+              <div className="flex flex-1 items-center overflow-scroll">
+                <div className="isolate flex flex-shrink cursor-pointer -space-x-3 overflow-scroll">
+                  {supporters &&
+                    Object?.keys(supporters).map((key) => (
+                      <div
+                        key={key}
+                        // href={routes.userProfile(key)}
+                        // target="_blank"
+                      >
+                        <AvatarImage
+                          alt="artist profile picture"
+                          username={key}
+                          height={supporters[
+                            key
+                          ]?.[0]?.user?.pinnedProfilePicture?.height?.toString()}
+                          width={supporters[
+                            key
+                          ]?.[0]?.user?.pinnedProfilePicture?.width?.toString()}
+                          path={
+                            supporters[key]?.[0]?.user?.pinnedProfilePicture
+                              ?.path
+                          }
+                          pinnedStatus={
+                            supporters[key]?.[0]?.user?.pinnedProfilePicture
+                              ?.status
+                          }
+                          imageHash={
+                            supporters[key]?.[0]?.user?.pinnedProfilePicture
+                              ?.ipfsHash
+                          }
+                          type="circle"
+                          // className="h-6"
+                          widthNumber={30}
+                          heightNumber={30}
+                        />
+                      </div>
+                    ))}
                 </div>
-                {percentagePot && (
-                  <Typography size="body-xs" className="text-neutral-content">
-                    {percentagePot.toFixed(2)}% of pot
-                  </Typography>
-                )}
               </div>
-
-              <progress
-                className="progress progress-primary h-1 w-full bg-base-300"
-                value={percentagePot || 0}
-                max={100}
-              ></progress>
-              {/* <div className="w-full"></div> */}
+              {percentagePot && (
+                <Typography size="body-xs" className="text-neutral-content">
+                  {percentagePot.toFixed(2)}% of pot
+                </Typography>
+              )}
             </div>
 
-            {/* BUY SECTION  */}
-            {candyMachineId && competitorCandyId && (
+            <progress
+              className="progress progress-primary h-1 w-full bg-base-300"
+              value={percentagePot || 0}
+              max={100}
+            ></progress>
+            {/* <div className="w-full"></div> */}
+          </div>
+
+          {/* BUY SECTION  */}
+          {candyMachineId &&
+            competitorCandyId &&
+            !candyMachine.guardsAndEligibility?.[0]?.hasEnded && (
               <Buy
                 candyMachineId={candyMachineId}
                 competitorCandyId={competitorCandyId}
               />
             )}
 
-            {/* <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+          {/* <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="flex items-center space-x-2 ">
                   <SolIcon height={20} />
@@ -414,7 +513,7 @@ function BattleCard({
                 </Typography>
               )}
             </div> */}
-            {/* {(publicKey || session) &&
+          {/* {(publicKey || session) &&
               !candyMachine?.guardsAndEligibility?.[0]?.isEligible && (
                 <div className="mt-3 flex items-center justify-between space-x-2">
                   <Typography size="body-xs" color="neutral-gray">
@@ -426,8 +525,8 @@ function BattleCard({
                   <AddFunds />
                 </div>
               )} */}
-          </div>
-        )}
+        </div>
+      )}
       {!battle?.isActive && (
         <div className="flex items-center justify-between space-x-2">
           {draft?.status === "DRAFT" && (

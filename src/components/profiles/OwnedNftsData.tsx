@@ -1,10 +1,10 @@
-import MarginLayout from "@/components/layouts/MarginLayout";
-import Typography from "@/components/typography";
-import { api } from "@/utils/api";
-import TrackItem from "@/components/track/TrackItem";
-import PlaylistCard from "@/components/playlist/PlaylistCard";
-import { routes } from "@/utils/constants";
-import Link from "next/link";
+// import MarginLayout from "@/components/layouts/MarginLayout";
+// import Typography from "@/components/typography";
+// import { api } from "@/utils/api";
+// import TrackItem from "@/components/track/TrackItem";
+// import PlaylistCard from "@/components/playlist/PlaylistCard";
+// import { routes } from "@/utils/constants";
+// import Link from "next/link";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { type Nft, PublicKey } from "@metaplex-foundation/js";
 import type {

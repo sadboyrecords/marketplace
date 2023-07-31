@@ -561,7 +561,7 @@ function DropDetails() {
                           <>Connect your wallet</>
                         )}
                       </div>
-                      {candy?.guardsAndEligibility?.[0]
+                      {/* {candy?.guardsAndEligibility?.[0]
                         ?.maxPurchaseQuantity && (
                         <Typography color="neutral-gray">
                           You can buy up to{" "}
@@ -571,7 +571,7 @@ function DropDetails() {
                           }
                           . Buy more sol to purchase more
                         </Typography>
-                      )}
+                      )} */}
                     </div>
                     {!candy?.guardsAndEligibility?.[0]?.isEligible && (
                       <Typography size="body-xs" color="neutral-gray">

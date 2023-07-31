@@ -35,6 +35,15 @@ export const battleRouter = createTRPCRouter({
                   firstName: true,
                   description: true,
                   walletAddress: true,
+                  pinnedProfilePicture: {
+                    select: {
+                      path: true,
+                      width: true,
+                      height: true,
+                      status: true,
+                      ipfsHash: true,
+                    },
+                  },
                 },
               },
               candyMachineDraft: {
@@ -115,6 +124,15 @@ export const battleRouter = createTRPCRouter({
                   firstName: true,
                   description: true,
                   walletAddress: true,
+                  pinnedProfilePicture: {
+                    select: {
+                      path: true,
+                      width: true,
+                      height: true,
+                      status: true,
+                      ipfsHash: true,
+                    },
+                  },
                 },
               },
               candyMachineDraft: {
@@ -197,6 +215,15 @@ export const battleRouter = createTRPCRouter({
                 firstName: true,
                 description: true,
                 walletAddress: true,
+                pinnedProfilePicture: {
+                  select: {
+                    path: true,
+                    width: true,
+                    height: true,
+                    status: true,
+                    ipfsHash: true,
+                  },
+                },
               },
             },
             candyMachineDraft: {
@@ -646,7 +673,7 @@ export const battleRouter = createTRPCRouter({
       });
       return battle;
     }),
-  displayOnHome: protectedProcedure
+  displayOnHome: protectedAdminProcedure
     .input(
       z.object({
         battleId: z.string(),
@@ -655,13 +682,13 @@ export const battleRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const battle = await ctx.prisma.$transaction(async (tx) => {
-        const b = await tx.battle.findUnique({ where: { id: input.battleId } });
-        if (
-          !b?.createdByWallet ||
-          b?.createdByWallet !== ctx.session.user.walletAddress
-        ) {
-          throw new Error("Battle not found");
-        }
+        // const b = await tx.battle.findUnique({ where: { id: input.battleId } });
+        // if (
+        //   !b?.createdByWallet ||
+        //   b?.createdByWallet !== ctx.session.user.walletAddress
+        // ) {
+        //   throw new Error("Battle not found");
+        // }
         const updateBattle = await tx.battle.update({
           where: {
             id: input.battleId,

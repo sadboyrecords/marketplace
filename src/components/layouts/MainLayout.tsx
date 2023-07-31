@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import HomeIcon from "@heroicons/react/24/outline/HomeIcon";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
@@ -11,15 +11,14 @@ import Header from "@/components/headersNav/Header";
 import Typography from "@/components/typography";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import {
-  routes,
-  // hashRoutes,
-  // tabMenuRoutes,
-  // addresses,
-} from "@/utils/constants";
+import { routes } from "@/utils/constants";
 import { useTheme } from "next-themes";
-import { useWallet } from "@solana/wallet-adapter-react";
+// import { useWallet } from "@solana/wallet-adapter-react";
 import NewPlaylistButton from "../buttons/NewPlaylist";
+import { api } from "@/utils/api";
+import { useDispatch } from "react-redux";
+import { setLookupAddress } from "@/lib/slices/appSlice";
+
 // import { useWallet } from '@solana/wallet-adapter-react';
 // import { trpc } from 'utils/trpc';
 function classNames(...classes: string[]) {
@@ -77,12 +76,9 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-const user = null;
-const publicKey = null;
-
 function NavSection() {
   const router = useRouter();
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
   //   const { data: user } = trpc.user.adminUser.useQuery();
   //   console.log({ user });
   // const userLibrary = [
@@ -228,6 +224,14 @@ function NavSection() {
 export default function MainLayout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { theme } = useTheme();
+  const { data } = api.admin.getLookup.useQuery();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (data?.publicKey) {
+      dispatch(setLookupAddress(data.publicKey));
+    }
+  }, [data, dispatch]);
 
   return (
     <>
@@ -241,6 +245,8 @@ export default function MainLayout({ children }: LayoutProps) {
       */}
 
       <ToastContainer theme={theme as "dark" | "light"} />
+
+      {/* <ThreeJsBg /> */}
       <div>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog

@@ -4,13 +4,15 @@ import { addresses } from "@/utils/constants";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Typography from "@/components/typography";
 import TextLoader from "@/components/loaders/TextLoader";
+import { useSession } from "next-auth/react";
 
 function CreateToken() {
   const { publicKey } = useWallet();
+  const { data: session } = useSession();
 
   return (
     <div>
-      {addresses.allowedWallets.find((a) => a === publicKey?.toBase58()) ? (
+      {session?.user?.isAdmin ? (
         // <MintingContainer />
         ""
       ) : (

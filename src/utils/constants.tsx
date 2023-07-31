@@ -1,4 +1,30 @@
-export const env = process.env.NEXT_PUBLIC_ENV;
+export const env = process.env.NEXT_PUBLIC_ENV as "prod" | "dev";
+
+export const coinflowFeePayer =
+  env === "prod"
+    ? "8gcbZ5up47bQpekXe3f24puKhR6JsZEPJX427AG7Ped2"
+    : "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd";
+
+export const socialMediaPrefix = {
+  twitter: "https://twitter.com/",
+  facebook: "https://www.facebook.com/",
+  instagram: "https://www.instagram.com/",
+  discord: "https://discord.gg/", //https://discordapp.com/users https://discord.com/invite/myWKuNQF7V
+  tiktok: "https://www.tiktok.com/@",
+  youtube: "https://www.youtube.com/",
+  spotify: "https://open.spotify.com/artist/",
+  // telegram: "https://t.me/niftytunesnft",
+  // medium: "https://niftytunesnft.medium.com/",
+  // github: "",
+};
+
+export const solanaUsdToken =
+  env === "prod"
+    ? "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+    : "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+
+export const battleDropsTreasury = process.env.NEXT_PUBLIC_BATTLE_TREASURY;
+// export const splTokenAccount = process.env.NEXT_PUBLIC_SPL_TOKEN_ACCOUNT; //Simalar to treasury, this is the address that will receive the USDC
 
 export const imageDomains = [
   "placekitten.com",
@@ -12,14 +38,12 @@ export const imageDomains = [
   "niftytunes.myfilebase.com",
 ];
 
-export const battleDropsTreasury = process.env.NEXT_PUBLIC_BATTLE_TREASURY;
-
 export const globalMeta = {
   siteName: "NiftyTunes",
   siteUrl: "https://www.niftytunes.xyz/",
-  siteLogo: "/logo/icon_1000.png",
+  siteLogo: "/logo/icon_192.png",
   // email: "email@yoursite.com",
-  description: "Your one stop shop for Music NFTs on SOLANA",
+  description: "Your one stop shop for Music Collectables.",
 };
 
 export const routes = {
@@ -52,6 +76,7 @@ export const routes = {
   allBattlesAdminView: "/admin/battles",
   battleDetailsAdminView: (id: string) => `/admin/battles/${id}`,
   createBattle: "/admin/new-battle",
+  lookupTable: "/admin/lookup",
 };
 
 export const tabMenuRoutes = {
@@ -87,6 +112,7 @@ export const adminWallets = [
   "A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf",
   "ESoydi4GMD3o4KU7Mm1Fn5RoY4kKf2VyDWJzGMBBXg4c",
   "5SBznwYE5GxtcoQjwsthjN9jrb7xuXJCufJmLvVBeR6B", // sadboy wallet
+  "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
 ];
 
 export const addresses = {
@@ -130,3 +156,85 @@ export const authProviderNames = {
   magic: "magic-link",
   solana: "solana-auth",
 };
+
+export const array1 = [
+  "D4wK2qaekUKUzXpPTnEDbCNLoJa4EhCXH7mTa2pT5Rur",
+  "7vPS1uqZffjVCTj9jhwkPCRda6EVQtwH89AqP5DtkPoZ",
+  "11111111111111111111111111111111",
+  "7vPS1uqZffjVCTj9jhwkPCRda6EVQtwH89AqP5DtkPoZ",
+  "SysvarRent111111111111111111111111111111111",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "D4wK2qaekUKUzXpPTnEDbCNLoJa4EhCXH7mTa2pT5Rur",
+  "BLXwEyZDiD4gAYdDUb8P6ma2ECddLapdWUUd61vArCMy",
+  "D4wK2qaekUKUzXpPTnEDbCNLoJa4EhCXH7mTa2pT5Rur",
+  "7vPS1uqZffjVCTj9jhwkPCRda6EVQtwH89AqP5DtkPoZ",
+  "11111111111111111111111111111111",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  "7vPS1uqZffjVCTj9jhwkPCRda6EVQtwH89AqP5DtkPoZ",
+  "BLXwEyZDiD4gAYdDUb8P6ma2ECddLapdWUUd61vArCMy",
+  "D4wK2qaekUKUzXpPTnEDbCNLoJa4EhCXH7mTa2pT5Rur",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "5KMJJsx9RK2G7sCmtVTwUVzjAL1bx7yEzGDSHs6aQrKr",
+  "CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR",
+  "BkXwtL4fgFc1BxaYwJ6iDYa3oNXBD6JcqTqz9dfpr7FU",
+  "vevzhVDVsbnuunHzTZTXNNzfzc2Pf89TaDjtSSpbgPG",
+  "D4wK2qaekUKUzXpPTnEDbCNLoJa4EhCXH7mTa2pT5Rur",
+  "7G7M8D1cPG7LB5AqUGpP3tYkbeuh1XVmrCteSfCpAjfh",
+  "7vPS1uqZffjVCTj9jhwkPCRda6EVQtwH89AqP5DtkPoZ",
+  "D4wK2qaekUKUzXpPTnEDbCNLoJa4EhCXH7mTa2pT5Rur",
+  "Eu1SL5WCVNdNeFYRiyMw6zuEwKVND5grZmpP2SVQftgG",
+  "2cVkpryQUN35Giwg1nHpGFbi3Gw4A7nYaR5c5pEeP6gx",
+  "2V9b4tAG6VWqjLsciyjQWaWWvHgu7wGpNnjYzpSCV3EM",
+  "H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg",
+  "AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK",
+  "A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf",
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "11111111111111111111111111111111",
+  "SysvarS1otHashes111111111111111111111111111",
+  "Sysvar1nstructions1111111111111111111111111",
+  "3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H",
+  "Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g",
+];
+
+export const array2 = [
+  "5RJc11HUuKBg8eiBjnLWFKhL5tdEz3VYim3Wjo7QR4iW",
+  "FnitJ7YV5aWp2yGNJRLD18YpHtvVvWnGSEJh5AyxzMXr",
+  "11111111111111111111111111111111",
+  "FnitJ7YV5aWp2yGNJRLD18YpHtvVvWnGSEJh5AyxzMXr",
+  "SysvarRent111111111111111111111111111111111",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "5RJc11HUuKBg8eiBjnLWFKhL5tdEz3VYim3Wjo7QR4iW",
+  "5q6zyewCWUb5CsS6iLHEWHFqn35Nr3zsMD6zdF9Kn2qM",
+  "5RJc11HUuKBg8eiBjnLWFKhL5tdEz3VYim3Wjo7QR4iW",
+  "FnitJ7YV5aWp2yGNJRLD18YpHtvVvWnGSEJh5AyxzMXr",
+  "11111111111111111111111111111111",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  "FnitJ7YV5aWp2yGNJRLD18YpHtvVvWnGSEJh5AyxzMXr",
+  "5q6zyewCWUb5CsS6iLHEWHFqn35Nr3zsMD6zdF9Kn2qM",
+  "5RJc11HUuKBg8eiBjnLWFKhL5tdEz3VYim3Wjo7QR4iW",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "5KMJJsx9RK2G7sCmtVTwUVzjAL1bx7yEzGDSHs6aQrKr",
+  "CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR",
+  "BkXwtL4fgFc1BxaYwJ6iDYa3oNXBD6JcqTqz9dfpr7FU",
+  "vevzhVDVsbnuunHzTZTXNNzfzc2Pf89TaDjtSSpbgPG",
+  "5RJc11HUuKBg8eiBjnLWFKhL5tdEz3VYim3Wjo7QR4iW",
+  "J4SmY8bKndf6iYPVcpq2dt7s68kh2LHXCoNg7eELyZc8",
+  "FnitJ7YV5aWp2yGNJRLD18YpHtvVvWnGSEJh5AyxzMXr",
+  "5RJc11HUuKBg8eiBjnLWFKhL5tdEz3VYim3Wjo7QR4iW",
+  "G5aEC7Xiy9FR81utjqPXPJFd1ZUTnPyXxHNa6YC4pdqr",
+  "2cVkpryQUN35Giwg1nHpGFbi3Gw4A7nYaR5c5pEeP6gx",
+  "2V9b4tAG6VWqjLsciyjQWaWWvHgu7wGpNnjYzpSCV3EM",
+  "H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg",
+  "AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK",
+  "A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf",
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "11111111111111111111111111111111",
+  "SysvarS1otHashes111111111111111111111111111",
+  "Sysvar1nstructions1111111111111111111111111",
+  "3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H",
+  "Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g",
+];
