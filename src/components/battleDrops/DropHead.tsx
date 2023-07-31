@@ -5,6 +5,12 @@ import { api } from "@/utils/api";
 import LineUp from "@/components/battleDrops/LineUp";
 import React from "react";
 import dynamic from "next/dynamic";
+import { TrophyIcon } from "@heroicons/react/24/solid";
+import AvatarImage from "../avatar/Avatar";
+import { useSelector } from "react-redux";
+import { selectBattleWinner } from "@/lib/slices/appSlice";
+import Link from "next/link";
+import { routes } from "@/utils/constants";
 
 // import ThreeJsBg from "@/components/backgrounds/ThreejsBg";
 
@@ -15,6 +21,7 @@ const ThreeJsBg = dynamic(() => import("@/components/backgrounds/ThreejsBg"), {
 function DropHead() {
   const { data: battle, isLoading } = api.battle.getHomePageBattle.useQuery();
 
+  const battleWinner = useSelector(selectBattleWinner);
   const today = new Date();
   const twoWeeksLater = new Date();
   twoWeeksLater.setDate(today.getDate() + 14);
@@ -35,7 +42,7 @@ function DropHead() {
       battle?.battleEndDate &&
       battle?.battleEndDate < new Date()
     ) {
-      setText("Too late, the battle has ended");
+      setText("The battle has ended but we have a winner");
     }
   }, [battle]);
 
@@ -82,6 +89,40 @@ function DropHead() {
           >
             {!isLoading && <>{battle ? text : "Coming Soon"}</>}
           </Typography>
+          {battleWinner && (
+            <div className="mt-8 flex items-center gap-3">
+              <div className=" rounded-full  p-3 shadow-md sm:p-5">
+                {/* bg-green-600 */}
+                <div className="relative">
+                  {/* <div className="absolute left-1/2 top-0  -translate-x-1/2 animate-ping rounded-full border border-green-100 p-4" />
+                   <div className="absolute left-1/2 top-0  -translate-x-1/2 animate-ping rounded-full border border-green-300 p-5" /> */}
+
+                  <TrophyIcon className="h-16 w-16 text-yellow-500 sm:h-32 sm:w-32" />
+                </div>
+              </div>
+
+              <Link
+                href={routes.artistProfile(battleWinner.walletAddress || "")}
+                className="flex items-center gap-2"
+              >
+                <AvatarImage
+                  alt="artist profile picture"
+                  username={battleWinner.artistName || ""}
+                  type="squircle"
+                  quality={50}
+                  path={battleWinner.imagePath}
+                  pinnedStatus={battleWinner.pinnedStatus}
+                  imageHash={battleWinner.imageHash}
+                  heightNumber={70}
+                  widthNumber={70}
+                />
+                <Typography className="font-bold">
+                  {battleWinner.artistName?.toUpperCase()}{" "}
+                </Typography>
+              </Link>
+            </div>
+          )}
+
           {battle && (
             <Countdown
               fullWidth

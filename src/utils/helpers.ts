@@ -77,6 +77,28 @@ export const getLowestSolpaymentFromGuard = (guards?: GuardFormType[]) => {
   return price;
 };
 
+export const getLowestTokenpaymentFromGuard = (guards?: GuardFormType[]) => {
+  if (!guards) return null;
+  let price;
+  const lowestNumber = guards.reduce((acc, curr) => {
+    if (!curr.tokenPayment?.amount) {
+      return acc || curr;
+    }
+    if (!acc.tokenPayment?.amount) {
+      return curr || null;
+    }
+    if (acc.tokenPayment?.amount < curr.tokenPayment?.amount) {
+      return acc;
+    }
+    return curr;
+  });
+  price = lowestNumber?.tokenPayment?.amount;
+  if (!price) {
+    price = guards[0]?.tokenPayment?.amount;
+  }
+  return price;
+};
+
 export const nftImagePath = "nft/images/";
 export const nftINonIpfsImagePath = "nft/images/nonIpfs/";
 export const nftMetaDataPath = "nft/metadata/";

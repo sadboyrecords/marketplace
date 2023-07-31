@@ -20,8 +20,9 @@ import {
 import { toast } from "react-toastify";
 import { api } from "@/utils/api";
 import TextArea from "@/components/formFields/TextArea";
-import { type inferRouterInputs } from "@trpc/server";
-import { type AppRouter } from "@/server/api/root";
+import { solanaUsdToken } from "@/utils/constants";
+import type { inferRouterInputs } from "@trpc/server";
+import type { AppRouter } from "@/server/api/root";
 
 type RouterOutput = inferRouterInputs<AppRouter>;
 
@@ -308,10 +309,15 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
           label: "battle",
           endDate: data.battleEndDate,
           startDate: data.battleStartDate,
-          solPayment: {
+          // solPayment: {
+          //   amount: data.battlePrice,
+          //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          //   destination: battleDropsTreasury!,
+          // },
+          tokenPayment: {
             amount: data.battlePrice,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            destination: battleDropsTreasury!,
+            destination: battleDropsTreasury as string,
+            splTokenAddress: solanaUsdToken,
           },
         },
       ];
@@ -525,7 +531,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
           }}
         />
         <Input
-          label="Price"
+          label="Price (USDC)"
           type="number"
           error={!!errors?.battlePrice}
           errorMessage={(errors?.battlePrice?.message as string) || ""}
