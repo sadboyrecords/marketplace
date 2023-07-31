@@ -44,6 +44,26 @@ function Lookup() {
 
   const knownAddresses = [
     new PublicKey(coinflowFeePayer),
+    // new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
+    // new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+    // new PublicKey("11111111111111111111111111111111"),
+    // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+    // new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
+    // new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
+    // new PublicKey("SysvarS1otHashes111111111111111111111111111")
+    // new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU") - usdc -dev
+    // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v usdc prod,
+    //  coinflows
+    // new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
+    // new PublicKey("Sysvar1nstructions1111111111111111111111111"),
+    // new PublicKey("SysvarRent111111111111111111111111111111111"),
+    // new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
+    // GigARaWnLsKrTUq8FNveo3rn18Dp4sV8ic6Y6i5yJ7Z5 -prod
+
+    // -------
+    // ComputeBudget111111111111111111111111111111
+    // 9edZCSuSRTS2eatJ1ZejmsXk9DqtXZRpNQvmy4K3KjRe - doesnt work dev
+    // GmomYjNZ4LuiJM5sPu9FQfRHqu4CB6TNzAMwcxy43EP7 - doesnt work dev
     // new PublicKey("2Dd4tLC5NmacAZiUyFFgABz67dd3sXz1BYdsAgXq4nVb"),
     // new PublicKey("HxaWVXo7SuTxqWm75exXc5zC2vKwjCScgnC2AqmtXgPB"),
     // new PublicKey("CTyszyCDYuP16rG1iFBdmRAD4SPzB85UHyWgPZX5whJk"),
@@ -60,10 +80,7 @@ function Lookup() {
     // new PublicKey("5ZM6EDXDHqbESpBTBfecXb2o12wxg4nYBuX6dxz1YvwV"),
     // new PublicKey("2ZovPCyn4VFKiNZpfJJghiEjLTHfGqyh1H7Qiec9Q6ec"),
     // new PublicKey("3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh"),
-    // new PublicKey("11111111111111111111111111111111"),
-    // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-    // new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
-    // new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
+
     // new PublicKey("5KMJJsx9RK2G7sCmtVTwUVzjAL1bx7yEzGDSHs6aQrKr"),
     // new PublicKey("BkXwtL4fgFc1BxaYwJ6iDYa3oNXBD6JcqTqz9dfpr7FU"),
     // new PublicKey("vevzhVDVsbnuunHzTZTXNNzfzc2Pf89TaDjtSSpbgPG"),
@@ -72,18 +89,17 @@ function Lookup() {
     // new PublicKey("H41nrjKg7PPbyhy3BjKr7px64Kwnd11oSMRWPxw87irg"),
     // new PublicKey("AX9Xk5UkN3k4ayKdsajec9esztuBpgj7qzQxSoHYkpEK"),
     // new PublicKey("3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H"),
-    // new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf"),
-    // new PublicKey("CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR"),
-    // new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-    // new PublicKey("Sysvar1nstructions1111111111111111111111111"),
-    // new PublicKey("SysvarRent111111111111111111111111111111111"),
-    // new PublicKey("SysvarS1otHashes111111111111111111111111111"),
-    // new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+    // new PublicKey("A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf") - put in ,
+
+    //
+    //
+    // ,
+
     // new PublicKey("HzdseyCGneNv4SzyBgteppi1N8GawjWLSkBSTx82UTtL"),
     // new PublicKey("SysvarC1ock11111111111111111111111111111111"),
     // new PublicKey("FD1amxhTsDpwzoVX41dxp2ygAESURV2zdUACzxM1Dfw9"),
-    // new PublicKey("5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U"),
-    // new PublicKey("8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM"),
+
+    //
   ];
 
   const handleDefaultLookup = async () => {
