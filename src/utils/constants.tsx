@@ -1,4 +1,30 @@
-export const env = process.env.NEXT_PUBLIC_ENV;
+export const env = process.env.NEXT_PUBLIC_ENV as "prod" | "dev";
+
+export const coinflowFeePayer =
+  env === "prod"
+    ? "8gcbZ5up47bQpekXe3f24puKhR6JsZEPJX427AG7Ped2"
+    : "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd";
+
+export const socialMediaPrefix = {
+  twitter: "https://twitter.com/",
+  facebook: "https://www.facebook.com/",
+  instagram: "https://www.instagram.com/",
+  discord: "https://discord.gg/", //https://discordapp.com/users https://discord.com/invite/myWKuNQF7V
+  tiktok: "https://www.tiktok.com/@",
+  youtube: "https://www.youtube.com/",
+  spotify: "https://open.spotify.com/artist/",
+  // telegram: "https://t.me/niftytunesnft",
+  // medium: "https://niftytunesnft.medium.com/",
+  // github: "",
+};
+
+export const solanaUsdToken =
+  env === "prod"
+    ? "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+    : "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+
+export const battleDropsTreasury = process.env.NEXT_PUBLIC_BATTLE_TREASURY;
+// export const splTokenAccount = process.env.NEXT_PUBLIC_SPL_TOKEN_ACCOUNT; //Simalar to treasury, this is the address that will receive the USDC
 
 export const imageDomains = [
   "placekitten.com",
@@ -12,14 +38,12 @@ export const imageDomains = [
   "niftytunes.myfilebase.com",
 ];
 
-export const battleDropsTreasury = process.env.NEXT_PUBLIC_BATTLE_TREASURY;
-
 export const globalMeta = {
   siteName: "NiftyTunes",
   siteUrl: "https://www.niftytunes.xyz/",
-  siteLogo: "/logo/icon_1000.png",
+  siteLogo: "/logo/icon_192.png",
   // email: "email@yoursite.com",
-  description: "Your one stop shop for Music NFTs on SOLANA",
+  description: "Your one stop shop for Music Collectables.",
 };
 
 export const routes = {
@@ -52,6 +76,7 @@ export const routes = {
   allBattlesAdminView: "/admin/battles",
   battleDetailsAdminView: (id: string) => `/admin/battles/${id}`,
   createBattle: "/admin/new-battle",
+  lookupTable: "/admin/lookup",
 };
 
 export const tabMenuRoutes = {
@@ -87,6 +112,7 @@ export const adminWallets = [
   "A8MpM5XxtguzTFbC5VcwqtpHdtcDtfp1fpMqr6AvtrCf",
   "ESoydi4GMD3o4KU7Mm1Fn5RoY4kKf2VyDWJzGMBBXg4c",
   "5SBznwYE5GxtcoQjwsthjN9jrb7xuXJCufJmLvVBeR6B", // sadboy wallet
+  "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
 ];
 
 export const addresses = {

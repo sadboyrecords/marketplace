@@ -11,16 +11,16 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { useMetaplex } from "../providers/MetaplexProvider";
-import { SolIcon } from "../iconComponents";
+import { SolIcon, UsdcIcon } from "../iconComponents";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
 import { magic } from "@/lib/magic";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
 import { useSelector } from "react-redux";
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 
-const AddFunds = dynamic(() => import("@/components/onRamp/AddFunds"), {
-  ssr: false,
-});
+// const AddFunds = dynamic(() => import("@/components/onRamp/AddFunds"), {
+//   ssr: false,
+// });
 
 // import ShieldCheckIcon from "@heroicons/react/24/outline/ShieldCheckIcon";
 
@@ -28,8 +28,9 @@ function AvatarNav() {
   const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { disconnect } = useWallet();
-  const { walletBalance } = useMetaplex();
+  const { walletBalance, usdcInfo } = useMetaplex();
   const [copied, setCopied] = useState<boolean>();
+  const [copiedUsdc, setCopiedUsdc] = useState<boolean>();
 
   const { data, isLoading } = api.user.myProfile.useQuery(undefined, {
     enabled: !!session,
@@ -37,12 +38,14 @@ function AvatarNav() {
   });
   const publicAddress = useSelector(selectPublicAddress);
 
-  const handleCopy = () => {
-    if (!publicAddress) return;
+  const handleCopy = (address: string) => {
+    if (!address) return;
     navigator.clipboard
-      .writeText(publicAddress)
+      .writeText(address)
       .then(() => {
-        setCopied(true);
+        if (address === publicAddress) setCopied(true);
+        if (address !== publicAddress) setCopiedUsdc(true);
+
         setTimeout(() => {
           setCopied(false);
         }, 1000); // Set timeout for 3 seconds (3000 milliseconds)
@@ -139,7 +142,7 @@ function AvatarNav() {
                       copied ? "tooltip-open tooltip tooltip-bottom" : ""
                     }  cursor-pointer`}
                     data-tip="Copied"
-                    onClick={handleCopy}
+                    onClick={() => handleCopy(publicAddress)}
                   >
                     <Typography
                       type="div"
@@ -151,9 +154,36 @@ function AvatarNav() {
                         `${publicAddress?.slice(0, 5)}...${publicAddress.slice(
                           -4
                         )}`}
-
                       <CopyIcon className="ml-1 h-4 w-7" />
                     </Typography>
+                  </div>
+                  <div
+                    className={`${
+                      copiedUsdc ? "tooltip-open tooltip tooltip-bottom" : ""
+                    }  cursor-pointer`}
+                    data-tip="Copied"
+                    onClick={
+                      usdcInfo?.address
+                        ? () => handleCopy(usdcInfo?.address)
+                        : undefined
+                    }
+                  >
+                    {usdcInfo && (
+                      <Typography
+                        type="div"
+                        size="body-xs"
+                        color="neutral-gray"
+                        className="flex"
+                      >
+                        {publicAddress &&
+                          `${usdcInfo?.address?.slice(
+                            0,
+                            5
+                          )}...${usdcInfo?.address.slice(-4)} `}
+                        (USDC)
+                        <CopyIcon className="ml-1 h-4 w-7" />
+                      </Typography>
+                    )}
                   </div>
                   {data?.email && (
                     <Typography
@@ -169,22 +199,39 @@ function AvatarNav() {
               )}
             </div>
             <Menu.Item>
-              {({ close }) => (
-                <div className="flex flex-col justify-between px-1 py-1">
-                  <Typography color="neutral-content" size="body-xs">
-                    Wallet Balance
-                  </Typography>
-                  <div className="flex items-center  justify-between">
-                    <div className="flex items-center space-x-1">
-                      <SolIcon className="h-4 w-4" />
-                      <Typography size="body-lg" className="font-bold">
-                        {walletBalance?.toFixed(2)} SOL
-                      </Typography>
-                    </div>
-                    {/* <div>
+              {({}) => (
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col justify-between px-1 py-1">
+                    <Typography color="neutral-content" size="body-xs">
+                      SOL Wallet Balance
+                    </Typography>
+                    <div className="flex items-center  justify-between">
+                      <div className="flex items-center space-x-1">
+                        <SolIcon className="h-4 w-4" />
+                        <Typography size="body-lg" className="font-bold">
+                          {walletBalance?.toFixed(2)} SOL
+                        </Typography>
+                      </div>
+                      {/* <div>
                       <AddFunds close={close} />
                     </div> */}
+                    </div>
                   </div>
+                  {usdcInfo && (
+                    <div className="flex flex-col justify-between px-1 py-1">
+                      <Typography color="neutral-content" size="body-xs">
+                        USDC Balance
+                      </Typography>
+                      <div className="flex items-center  justify-between">
+                        <div className="flex items-center space-x-1">
+                          <UsdcIcon className="h-8 w-8" />
+                          <Typography size="body-lg" className="font-bold">
+                            {usdcInfo?.balance?.toFixed(2)} USDC
+                          </Typography>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </Menu.Item>
@@ -264,6 +311,20 @@ function AvatarNav() {
                     // onClick={handleLogout}
                   >
                     Create a new battle
+                  </Link>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href={routes.lookupTable}
+                    className={`${
+                      active ? "bg-primary-500 text-white" : "text-base-content"
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    // onClick={handleLogout}
+                  >
+                    Lookup table
                   </Link>
                 )}
               </Menu.Item>

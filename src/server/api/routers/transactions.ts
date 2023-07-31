@@ -66,6 +66,7 @@ export const transactionRouter = createTRPCRouter({
       });
       if (transactions.length === input.redeemed) return transactions;
       const lastSignature = transactions && transactions[0]?.signature;
+      console.log({ lastSignature });
 
       const signatures = await connection.getSignaturesForAddress(
         new PublicKey(input.candymachineId),

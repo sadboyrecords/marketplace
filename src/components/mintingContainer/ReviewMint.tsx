@@ -17,22 +17,29 @@ import {
   hashJsonToNumber,
   convertToSlug,
   getLowestSolpaymentFromGuard,
+  getLowestTokenpaymentFromGuard,
 } from "@/utils/helpers";
 import {
   toBigNumber,
   sol,
   toDateTime,
   PublicKey,
+  token,
 } from "@metaplex-foundation/js";
 import type { Signer } from "@metaplex-foundation/js";
 import {
   ExclamationCircleIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/solid";
-import { ipfsPublicGateway, liveIpfsGateway } from "@/utils/constants";
+import {
+  battleDropsTreasury,
+  ipfsPublicGateway,
+  liveIpfsGateway,
+} from "@/utils/constants";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { routes } from "@/utils/constants";
 import Link from "next/link";
+import { solanaUsdToken } from "@/utils/constants";
 
 type CreatorInput = {
   readonly address: PublicKey;
@@ -158,7 +165,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       await utils.candyMachine.getDraftById.invalidate({
         id: data.id,
       });
-      toast.success("Metadata uploaded successfully");
+      // toast.success("Metadata uploaded successfully");
       setIsMinting(false);
     } catch (error) {
       console.log(error);
@@ -194,7 +201,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       await utils.candyMachine.getDraftById.invalidate({
         id: data.id,
       });
-      toast.success("Your Collection was created successfully");
+      // toast.success("Your Collection was created successfully");
       setIsMinting(false);
       return;
     }
@@ -258,7 +265,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       await utils.candyMachine.getDraftById.invalidate({
         id: data.id,
       });
-      toast.success("Your Collection was created successfully");
+      // toast.success("Your Collection was created successfully");
       setIsMinting(false);
     } catch (error) {
       console.log(error);
@@ -311,7 +318,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       await utils.candyMachine.getDraftById.invalidate({
         id: data.id,
       });
-      toast.success("Your Candy Machine was created successfully");
+      // toast.success("Your Candy Machine was created successfully");
       setIsMinting(false);
       return;
     }
@@ -357,6 +364,22 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
         groups: formSubmission?.guards.map((g, i) => ({
           label: g.label,
           guards: {
+            tokenPayment: g.tokenPayment
+              ? {
+                  amount: token(g.tokenPayment.amount, 6), //* 1e6
+                  mint: new PublicKey(solanaUsdToken), //The address of the mint account defining the SPL Token we want to pay with.
+                  destinationAta: metaplex
+                    .tokens()
+                    .pdas()
+                    .associatedTokenAccount({
+                      mint: new PublicKey(solanaUsdToken),
+                      owner: new PublicKey(battleDropsTreasury as string),
+                    }),
+                  // Destination Associated Token Address (ATA): The address of the associated token account to
+                  // send the tokens to. We can get this address by finding the Associated Token Address PDA using the
+                  // Token Mint attribute and the address of any wallet that should receive these tokens
+                }
+              : null,
             solPayment: g.solPayment?.amount
               ? {
                   amount: sol(g.solPayment.amount),
@@ -393,7 +416,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       await utils.candyMachine.getDraftById.invalidate({
         id: data.id,
       });
-      toast.success("Drop has been created successfully");
+      // toast.success("Drop has been created successfully");
       setIsMinting(false);
 
       //   setCurrentStep(stepperKeys.SAVE_DATA);
@@ -466,7 +489,8 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       }
       const slug = convertToSlug(formSubmission?.collectionName || "");
       const songTitleSlug = convertToSlug(formSubmission?.trackTitle || "");
-      const price = getLowestSolpaymentFromGuard(formSubmission?.guards);
+      // const price = getLowestSolpaymentFromGuard(formSubmission?.guards);
+      const price = getLowestTokenpaymentFromGuard(formSubmission?.guards);
       console.log({ formSubmission, startDate, endDate, data });
       if (!data.candyMachineId && !data.candyMachineIdPlaceholder) {
         setIsMinting(false);
@@ -511,7 +535,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       await utils.candyMachine.getDraftById.invalidate({
         id: data.id,
       });
-      toast.success("Drop has been published successfully");
+      // toast.success("Drop has been published successfully");
     } catch (error) {
       console.log({ error });
       const newSteps = originalSteps?.map((step) => {

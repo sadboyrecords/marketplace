@@ -8,8 +8,9 @@ import { store } from "@/lib/store";
 import { Provider } from "react-redux";
 import MarginLayout from "@/components/layouts/MarginLayout";
 import dynamic from "next/dynamic";
-
+import SeoHead from "@/components/SeoHead";
 import { api } from "@/utils/api";
+
 import "react-toastify/dist/ReactToastify.css";
 import "@/styles/globals.css";
 
@@ -42,6 +43,13 @@ const JoinBattleFansModal = dynamic(
   }
 );
 
+const TopFansModal = dynamic(
+  () => import("@/components/battleDrops/TopFansModal"),
+  {
+    ssr: false,
+  }
+);
+
 const OnrampModal = dynamic(() => import("@/components/modals/OnrampModal"), {
   ssr: false,
 });
@@ -62,7 +70,9 @@ const MyApp: AppType<{ session: AppSession | null }> = ({
             <Provider store={store}>
               <MetaplexProvider>
                 <MainLayout>
+                  <SeoHead />
                   <JoinBattleFansModal />
+                  <TopFansModal />
                   <OnrampModal />
                   {getLayout(<Component {...pageProps} />)}
                 </MainLayout>

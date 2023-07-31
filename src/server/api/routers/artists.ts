@@ -16,6 +16,7 @@ export const artistRouter = createTRPCRouter({
               width: true,
               height: true,
               status: true,
+              ipfsHash: true,
             },
           },
           creatorTokens: {
@@ -100,6 +101,7 @@ export const artistRouter = createTRPCRouter({
               width: true,
               height: true,
               status: true,
+              ipfsHash: true,
             },
           },
           creatorTokens: {

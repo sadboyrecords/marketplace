@@ -12,8 +12,9 @@ import {
 type TopFans = {
   supporters?: ISupporters;
   isModal?: boolean;
+  isEnded?: boolean;
 };
-function TopFans({ supporters, isModal }: TopFans) {
+function TopFans({ supporters, isModal, isEnded }: TopFans) {
   // console.log({ supporters });
   const dispatch = useDispatch();
   const battleInfo = useSelector(selectBattleDetailsAndSupporters);
@@ -25,9 +26,11 @@ function TopFans({ supporters, isModal }: TopFans) {
         <Typography size="display-xs" className="font-bold ">
           Top Fans of {battleInfo?.artistName}
         </Typography>
-        <Typography size="body-sm" color="neutral-content">
-          Purchase this digital collectible and join other fans
-        </Typography>
+        {!isEnded && (
+          <Typography size="body-sm" color="neutral-content">
+            Purchase this digital collectible and join other fans
+          </Typography>
+        )}
       </div>
       <div
         className={`grid  w-full  ${
