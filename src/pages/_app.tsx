@@ -8,8 +8,9 @@ import { store } from "@/lib/store";
 import { Provider } from "react-redux";
 import MarginLayout from "@/components/layouts/MarginLayout";
 import dynamic from "next/dynamic";
-
+import SeoHead from "@/components/SeoHead";
 import { api } from "@/utils/api";
+
 import "react-toastify/dist/ReactToastify.css";
 import "@/styles/globals.css";
 
@@ -69,6 +70,7 @@ const MyApp: AppType<{ session: AppSession | null }> = ({
             <Provider store={store}>
               <MetaplexProvider>
                 <MainLayout>
+                  <SeoHead />
                   <JoinBattleFansModal />
                   <TopFansModal />
                   <OnrampModal />

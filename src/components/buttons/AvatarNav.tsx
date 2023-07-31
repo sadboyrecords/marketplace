@@ -314,6 +314,20 @@ function AvatarNav() {
                   </Link>
                 )}
               </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href={routes.lookupTable}
+                    className={`${
+                      active ? "bg-primary-500 text-white" : "text-base-content"
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                    // onClick={handleLogout}
+                  >
+                    Lookup table
+                  </Link>
+                )}
+              </Menu.Item>
             </div>
           )}
           <div className="px-1 py-1 ">

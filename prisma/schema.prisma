@@ -87,6 +87,21 @@ model Follow {
     @@unique([followingAddress, followerAddress], name: "followingFollowAddress")
 }
 
+model AdminValues {
+    id         String          @id @default(uuid())
+    createdAt  DateTime        @default(now())
+    updatedAt  DateTime        @updatedAt
+    publicKey  String?
+    ownerKey   String?
+    uniqueType AdminValueType? @unique
+
+    // @@unique([])
+}
+
+enum AdminValueType {
+    LOOKUP
+}
+
 model User {
     id                   String              @id @default(uuid())
     email                String?             @unique

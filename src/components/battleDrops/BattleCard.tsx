@@ -130,6 +130,7 @@ function BattleCard({
   const handleUpdateTransaction = useCallback(async () => {
     if (!candyMachineId || !candyMachine?.items?.redeemed) return null;
     try {
+      console.log({ candyMachineId });
       const update = await updateTransactions.mutateAsync({
         candymachineId: candyMachineId,
         redeemed: candyMachine?.items?.redeemed,

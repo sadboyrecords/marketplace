@@ -24,6 +24,7 @@ export interface RootState {
     isEnded?: boolean;
   } | null;
   onRamperModal: boolean;
+  lookupAddress: string | null;
 }
 
 const initialState: RootState = {
@@ -34,12 +35,16 @@ const initialState: RootState = {
   onRamperModal: false,
   topFansModal: false,
   battleWinner: null,
+  lookupAddress: null,
 };
 
 export const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
+    setLookupAddress: (state, action: PayloadAction<string | null>) => {
+      state.lookupAddress = action.payload;
+    },
     open: (state) => {
       state.authModal = true;
     },
@@ -110,7 +115,12 @@ export const {
   closeTopFansModal,
   openTopFansModal,
   setBattleWinner,
+  setLookupAddress,
 } = appSlice.actions;
+
+export const selectLookupAddress = (state: { app: RootState }) => {
+  return state.app.lookupAddress;
+};
 
 export const selectOnrampModal = (state: { app: RootState }) =>
   state.app.onRamperModal;

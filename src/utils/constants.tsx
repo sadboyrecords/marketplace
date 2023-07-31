@@ -1,4 +1,9 @@
-export const env = process.env.NEXT_PUBLIC_ENV;
+export const env = process.env.NEXT_PUBLIC_ENV as "prod" | "dev";
+
+export const coinflowFeePayer =
+  env === "prod"
+    ? "8gcbZ5up47bQpekXe3f24puKhR6JsZEPJX427AG7Ped2"
+    : "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd";
 
 export const socialMediaPrefix = {
   twitter: "https://twitter.com/",
@@ -36,9 +41,9 @@ export const imageDomains = [
 export const globalMeta = {
   siteName: "NiftyTunes",
   siteUrl: "https://www.niftytunes.xyz/",
-  siteLogo: "/logo/icon_1000.png",
+  siteLogo: "/logo/icon_192.png",
   // email: "email@yoursite.com",
-  description: "Your one stop shop for Music NFTs on SOLANA",
+  description: "Your one stop shop for Music Collectables.",
 };
 
 export const routes = {
@@ -71,6 +76,7 @@ export const routes = {
   allBattlesAdminView: "/admin/battles",
   battleDetailsAdminView: (id: string) => `/admin/battles/${id}`,
   createBattle: "/admin/new-battle",
+  lookupTable: "/admin/lookup",
 };
 
 export const tabMenuRoutes = {
