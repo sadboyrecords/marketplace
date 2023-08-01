@@ -131,9 +131,9 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
           Close
         </Button>
       </GenericModal>
-      <div className="mt-2 ">
+      <div className="mt-4 ">
         {/* flex flex-wrap items-center justify-between gap-3 */}
-        <div>
+        <div className="flex flex-wrap items-center justify-between gap-3 ">
           <div className="flex items-center space-x-2 ">
             {candyMachine?.guardsAndEligibility?.[0]?.payment?.sol && (
               <>
@@ -160,22 +160,39 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
             )}
             {candyMachine?.guardsAndEligibility?.[0]?.payment?.token && (
               <div className="flex items-center space-x-1 ">
-                <UsdcIcon className="h-11 w-11" />
+                {/* <UsdcIcon className="h-11 w-11" /> */}
+                <span className="text-xl">$</span>
                 <Typography size="body-xl" className="">
                   {
                     candyMachine?.guardsAndEligibility?.[0]?.payment?.token
                       ?.amount
                   }
                   <span className="ml-2 text-xs text-neutral-content">
-                    (SOL-USDC)
+                    (USD)
                   </span>
                 </Typography>
               </div>
             )}
           </div>
+          {publicKey || session ? (
+            <>
+              <div className="flex flex-col sm:flex-row">
+                <Coinflow
+                  candyMachineId={candyMachineId}
+                  quantityString={mintAmount}
+                  label={candyMachine?.guardsAndEligibility?.[0]?.label || ""}
+                  refetchTheseIds={
+                    competitorCandyId ? [competitorCandyId] : undefined
+                  }
+                />
+              </div>
+            </>
+          ) : (
+            <>You need to sign in to buy</>
+          )}
         </div>
 
-        <div className=" ">
+        {/* <div className=" ">
           {publicKey || session ? (
             <>
               <div className="mt-4 items-center justify-between space-x-4 space-y-3 rounded-md border border-border-gray p-4 sm:flex sm:flex-wrap sm:space-y-0">
@@ -209,7 +226,6 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                             ?.inEligibleReasons?.[0]
                         }
                       </Typography>
-                      {/* <AddFunds /> */}
                     </div>
                   )}
                 <div className="mt-2 flex flex-col flex-wrap justify-between space-x-3 sm:flex-row sm:items-center ">
@@ -246,7 +262,6 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                           className="w-10"
                           value={mintAmount.toString()}
                         />
-                        {/* <Input /> */}
                       </div>
                       <Button
                         className="!p-1"
@@ -270,10 +285,9 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
                         // eslint-disable-next-line @typescript-eslint/no-misused-promises
                         onClick={handleMint}
                         loading={isMinting}
-                        // rounded="lg"
                       >
                         Buy with wallet
-                        {/* {isMinting ? 'Minting...' : 'Mint'} */}
+                      {isMinting ? 'Minting...' : 'Mint'} 
                       </Button>
                     </div>
                   </div>
@@ -283,7 +297,7 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
           ) : (
             <>You need to sign in to buy</>
           )}
-        </div>
+        </div> */}
         {/* {candyMachine?.guardsAndEligibility?.[0]?.maxPurchaseQuantity && (
           <Typography color="neutral-gray">
             You can buy up to{" "}
