@@ -130,6 +130,7 @@ export default function WalletAdaptor() {
   }, [connected, handleSignIn, status]);
 
   React.useEffect(() => {
+    if (status === "loading") return;
     if (!session) {
       dispatch(setPublicAddress(null));
     }
@@ -139,7 +140,7 @@ export default function WalletAdaptor() {
           (session?.user.walletAddress as string)
       )
     );
-  }, [dispatch, session]);
+  }, [dispatch, session, status]);
 
   return (
     <>
