@@ -251,7 +251,7 @@ export default function MainLayout({ children }: LayoutProps) {
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog
             as="div"
-            className="relative z-40 lg:hidden"
+            className="relative z-50 lg:hidden"
             onClose={setSidebarOpen}
           >
             <Transition.Child
@@ -266,7 +266,7 @@ export default function MainLayout({ children }: LayoutProps) {
               <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
             </Transition.Child>
 
-            <div className="fixed inset-0 z-10 flex">
+            <div className="fixed inset-0  flex">
               <Transition.Child
                 as={Fragment}
                 enter="transition ease-in-out duration-300 transform"
@@ -300,7 +300,7 @@ export default function MainLayout({ children }: LayoutProps) {
                       </button>
                     </div>
                   </Transition.Child>
-                  <div className="flex items-center px-1  sm:px-4">
+                  <div className="flex items-center self-center px-1  sm:px-4">
                     <Link href="/">
                       <Image
                         alt="logo"
@@ -310,8 +310,9 @@ export default function MainLayout({ children }: LayoutProps) {
                             ? "/logo/icon_no_bg_white_1000.png"
                             : "/logo/icon_no_bg_black_1000.png"
                         }
-                        width={60}
-                        height={60}
+                        width={40}
+                        height={40}
+                        className="flex  justify-center p-2"
                         // fill
                       />
                     </Link>
@@ -352,7 +353,7 @@ export default function MainLayout({ children }: LayoutProps) {
         <div className="z-10  hidden md:fixed md:inset-y-0 md:flex md:w-14 xl:w-60 xl:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-grow flex-col overflow-y-auto border-r-2 border-base-300/60 border-opacity-20 bg-base-100 pt-5">
-            <div className="flex flex-shrink-0 items-center px-1 xl:px-4">
+            <div className="flex flex-shrink-0 items-center self-center px-1 xl:px-4">
               <Link href="/">
                 <Image
                   alt="logo"
@@ -361,8 +362,9 @@ export default function MainLayout({ children }: LayoutProps) {
                       ? "/logo/icon_no_bg_white_1000.png"
                       : "/logo/icon_no_bg_black_1000.png"
                   }
-                  width={60}
-                  height={60}
+                  width={40}
+                  height={40}
+                  className="flex  justify-center p-2"
                 />
               </Link>
             </div>

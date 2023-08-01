@@ -316,6 +316,7 @@ function CoinflowContent({
                           onSuccess={async () => {
                             console.log("Purchase Success");
                             if (!metaplex || !ctx) return;
+                            setIsOpen(false);
                             try {
                               console.log({ ctx });
                               const nft = await metaplex.nfts().findByMint({

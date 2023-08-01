@@ -69,6 +69,21 @@ function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
       </div>
 
       <div className="flex flex-col items-center justify-between">
+        {data?.isActive && (
+          <div className="flex w-full flex-col items-center text-center">
+            <Typography size="body-xs">Total Pot</Typography>
+            <div className="flex items-center space-x-2">
+              {/* <SolIcon className="h-4 w-4" /> */}
+              <Typography size="display-xs" className=" font-semibold">
+                $ {totalPot?.sol.toFixed(2)} USD
+              </Typography>
+            </div>
+
+            {/* <Typography size="body-xs">
+              (${totalPot?.usd.toFixed(2)} USD)
+            </Typography> */}
+          </div>
+        )}
         <div className="flex flex-1 items-center">
           <div className="w-40 text-center">
             <Typography className="font-bold" size="display-xs" color="primary">
@@ -87,19 +102,6 @@ function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
             />
           </div>
         </div>
-        {data?.isActive && (
-          <div className="flex w-full flex-col items-center text-center">
-            <div className="flex items-center space-x-2">
-              <SolIcon className="h-4 w-4" />
-              <Typography size="display-xs" className=" font-semibold">
-                {totalPot?.sol.toFixed(2)}
-              </Typography>
-            </div>
-            <Typography size="body-xs">
-              (${totalPot?.usd.toFixed(2)} USD)
-            </Typography>
-          </div>
-        )}
       </div>
       <div className="h-full w-full  lg:w-5/12 ">
         <BattleCard
