@@ -91,7 +91,7 @@ function DropHead() {
           </Typography>
           {battleWinner && (
             <div className="mt-8 flex items-center gap-3">
-              <div className=" rounded-full  p-3 shadow-md sm:p-5">
+              <div className=" rounded-full  p-3  sm:p-5">
                 {/* bg-green-600 */}
                 <div className="relative">
                   {/* <div className="absolute left-1/2 top-0  -translate-x-1/2 animate-ping rounded-full border border-green-100 p-4" />
