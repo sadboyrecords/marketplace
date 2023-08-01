@@ -1,9 +1,13 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedAdminProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedAdminProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 
 export const adminRouter = createTRPCRouter({
-  getLookup: protectedAdminProcedure.query(async ({ ctx }) => {
+  getLookup: publicProcedure.query(async ({ ctx }) => {
     return await ctx.prisma.adminValues.findUnique({
       where: {
         uniqueType: "LOOKUP",
