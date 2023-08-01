@@ -21,6 +21,21 @@ function Lookup() {
   } = api.admin.getLookup.useQuery();
   const createLookup = api.admin.createLookup.useMutation();
 
+  // Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g
+  // ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL
+  // 11111111111111111111111111111111
+  // TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+  // metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s
+  // CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR
+  // SysvarS1otHashes111111111111111111111111111
+  // EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+  // 5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U
+  // Sysvar1nstructions1111111111111111111111111
+  // SysvarRent111111111111111111111111111111111
+  // 8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM
+  // GigARaWnLsKrTUq8FNveo3rn18Dp4sV8ic6Y6i5yJ7Z5
+  // 3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H
+
   const keys = [
     "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd",
     "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
@@ -170,10 +185,16 @@ function Lookup() {
   const handleLookupInput = async () => {
     const toastId = toast.loading("Extending...");
     if (!lookupTable?.publicKey) {
-      toast.error("No lookup table found");
+      toast.update(toastId, {
+        type: "error",
+        isLoading: false,
+        autoClose: 2000,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        render: "No lookup table found",
+      });
       return;
     }
-
     try {
       const values: string[] = [];
       const valueMapped = value
@@ -189,7 +210,14 @@ function Lookup() {
         });
       console.log({ valueMapped });
       if (valueMapped.length === 0) {
-        toast.error("No addresses in input");
+        toast.update(toastId, {
+          type: "error",
+          isLoading: false,
+          autoClose: 2000,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          render: "No addresses in input",
+        });
         return;
       }
 
