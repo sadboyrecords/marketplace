@@ -2,7 +2,7 @@ export const env = process.env.NEXT_PUBLIC_ENV as "prod" | "dev";
 
 export const coinflowFeePayer =
   env === "prod"
-    ? "8gcbZ5up47bQpekXe3f24puKhR6JsZEPJX427AG7Ped2"
+    ? "9hbnec2G7tEq76jbitZ7ykVPzz5QnB3Rjc9zcKjPCsae"
     : "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd";
 
 export const socialMediaPrefix = {
@@ -114,6 +114,7 @@ export const adminWallets = [
   "5SBznwYE5GxtcoQjwsthjN9jrb7xuXJCufJmLvVBeR6B", // sadboy wallet
   "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
   "8miKAoCCf13Ui7e4Tphh2GYboe6kCRhuvw7mS8oAzPFH", // brave
+  "3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H", //battle treasury
 ];
 
 export const addresses = {
