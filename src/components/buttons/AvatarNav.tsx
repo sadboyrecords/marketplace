@@ -11,7 +11,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { useMetaplex } from "../providers/MetaplexProvider";
-import { SolIcon, UsdcIcon } from "../iconComponents";
+import { UsdcIcon } from "../iconComponents";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
 import { magic } from "@/lib/magic";
 import { selectPublicAddress } from "@/lib/slices/appSlice";
@@ -28,7 +28,7 @@ function AvatarNav() {
   const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const { disconnect } = useWallet();
-  const { walletBalance, usdcInfo } = useMetaplex();
+  const { usdcInfo } = useMetaplex();
   const [copied, setCopied] = useState<boolean>();
   const [copiedUsdc, setCopiedUsdc] = useState<boolean>();
 
@@ -67,9 +67,12 @@ function AvatarNav() {
     }
   }, [copied]);
 
-  const handleLogout = async () => {
+  const handleLogout = async (
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    e?.preventDefault();
     void disconnect();
-    await signOut();
+    void signOut();
     if (magic) await magic.user.logout();
     // await magic.user.logout();
     return;
@@ -201,22 +204,25 @@ function AvatarNav() {
             <Menu.Item>
               {({}) => (
                 <div className="flex items-start justify-between">
-                  <div className="flex flex-col justify-between px-1 py-1">
-                    <Typography color="neutral-content" size="body-xs">
-                      SOL Wallet Balance
-                    </Typography>
-                    <div className="flex items-center  justify-between">
-                      <div className="flex items-center space-x-1">
-                        <SolIcon className="h-4 w-4" />
-                        <Typography size="body-lg" className="font-bold">
-                          {walletBalance?.toFixed(2)} SOL
-                        </Typography>
+                  {/* {walletBalance?.toFixed(2) && (
+                    <div className="flex flex-col justify-between px-1 py-1">
+                      <Typography color="neutral-content" size="body-xs">
+                        SOL Wallet Balance
+                      </Typography>
+                      <div className="flex items-center  justify-between">
+                        <div className="flex items-center space-x-1">
+                          <SolIcon className="h-4 w-4" />
+                          <Typography size="body-lg" className="font-bold">
+                            {walletBalance?.toFixed(2)} SOL
+                          </Typography>
+                        </div>
                       </div>
-                      {/* <div>
+                    </div>
+                  )} */}
+
+                  {/* <div>
                       <AddFunds close={close} />
                     </div> */}
-                    </div>
-                  </div>
                   {usdcInfo && (
                     <div className="flex flex-col justify-between px-1 py-1">
                       <Typography color="neutral-content" size="body-xs">
@@ -333,7 +339,8 @@ function AvatarNav() {
           <div className="px-1 py-1 ">
             <Menu.Item>
               {({ active }) => (
-                <button
+                <Link
+                  href="/api/auth/signout"
                   className={`${
                     active ? "bg-primary-500 text-white" : "text-base-content"
                   } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -341,7 +348,7 @@ function AvatarNav() {
                   onClick={handleLogout}
                 >
                   Logout
-                </button>
+                </Link>
               )}
             </Menu.Item>
           </div>

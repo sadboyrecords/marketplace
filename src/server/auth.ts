@@ -16,6 +16,7 @@ import { type NextApiRequest } from "next";
 import { adminWallets } from "@/utils/constants";
 import { Magic, WalletType } from "@magic-sdk/admin";
 import { authProviderNames } from "@/utils/constants";
+import { api } from "@/utils/api";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -207,10 +208,25 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       //   }
       //   return Promise.resolve(token); //token
       // },
-      jwt: ({ token, user }) => {
+      jwt: async ({ token, user }) => {
         // console.log("JWT===", { token, user });
         user && (token.user = user);
         let isAdmin = false;
+        if (token.sub) {
+          const userInfo = await prisma.user.upsert({
+            where: { walletAddress: token.sub },
+            create: {
+              walletAddress: token.sub,
+            },
+            update: {},
+          });
+          if (userInfo.isAdmin) {
+            isAdmin = true;
+          }
+          token.isAdmin = isAdmin;
+          return token;
+        }
+
         if (token.sub && adminWallets.includes(token.sub)) {
           isAdmin = true;
         }
