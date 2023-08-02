@@ -92,24 +92,14 @@ export default function WalletAdaptor() {
       toast.error("Failed to sign in. Please try again.");
       await disconnect();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    connected,
-    // disconnect,
-    publicKey,
-    // session,
-    // setVisible,
-    // signMessage,
-    // status,
-    // visible,
-  ]);
+  }, [disconnect, dispatch, publicKey, signMessage]);
 
   // console.log({ connected, status });
   React.useEffect(() => {
+    // console.log("EFFECT - 1", { status, connected, session });
     if (status === "loading") return;
-    if (connected && status === "unauthenticated") {
-      // console.log("--CONNECT ---- UNAUTHENTICATED", { connected, status });
 
+    if (connected && status === "unauthenticated") {
       void handleSignIn();
     }
     if (
@@ -118,21 +108,19 @@ export default function WalletAdaptor() {
       session.user.provider !== authProviderNames.magic
     ) {
       console.log("authenticated - not connected");
+      void signOut();
+      //   .then(() => null)
+      //   .catch(() => null);
       // void handleSignIn();
-
-      // void disconnect();
-      signOut()
-        .then(() => null)
-        .catch(() => null);
-      void handleSignIn();
     }
-    // connected,
-  }, [connected, handleSignIn, status]);
+  }, [connected, handleSignIn, session?.user.provider, status]);
 
   React.useEffect(() => {
+    // console.log("EFFECT - 2", { status, connected, session });
     if (status === "loading") return;
     if (!session) {
       dispatch(setPublicAddress(null));
+      return;
     }
     dispatch(
       setPublicAddress(

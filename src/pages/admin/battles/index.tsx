@@ -3,13 +3,28 @@ import Typography from "@/components/typography";
 import { api } from "@/utils/api";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
+import { useSession } from "next-auth/react";
 
 function AllBattles() {
-  const { data, isLoading, isError } = api.battle.getAllBattles.useQuery();
+  const { data: session, status } = useSession();
+  const { data, isLoading, isError } = api.battle.getAllBattles.useQuery(
+    undefined,
+    {
+      enabled: !!session?.user?.isAdmin,
+    }
+  );
 
   console.log({ data });
 
-  if (isLoading && !data) {
+  if (!session?.user?.isAdmin && status !== "loading") {
+    return (
+      <Typography size="body" color="neutral-content">
+        You are not authorized to view this page.
+      </Typography>
+    );
+  }
+
+  if ((isLoading && !data) || status === "loading") {
     return (
       <div>
         <div className="h-4 w-1/4 animate-pulse bg-border-gray" />
