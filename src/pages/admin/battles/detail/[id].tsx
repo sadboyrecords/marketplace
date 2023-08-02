@@ -17,13 +17,13 @@ function BattleDetails() {
   const twoWeeksLater = new Date();
   twoWeeksLater.setDate(today.getDate() - 14);
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { id } = router.query;
   const { data, isLoading, refetch } = api.battle.getBattleById.useQuery(
     { battleId: id as string },
     {
-      enabled: !!id,
+      enabled: !!id && !!session?.user?.isAdmin,
     }
   );
 
@@ -66,6 +66,7 @@ function BattleDetails() {
       setToggleLoading(false);
     }
   };
+  console.log({ data, session });
 
   React.useMemo(() => {
     const checkIfReady = () => {
@@ -78,6 +79,15 @@ function BattleDetails() {
     };
     void checkIfReady();
   }, [data]);
+
+  if (!session?.user?.isAdmin && status !== "loading") {
+    return (
+      <Typography size="body" color="neutral-content">
+        You are not authorized to view this page.
+      </Typography>
+    );
+  }
+
   if (isLoading && !data) {
     return (
       <div>
@@ -85,18 +95,7 @@ function BattleDetails() {
       </div>
     );
   }
-  console.log({ data });
 
-  if (
-    (!session?.user.isAdmin || !session?.user.walletAddress) &&
-    !data?.isActive
-  ) {
-    return (
-      <div className="flex flex-col space-y-4">
-        <Typography> You do not have access to view this battle</Typography>
-      </div>
-    );
-  }
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center justify-between">

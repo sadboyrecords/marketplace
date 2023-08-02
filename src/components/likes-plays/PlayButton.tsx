@@ -15,6 +15,7 @@ import {
 } from "@/lib/slices/appSlice";
 import { api } from "@/utils/api";
 import { handleCanPlay } from "@/utils/audioHelpers";
+import { useSession } from "next-auth/react";
 
 type Props = {
   song: SongType;
@@ -27,6 +28,7 @@ function PlayButton({ song, playlistName, tracks, disabled }: Props) {
   const { data: activeBattles } = api.songs.checkCanPlay.useQuery(undefined, {
     staleTime: 1000 * 5,
   });
+  const { status } = useSession();
   const dispatch = useDispatch();
   const currentSong = useSelector(selectCurrentSong);
   const isPlaying = useSelector(selectIsPlaying);
@@ -67,23 +69,27 @@ function PlayButton({ song, playlistName, tracks, disabled }: Props) {
 
   return (
     <>
-      <Button
-        variant="ghost"
-        className="z-10 px-0 py-1 text-primary-400 hover:scale-110 lg:py-3"
-        disabled={disabled}
-        onClick={handlePlay}
-      >
-        {currentSong?.id === song?.id && isPlaying ? (
-          <PauseIcon className="h-6 w-6 text-primary hover:text-primary-focus" />
-        ) : (
-          <PlayIcon
-            className={`h-6 w-6 ${
-              disabled ? "text-neutral-content" : "text-primary"
-            } hover:text-primary-focus" `}
-          />
-        )}
-        {/* <PlayIcon className="h-6 w-6 text-primary hover:text-primary-focus" /> */}
-      </Button>
+      {status === "loading" ? (
+        <div className=" animate-pulse border-b-[0.75rem] border-l-[1.5rem] border-t-[0.75rem] border-b-transparent border-l-border-gray  border-t-transparent  " />
+      ) : (
+        <Button
+          variant="ghost"
+          className="z-10 px-0 py-1 text-primary-400 hover:scale-110 lg:py-3"
+          disabled={disabled}
+          onClick={handlePlay}
+        >
+          {currentSong?.id === song?.id && isPlaying ? (
+            <PauseIcon className="h-6 w-6 text-primary hover:text-primary-focus" />
+          ) : (
+            <PlayIcon
+              className={`h-6 w-6 ${
+                disabled ? "text-neutral-content" : "text-primary"
+              } hover:text-primary-focus" `}
+            />
+          )}
+          {/* <PlayIcon className="h-6 w-6 text-primary hover:text-primary-focus" /> */}
+        </Button>
+      )}
     </>
   );
 }
