@@ -68,7 +68,7 @@ const Playlists: NextPage = () => {
         <NewPlaylistButton />
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-10 grid h-full auto-rows-fr grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {isLoading && (
           <>
             <div className="h-full w-full animate-pulse rounded-lg bg-neutral-content/30"></div>
@@ -82,6 +82,7 @@ const Playlists: NextPage = () => {
             <Link
               key={playlist?.id}
               href={routes.playlistDetail(playlist?.id || "")}
+              className="h-full"
             >
               <PlaylistCard
                 playlist={playlist}

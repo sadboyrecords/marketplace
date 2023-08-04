@@ -1,7 +1,7 @@
 import { Magic } from "magic-sdk";
 // import { } from "@magic-ext/auth"
 import { SolanaExtension } from "@magic-ext/solana";
-
+import { env } from "@/env.mjs";
 import * as web3 from "@solana/web3.js";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -18,7 +18,8 @@ const createMagic = (key: string) =>
     ],
   });
 
-export const magic = createMagic("pk_live_80BDE391B04E0DC2");
+export const magic = createMagic("pk_live_B4A4FA0BBE63CFBD");
+console.log({ magic });
 
 export async function signTransaction(
   tx: web3.Transaction
@@ -32,7 +33,7 @@ export async function signTransaction(
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const signedTransaction = await magic.solana.signTransaction(
+  const signedTransaction = await magic?.solana.signTransaction(
     tx,
     serializeConfig
   );

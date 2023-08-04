@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
 function AvatarNav() {
   const { data: session } = useSession();
   // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { disconnect } = useWallet();
+  const { disconnect, publicKey } = useWallet();
   const { usdcInfo } = useMetaplex();
   const [copied, setCopied] = useState<boolean>();
   const [copiedUsdc, setCopiedUsdc] = useState<boolean>();
@@ -71,8 +71,18 @@ function AvatarNav() {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e?.preventDefault();
-    void disconnect();
-    void signOut();
+    if (publicKey) {
+      disconnect()
+        .then(() => null)
+        .catch(() => null);
+    }
+
+    signOut({
+      redirect: false,
+      // callbackUrl: "/",
+    })
+      .then(() => null)
+      .catch(() => null);
     if (magic) await magic.user.logout();
     // await magic.user.logout();
     return;
@@ -286,7 +296,7 @@ function AvatarNav() {
                           : "text-base-content"
                       } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                      // onClick={handleLogout}
+                   
                     >
                       Admin Home
                     </Link>
@@ -300,7 +310,6 @@ function AvatarNav() {
                       active ? "bg-primary-500 text-white" : "text-base-content"
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    // onClick={handleLogout}
                   >
                     View All Battles
                   </Link>
@@ -314,7 +323,6 @@ function AvatarNav() {
                       active ? "bg-primary-500 text-white" : "text-base-content"
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    // onClick={handleLogout}
                   >
                     Create a new battle
                   </Link>
@@ -328,7 +336,6 @@ function AvatarNav() {
                       active ? "bg-primary-500 text-white" : "text-base-content"
                     } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    // onClick={handleLogout}
                   >
                     Lookup table
                   </Link>

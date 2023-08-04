@@ -56,14 +56,22 @@ export const handleCanPlay = ({
   let candyId: string | undefined;
   let competitorCandyId: string | undefined;
   let battleIndex = 0;
+
   if (activeBattles) {
     activeBattles.forEach((b, index) => {
       b.battleContestants.forEach((bc) => {
         if (bc.candyMachineDraft?.drop?.song?.id === song?.id) {
           console.log(" CHecking song");
           const found = bc.candyMachineDraft?.drop?.transactions?.find(
-            (t) => t?.receiver?.walletAddress === publicAddress
+            (t) =>
+              t?.receiver?.walletAddress === publicAddress ||
+              t?.receiverWalletAddress === publicAddress
           );
+          console.log({
+            found,
+            candyMachineDraft: bc.candyMachineDraft,
+            publicAddress,
+          });
           // @ts-ignore
           // supporters = bc.candyMachineDraft?.drop?.transactions?.reduce(
           //   (acc, curr) => {
