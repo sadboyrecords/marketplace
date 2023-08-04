@@ -27,6 +27,8 @@ import {
   openJoinBattleFansModal,
   setBattleWinner,
 } from "@/lib/slices/appSlice";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
 
 type BattleCardProps = {
   index: number;
@@ -42,6 +44,7 @@ function BattleCard({
   competitorIndex,
 }: BattleCardProps) {
   const { fetchCandyMachineById, candyMachines } = useMetaplex();
+  const { connection } = useConnection();
   const draft = battle?.battleContestants[index]?.candyMachineDraft;
   const imageHash = battle?.battleContestants[index]?.candyMachineDraft
     ?.imageIpfsHash as string;
@@ -93,7 +96,6 @@ function BattleCard({
   //   return acc;
   // }, {});
   const supporters = getSupporters(transactions?.data);
-  // console.log({ supporters });
 
   const handleOpenSupporters = () => {
     if (supporters) {
@@ -108,7 +110,6 @@ function BattleCard({
     }
   };
   const handleOpenTopFans = () => {
-    console.log({ supporters });
     if (supporters) {
       dispatch(
         openTopFansModal({
@@ -126,11 +127,10 @@ function BattleCard({
 
   const candyMachine = candyMachines?.[candyMachineId || ""];
   // console.log({ transactions, candyMachine });
-
+  // console.log({ candyMachineId });
   const handleUpdateTransaction = useCallback(async () => {
     if (!candyMachineId || !candyMachine?.items?.redeemed) return null;
     try {
-      console.log({ candyMachineId });
       const update = await updateTransactions.mutateAsync({
         candymachineId: candyMachineId,
         redeemed: candyMachine?.items?.redeemed,

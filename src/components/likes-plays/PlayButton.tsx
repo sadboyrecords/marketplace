@@ -10,7 +10,7 @@ import {
   setPlaylist,
 } from "@/lib/slices/audioSlice";
 import {
-  selectPublicAddress,
+  // selectPublicAddress,
   openJoinBattleFansModal,
 } from "@/lib/slices/appSlice";
 import { api } from "@/utils/api";
@@ -28,20 +28,21 @@ function PlayButton({ song, playlistName, tracks, disabled }: Props) {
   const { data: activeBattles } = api.songs.checkCanPlay.useQuery(undefined, {
     staleTime: 1000 * 5,
   });
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const dispatch = useDispatch();
   const currentSong = useSelector(selectCurrentSong);
   const isPlaying = useSelector(selectIsPlaying);
-  const publicAddress = useSelector(selectPublicAddress);
+  // const publicAddress = useSelector(selectPublicAddress);
   // console.log({ currentSong });
 
   const handlePlay = () => {
     const canPlay = handleCanPlay({
       song,
       activeBattles,
-      publicAddress: publicAddress || "",
+      publicAddress: session?.user.walletAddress,
     });
-    console.log({ canPlay, play: canPlay?.canPlay });
+    console.log({ canPlay, play: canPlay?.canPlay, session });
+
     if (!canPlay.canPlay) {
       dispatch(
         openJoinBattleFansModal({

@@ -48,10 +48,17 @@ function DynamicAuthMethods() {
         showUI: true,
       });
 
-      await signIn("magic-link", {
+      console.log({ didToken });
+      const resp = await signIn("magic-link", {
         didToken,
         callbackUrl: window.location.href,
+        redirect: false,
       });
+      console.log({ resp });
+      const token = await magic.user.getIdToken();
+      console.log({ token });
+      const authtokeSet = await magic.auth.setAuthorizationToken(token);
+      console.log({ authtokeSet });
       setLoading(false);
       dispatch(close());
     } catch (error) {

@@ -59,6 +59,7 @@ function Lookup() {
 
   const knownAddresses = [
     new PublicKey(coinflowFeePayer),
+    // A2k9wo2TRm4saX4oAEGjfUubBxNA3CaZJFAWvpPeeurX - metaplex token metadata
     // new PublicKey("Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g"),
     // new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
     // new PublicKey("11111111111111111111111111111111"),

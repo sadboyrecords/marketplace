@@ -826,6 +826,7 @@ export default function MetaplexProvider({
     async (lookupTable: PublicKey, addresses: PublicKey[]) => {
       try {
         if (!publicAddress || !wallet) return;
+        console.log({ wallet });
         console.log({ lookupTable, addresses });
         const lookupTableAccount = await connection
           .getAddressLookupTable(lookupTable)

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { type GetServerSidePropsContext } from "next";
@@ -17,6 +18,7 @@ import { adminWallets } from "@/utils/constants";
 import { Magic, WalletType } from "@magic-sdk/admin";
 import { authProviderNames } from "@/utils/constants";
 import { api } from "@/utils/api";
+import { env } from "@/env.mjs";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -52,7 +54,7 @@ declare module "next-auth" {
  */
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const magic: Magic = new Magic(process.env.MAGIC_SK, {});
+const magic: Magic = new Magic(env.MAGIC_SK, {});
 // NextAuthOptions
 export function authOptions(req: NextApiRequest): NextAuthOptions {
   const providers = [
@@ -209,27 +211,71 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
       //   return Promise.resolve(token); //token
       // },
       jwt: async ({ token, user }) => {
-        // console.log("JWT===", { token, user });
+        console.log("JWT===", { token, user });
         user && (token.user = user);
         let isAdmin = false;
         if (token.sub) {
-          const userInfo = await prisma.user.upsert({
-            where: { walletAddress: token.sub },
-            create: {
-              walletAddress: token.sub,
+          const user = await prisma.user.findFirst({
+            where: {
+              OR: [
+                {
+                  email: token.email,
+                },
+                {
+                  walletAddress: token.sub,
+                },
+                {
+                  magicSolanaAddress: token.sub,
+                },
+              ],
             },
-            update: {},
           });
-          if (userInfo.isAdmin) {
+
+          if (!user) {
+            console.log("user not found");
+            await prisma.user.create({
+              data: {
+                walletAddress: token.sub,
+                email: token.email,
+              },
+            });
+          }
+
+          if (
+            user &&
+            // @ts-ignore
+            token?.user?.magicSolanaAddress &&
+            (token?.email !== user.email ||
+              token?.walletAddress !== user.walletAddress ||
+              // @ts-ignore
+              token?.user?.magicSolanaAddress !== user.magicSolanaAddress)
+          ) {
+            console.log("updating user");
+            await prisma.user.update({
+              where: {
+                id: user.id,
+              },
+              data: {
+                email: token.email,
+                walletAddress: token.sub,
+                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                magicSolanaAddress: token?.user?.magicSolanaAddress,
+              },
+            });
+            // token.user = user;
+          }
+
+          if (user?.isAdmin) {
             isAdmin = true;
           }
           token.isAdmin = isAdmin;
           return token;
         }
 
-        if (token.sub && adminWallets.includes(token.sub)) {
-          isAdmin = true;
-        }
+        // if (token.sub && adminWallets.includes(token.sub)) {
+        //   isAdmin = true;
+        // }
         token.isAdmin = isAdmin;
         return token;
       },
