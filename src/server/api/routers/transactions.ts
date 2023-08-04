@@ -29,6 +29,7 @@ export const transactionRouter = createTRPCRouter({
         include: {
           receiver: {
             select: {
+              name: true,
               walletAddress: true,
               magicSolanaAddress: true,
               pinnedProfilePicture: {
