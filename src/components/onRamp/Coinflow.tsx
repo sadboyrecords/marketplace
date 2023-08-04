@@ -73,7 +73,12 @@ function CoinflowContent({
         onlySign: true,
       })) as CoinflowResp;
 
-      if (!mintResp) return;
+      if (!mintResp || !magic) return;
+      // console.log({ magic });
+      // const isLoggedIn = await magic.user.isLoggedIn();
+      // console.log({ isLoggedIn });
+      // const magicUser = await magic.user.getInfo();
+      // console.log({ magicUser });
       setBlockhash(mintResp.blockhash);
       setCandyMachinesIds(mintResp.candymachineIds);
       setNftPrice(mintResp.amount);
@@ -252,12 +257,13 @@ function CoinflowContent({
                               ? ({
                                   publicKey: new PublicKey(publicAddress),
                                   sendTransaction: async (tx) => {
-                                    // console.log("sending transaction", {
-                                    //   tx,
-                                    // });
+                                    console.log("sending transaction", {
+                                      tx,
+                                    });
                                     // // VersionedTransaction
 
                                     if (tx instanceof Transaction) {
+                                      console.log("sign ");
                                       const udpatetx = await signTransaction(
                                         tx
                                       );
@@ -276,8 +282,12 @@ function CoinflowContent({
                                       return txid;
                                     }
                                     if (tx instanceof VersionedTransaction) {
+                                      console.log("versioned ");
                                       const serilize = tx.message.serialize();
                                       if (!magic) return null;
+                                      console.log("seerialize", {
+                                        publicAddress,
+                                      });
                                       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                                       const signedMagic: Uint8Array =
                                         await magic.solana.signMessage(

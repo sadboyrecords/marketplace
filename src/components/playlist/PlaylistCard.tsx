@@ -50,7 +50,7 @@ function PlaylistCard({ songs, playlist, hideBottom, fullWidth }: Props) {
 
   if (!playlist) return null;
   return (
-    <div className="relative ">
+    <div className="relative flex-grow flex-col">
       <div
         className={`relative grid  grid-cols-2  !overflow-hidden !text-base-content ${
           fullWidth ? "w-full" : "w-[18rem] "
@@ -77,9 +77,10 @@ function PlaylistCard({ songs, playlist, hideBottom, fullWidth }: Props) {
         ))}
       </div>
       {!hideBottom && (
-        <div className="flex min-h-[5rem]  w-full flex-wrap items-center justify-between space-x-2 rounded-b-lg bg-black p-4 text-white">
+        <div className="flex h-full min-h-[5rem] w-full  flex-1  items-center justify-between space-x-2 rounded-b-lg bg-black p-4 text-white">
           {/* name, ispublic, created by, how many songs */}
-          <div className="">
+          <div className="truncate">
+            {/*  flex-1 flex-wrap */}
             <Typography color="neutral-gray" size="body-xs" className="mb-1">
               By:{" "}
               {getCreatorname({
@@ -88,7 +89,7 @@ function PlaylistCard({ songs, playlist, hideBottom, fullWidth }: Props) {
                 walletAddress: playlist?.creator?.walletAddress || "",
               })}
             </Typography>
-            <Typography className="font-bold" color="neutral-gray">
+            <Typography className=" font-bold" color="neutral-gray">
               {playlist?.name || "Playlist"}
             </Typography>
             <Typography color="neutral-gray" size="body-xs" className="">
@@ -107,7 +108,11 @@ function PlaylistCard({ songs, playlist, hideBottom, fullWidth }: Props) {
             </div>
           )}
 
-          <div onClick={(e) => e.preventDefault()} className="z-20">
+          <div
+            onClick={(e) => e.preventDefault()}
+            className="z-20 "
+            // flex w-full flex-1 items-end justify-end
+          >
             {songs?.length > 0 && (
               <PlayButton
                 playlistName={playlist?.name || "Playlist"}

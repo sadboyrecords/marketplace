@@ -20,8 +20,11 @@ export const userRouter = createTRPCRouter({
     if (!ctx.session || !ctx.session.user.walletAddress) {
       throw new Error("No wallet address found in session");
     }
+
     return ctx.prisma.user.upsert({
-      where: { walletAddress: ctx.session.user.walletAddress },
+      where: {
+        walletAddress: ctx.session.user.walletAddress,
+      },
       update: {
         email: ctx.session.user.email,
       },

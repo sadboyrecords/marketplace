@@ -10,6 +10,7 @@ import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 import {
   selectAuthModal,
@@ -19,6 +20,8 @@ import {
 } from "@/lib/slices/appSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { authProviderNames } from "@/utils/constants";
+import { magic } from "@/lib/magic";
+import { router } from "@trpc/server";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -39,7 +42,7 @@ export default function WalletAdaptor() {
   const { publicKey, signMessage, disconnect, connected } = useWallet();
 
   const dispatch = useDispatch();
-
+  const router = useRouter();
   const authModal = useSelector(selectAuthModal);
 
   const { data: session, status } = useSession();
@@ -102,18 +105,34 @@ export default function WalletAdaptor() {
     if (connected && status === "unauthenticated") {
       void handleSignIn();
     }
-    if (
-      status === "authenticated" &&
-      !connected &&
-      session.user.provider !== authProviderNames.magic
-    ) {
+    if (status === "authenticated" && !connected) {
       console.log("authenticated - not connected");
-      void signOut();
-      //   .then(() => null)
-      //   .catch(() => null);
-      // void handleSignIn();
+      if (session.user.provider !== authProviderNames.magic) {
+        signOut({
+          redirect: false,
+        })
+          .then(() => null)
+          .catch(() => null);
+      }
+      if (session.user.provider === authProviderNames.magic && magic) {
+        console.log("MAGIC");
+        console.log({ session });
+        magic.user
+          .isLoggedIn()
+          .then((isLoggedIn) => {
+            console.log({ isLoggedIn });
+            if (!isLoggedIn) {
+              signOut({
+                redirect: false,
+              })
+                .then(() => null)
+                .catch(() => null);
+            }
+          })
+          .catch(() => null);
+      }
     }
-  }, [connected, handleSignIn, session?.user.provider, status]);
+  }, [connected, handleSignIn, session, session?.user.provider, status]);
 
   React.useEffect(() => {
     // console.log("EFFECT - 2", { status, connected, session });
