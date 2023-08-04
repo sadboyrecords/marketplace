@@ -29,6 +29,7 @@ export const transactionRouter = createTRPCRouter({
         include: {
           receiver: {
             select: {
+              name: true,
               walletAddress: true,
               magicSolanaAddress: true,
               pinnedProfilePicture: {
@@ -86,6 +87,7 @@ export const transactionRouter = createTRPCRouter({
           maxSupportedTransactionVersion: 0,
         }
       );
+
       const minted = parsedTransactions.filter((t) =>
         t?.transaction?.message?.instructions?.find(
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
