@@ -1,5 +1,6 @@
-import { Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
-import { MoonIcon, SunIcon } from "@heroicons/react/24/outline";
+import Bars3BottomLeftIcon from "@heroicons/react/24/outline/Bars3BottomLeftIcon";
+import MoonIcon from "@heroicons/react/24/outline/MoonIcon";
+import SunIcon from "@heroicons/react/24/outline/SunIcon";
 import { useTheme } from "next-themes";
 import React from "react";
 import WalletAdaptor from "@/components/buttons/WalletAdaptor";
@@ -17,11 +18,12 @@ function Header({
   return (
     <>
       {/* sticky top-0  */}
-      <div className="sticky top-0 z-50  bg-gradient-to-b from-black px-4">
+      <div className="sticky top-0 z-40  bg-gradient-to-b from-black px-4">
         {/* bg-base-100 */}
         <div className="mx-auto flex h-20 max-w-7xl">
           {/* */}
           <button
+            title="Open sidebar"
             type="button"
             className=" px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
             onClick={() => setSidebarOpen(true)}
@@ -61,6 +63,7 @@ function Header({
               <BellIcon className="h-6 w-6" aria-hidden="true" /> */}
               {mounted && (
                 <button
+                  title="Toggle Dark Mode"
                   onClick={() => setTheme(theme === "light" ? "dark" : "light")}
                   type="button"
                   className="rounded-full  p-1 text-gray-600  backdrop-blur hover:text-gray-800/60 "

@@ -116,7 +116,7 @@ export const tokenRouter = createTRPCRouter({
       let nextCursor: typeof cursor | undefined = undefined;
       if (collections.length > limit) {
         const nextItem = collections.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = nextItem?.id;
       }
 
       return {
@@ -146,7 +146,7 @@ export const tokenRouter = createTRPCRouter({
         nft: z.custom<Sft | Nft | SftWithToken | NftWithToken>().optional(),
       })
     )
-    .query(({ ctx, input }) => {
+    .query(({ input }) => {
       try {
         const nft = input.nft;
         if (!nft) {

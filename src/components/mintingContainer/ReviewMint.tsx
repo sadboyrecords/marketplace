@@ -16,7 +16,7 @@ import {
   uploadFileToIpfs,
   hashJsonToNumber,
   convertToSlug,
-  getLowestSolpaymentFromGuard,
+  // getLowestSolpaymentFromGuard,
   getLowestTokenpaymentFromGuard,
 } from "@/utils/helpers";
 import {
@@ -499,7 +499,7 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
         );
         return;
       }
-      const res = await candyMutation.mutateAsync({
+      await candyMutation.mutateAsync({
         candyMachineId: (data.candyMachineIdPlaceholder ||
           data.candyMachineId) as string,
         creatorWalletAddress: publicKey?.toBase58() || "",

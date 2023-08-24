@@ -80,7 +80,7 @@ export const candyMachineRouter = createTRPCRouter({
       let nextCursor: typeof cursor | undefined = undefined;
       if (candyMachines.length > limit) {
         const nextItem = candyMachines.pop();
-        nextCursor = nextItem!.id;
+        nextCursor = nextItem?.id;
       }
       const count = await ctx.prisma.candyMachines.count({
         where: {
@@ -382,7 +382,7 @@ export const candyMachineRouter = createTRPCRouter({
       },
     });
   }),
-  getFeatured: publicProcedure.query(async ({ ctx, input }) => {
+  getFeatured: publicProcedure.query(async ({ ctx }) => {
     // const tokens = await ctx.ctx.prisma.raw_nfts.findMany();
     const cm = await ctx.prisma.candyMachines?.findMany?.({
       where: {

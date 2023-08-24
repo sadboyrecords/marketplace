@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import type ReactPlayer from "react-player";
 import { useSelector, useDispatch } from "react-redux";
 import { selectAudio, setSeeking, setPlayed } from "@/lib/slices/audioSlice";

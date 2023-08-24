@@ -14,7 +14,9 @@ export default function ErrorFallback() {
           Something went wrong! Try again later.
         </Typography>
         <div className="mt-8">
-          <Button onClick={() => router.reload()}>Refresh</Button>
+          <Button title="refresh" onClick={() => router.reload()}>
+            Refresh
+          </Button>
         </div>
       </div>
     </div>

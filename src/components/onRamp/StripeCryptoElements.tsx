@@ -65,7 +65,7 @@ const useOnrampSessionListener = (
   React.useEffect(() => {
     if (session && callback) {
       // @ts-ignore
-      const listener = (e: { payload: any }) => callback(e.payload);
+      const listener = (e: { payload: unknwon }) => callback(e.payload);
       // @ts-ignore
       session.addEventListener(type, listener);
       return () => {

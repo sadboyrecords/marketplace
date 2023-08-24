@@ -12,6 +12,7 @@ type ButtonProps = {
   className?: string;
   disabled?: boolean;
   type?: "submit" | "button" | "reset";
+  title?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> &
     React.MouseEventHandler<HTMLAnchorElement>;
   // //   ref: React.
@@ -33,6 +34,7 @@ function Button({
   size = "md",
   onClick,
   type = "button",
+  title,
   ...props
 }: ButtonProps) {
   const variantClasses = {
@@ -98,6 +100,7 @@ function Button({
       href={href}
       disabled={disabled}
       onClick={onClick}
+      title={title || "button"}
       {...props}
     >
       {children}

@@ -1,7 +1,7 @@
 import { Magic } from "magic-sdk";
 // import { } from "@magic-ext/auth"
 import { SolanaExtension } from "@magic-ext/solana";
-import { env } from "@/env.mjs";
+// import { env } from "@/env.mjs";
 import * as web3 from "@solana/web3.js";
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

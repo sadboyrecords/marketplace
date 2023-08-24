@@ -5,7 +5,6 @@ import type {
   SftWithToken,
   Nft,
   NftWithToken,
-  sol,
 } from "@metaplex-foundation/js";
 
 interface MintDescriptionProps {
