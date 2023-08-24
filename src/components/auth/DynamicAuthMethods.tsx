@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { close } from "@/lib/slices/appSlice";
+import { privacyPolicy, termsConditions } from "@/utils/constants";
 
 type FormValues = {
   email: string;
@@ -85,6 +86,7 @@ function DynamicAuthMethods() {
         />
         <button
           // onClick={() => select(wallet.adapter.name)}
+          title="Continue"
           className=" flex  h-12 w-full items-center justify-center rounded-md bg-base-300 p-4 hover:bg-base-300/70"
         >
           <div className="flex items-center space-x-2">
@@ -107,6 +109,7 @@ function DynamicAuthMethods() {
       <div className="flex flex-col space-y-2 ">
         {sortedWallets.map((wallet) => (
           <button
+            title="wallet"
             onClick={() => select(wallet.adapter.name)}
             key={wallet.adapter.name}
             className="flex h-12 items-center justify-between rounded-md bg-base-300 p-4 text-left hover:bg-base-300/70"
@@ -131,6 +134,28 @@ function DynamicAuthMethods() {
             )}
           </button>
         ))}
+      </div>
+      <div className="pt-4">
+        <Typography color="neutral-gray" size="body-xs">
+          By continuing, you agree, have read and understand our{" "}
+          <a
+            className=" underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={termsConditions}
+          >
+            Terms and Conditions
+          </a>{" "}
+          and{" "}
+          <a
+            className=" underline"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={privacyPolicy}
+          >
+            Privacy Policy
+          </a>
+        </Typography>
       </div>
     </div>
   );

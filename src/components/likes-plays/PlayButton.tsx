@@ -74,6 +74,7 @@ function PlayButton({ song, playlistName, tracks, disabled }: Props) {
         <div className=" animate-pulse border-b-[0.75rem] border-l-[1.5rem] border-t-[0.75rem] border-b-transparent border-l-border-gray  border-t-transparent  " />
       ) : (
         <Button
+          title="Play"
           variant="ghost"
           className="z-10 px-0 py-1 text-primary-400 hover:scale-110 lg:py-3"
           disabled={disabled}

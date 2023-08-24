@@ -12,10 +12,10 @@ type SignMessage = {
 };
 
 export class SigninMessage {
-  domain: any;
-  publicKey: any;
-  nonce: any;
-  statement: any;
+  domain: unknown;
+  publicKey: string;
+  nonce: unknown;
+  statement: unknown;
 
   constructor({ domain, publicKey, nonce, statement }: SignMessage) {
     this.domain = domain;

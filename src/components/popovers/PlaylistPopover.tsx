@@ -14,7 +14,6 @@ const PlaylistPopover = ({
   // contractAddress,
   // artistSlug,
   songTitle,
-  publicKey,
   playlistId,
   showRemove,
   updatePlaylist,
@@ -37,6 +36,7 @@ const PlaylistPopover = ({
   if (playlistId && showRemove) {
     return (
       <button
+        title="Remove from playlist"
         onClick={async () => {
           try {
             await removeTrackFromPlaylistMutation.mutateAsync({
@@ -55,6 +55,7 @@ const PlaylistPopover = ({
   } else if (playlistId) {
     return (
       <button
+        title="Add to playlist"
         onClick={async () => {
           try {
             await addTrackToPlaylistMutation.mutateAsync({
@@ -126,6 +127,7 @@ const PlaylistPopover = ({
                       <Menu.Item>
                         {({ active }) => (
                           <button
+                            title="Add to playlist"
                             className={`${
                               active ? "text-primary" : "text-base-content"
                             } group flex w-full items-center rounded-md px-4 py-4 text-sm

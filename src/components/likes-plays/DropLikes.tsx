@@ -12,7 +12,7 @@ function DropLikes({
   hideNumber = false,
   isPrimary = true,
   sideView = false,
-  padding = "sm",
+  // padding = "sm",
   candyMachineId,
 }: {
   candyMachineId?: string;
@@ -65,6 +65,7 @@ function DropLikes({
   return (
     <>
       <Button
+        title="Like/Unlike"
         className={`${sideView ? "flex space-x-2" : "flex-col space-y-2"}`}
         onClick={handleLikeUnlike}
         variant="ghost"

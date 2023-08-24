@@ -1,9 +1,8 @@
 import React from "react";
 
-function ArrowRight({
-  className,
-  style,
-}: {
+function ArrowRight({}: // className,
+// style,
+{
   className?: string;
   style?: React.CSSProperties;
 }) {

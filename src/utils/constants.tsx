@@ -240,3 +240,8 @@ export const array2 = [
   "3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H",
   "Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g",
 ];
+
+export const termsConditions =
+  "https://app.termly.io/document/terms-of-service/e73d99e0-b345-45cf-afd7-e49c4e3afa67";
+export const privacyPolicy =
+  "https://app.termly.io/document/privacy-policy/1a9b60aa-402a-4ddf-92e7-867980bce883";

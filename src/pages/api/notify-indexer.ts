@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 // src/pages/api/examples.ts
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Nft } from "@metaplex-foundation/js";
+// import { Nft } from "@metaplex-foundation/js";
 import axios from "axios";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -33,7 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const data = await response.data;
+    await response.data;
     // console.log({ data });
 
     res.status(200).json({

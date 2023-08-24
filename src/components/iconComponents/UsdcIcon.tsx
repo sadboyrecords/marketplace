@@ -2,7 +2,7 @@ import React from "react";
 
 function UsdcIcon({
   className,
-  style,
+  // style,
   height,
   width,
 }: {

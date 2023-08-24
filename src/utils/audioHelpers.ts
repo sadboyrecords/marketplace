@@ -30,7 +30,7 @@ export const getSupporters = (
     // @ts-ignore
     (a, b) => b?.[1]?.length - a?.[1]?.length
   );
-  const sortedObject = Object.fromEntries(sortedData);
+  // const sortedObject = Object.fromEntries(sortedData);
   const sortedArray = sortedData.reduce(
     (acc, [key, value]) => ({ ...acc, [key]: value }),
     {}

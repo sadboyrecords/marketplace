@@ -1,7 +1,7 @@
 function Shuffle({
   className,
-  style,
-}: {
+}: // style,
+{
   className?: string;
   style?: React.CSSProperties;
 }) {

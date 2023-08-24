@@ -10,6 +10,8 @@ import MarginLayout from "@/components/layouts/MarginLayout";
 import dynamic from "next/dynamic";
 import SeoHead from "@/components/SeoHead";
 import { api } from "@/utils/api";
+// import { env } from "../env.mjs";
+import { GoogleAnalytics } from "nextjs-google-analytics";
 
 import "react-toastify/dist/ReactToastify.css";
 import "@/styles/globals.css";
@@ -82,6 +84,18 @@ const MyApp: AppType<{ session: AppSession | null }> = ({
                   defer
                   src="https://static.moonpay.com/web-sdk/v1/moonpay-web-sdk.min.js"
                 />
+                <GoogleAnalytics trackPageViews />
+                {/* <Script
+                  strategy="lazyOnload"
+                  src={`https://www.googletagmanager.com/gtag/js?id=${env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`}
+                />
+                <Script strategy="lazyOnload" id="google-script">
+                  {`window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '${env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}'); `}
+                </Script> */}
               </MetaplexProvider>
             </Provider>
           </Web3Provider>

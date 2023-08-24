@@ -47,10 +47,15 @@ export default function FormContainer({
     <form className="relative" onSubmit={handleSubmit}>
       <div className="mt-4 flex-shrink-0 border-t border-gray-200 bg-base-100 px-4  py-5  sm:px-6">
         <div className="flex justify-end space-x-3">
-          <Button variant="outlined" color="neutral" onClick={handleCancel}>
+          <Button
+            title="cancel"
+            variant="outlined"
+            color="neutral"
+            onClick={handleCancel}
+          >
             Cancel
           </Button>
-          <Button loading={submitLoading}>
+          <Button title="create" loading={submitLoading}>
             {submitButtonLabel || "Create"}
           </Button>
         </div>

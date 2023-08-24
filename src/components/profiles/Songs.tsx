@@ -17,15 +17,14 @@ function UserSongs({ walletAddress }: Props) {
       enabled: !!walletAddress,
     }
   );
-  const { data: likedSongs, isLoading: isLoadingLiked } =
-    api.user.getLikedSongs.useQuery(
-      {
-        walletAddress: walletAddress || "",
-      },
-      {
-        enabled: !!walletAddress,
-      }
-    );
+  const { data: likedSongs } = api.user.getLikedSongs.useQuery(
+    {
+      walletAddress: walletAddress || "",
+    },
+    {
+      enabled: !!walletAddress,
+    }
+  );
 
   const [buttonState, setButtonState] = useState<"LIKED" | "CREATED">();
 

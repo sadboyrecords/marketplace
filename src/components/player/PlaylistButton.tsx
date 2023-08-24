@@ -115,7 +115,7 @@ function PlaylistButton() {
   return (
     <div className="">
       <Menu as="div" className="inline-block text-left">
-        {({ open }) => (
+        {() => (
           <>
             <Button variant="ghost" onClick={handleOpenMenu}>
               <ListBulletIcon className="h-6 w-6 text-neutral-content hover:text-primary-focus" />

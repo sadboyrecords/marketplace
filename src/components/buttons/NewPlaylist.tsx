@@ -52,6 +52,7 @@ function NewPlaylistButton({ isNav }: { isNav?: boolean }) {
         size="sm"
         loading={isCreating}
         className={`${isNav ? "md:bg-transparent xl:bg-primary" : ""} "`}
+        title="Create Playlist"
       >
         <PlusCircleIcon
           className={`${isNav ? "md:text-primary xl:text-white" : ""} h-7 w-7`}

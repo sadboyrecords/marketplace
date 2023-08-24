@@ -8,7 +8,7 @@ import { PlayIcon, PauseIcon } from "@heroicons/react/24/solid";
 import { routes } from "@/utils/constants";
 import { TrashIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { getCreatorNames, getTrackUrl } from "@/utils/helpers";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PlaylistPopover from "@/components/popovers/PlaylistPopover";
 import Button from "@/components/buttons/Button";
 import ImageDisplay from "@/components/imageDisplay/ImageDisplay";
@@ -34,7 +34,6 @@ function TrackItem({
   playlistName,
   playlistId,
   isCreator,
-  refreshPlaylist,
   showPopover,
   userPublicKey,
   canAdd,

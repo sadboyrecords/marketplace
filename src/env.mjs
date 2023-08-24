@@ -31,6 +31,7 @@ const server = z.object({
   NEXT_RPC_HOST: z.string().min(1),
   MAGIC_SK: z.string().min(1),
   NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY: z.string().min(1),
+  NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: z.string().min(1),
 });
 
 /**
@@ -70,6 +71,7 @@ const processEnv = {
   NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
 };
 
 // Don't touch the part below
