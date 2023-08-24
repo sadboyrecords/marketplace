@@ -25,7 +25,7 @@ function UploadedFileIpfs({
   setIPFSHash: (hash: string | undefined) => void;
   clearFile: () => void;
   text?: string;
-  placeholderImg?: any;
+  placeholderImg?: string;
   // uploadPercentage?: number;
 }) {
   const [done, setDone] = useState(false);
@@ -43,10 +43,10 @@ function UploadedFileIpfs({
     try {
       console.log("UPLOADING");
       setStatus("UPLOADING");
-      let isImage = false;
+      // let isImage = false;
       const fileType = uploadedFile.type;
       if (fileType.includes("image")) {
-        isImage = true;
+        // isImage = true;
         setType("IMAGE");
         if (preventUpload) {
           setStatus("SUCCESS");
@@ -87,7 +87,7 @@ function UploadedFileIpfs({
         const cid = data?.cid;
         const key = data?.key;
         if (cid && key) {
-          const res = await audioApi.mutateAsync({
+          await audioApi.mutateAsync({
             ipfsHash: cid,
             path: key,
           });

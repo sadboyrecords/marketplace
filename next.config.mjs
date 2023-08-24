@@ -32,5 +32,8 @@ const config = {
       "niftytunes.b-cdn.net",
     ],
   },
+  compiler: {
+    removeConsole: process.env.NEXT_ENV === "prod",
+  },
 };
 export default config;

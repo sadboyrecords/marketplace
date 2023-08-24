@@ -27,8 +27,6 @@ import {
   openJoinBattleFansModal,
   setBattleWinner,
 } from "@/lib/slices/appSlice";
-import { useConnection } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@solana/web3.js";
 
 type BattleCardProps = {
   index: number;
@@ -43,8 +41,11 @@ function BattleCard({
   totalPot,
   competitorIndex,
 }: BattleCardProps) {
+  console.log({
+    image:
+      battle?.battleContestants[index]?.candyMachineDraft?.drop?.pinnedImage,
+  });
   const { fetchCandyMachineById, candyMachines } = useMetaplex();
-  const { connection } = useConnection();
   const draft = battle?.battleContestants[index]?.candyMachineDraft;
   const imageHash = battle?.battleContestants[index]?.candyMachineDraft
     ?.imageIpfsHash as string;
@@ -275,7 +276,12 @@ function BattleCard({
           }
           hash={imageHash || null}
           quality={100}
-          // fill
+          pinnedStatus={
+            battle?.battleContestants[index]?.candyMachineDraft?.drop
+              ?.pinnedImage?.status
+          }
+          fill
+          sizes="(max-width: 640px) 90vw, (max-width: 800px) 60vw, (max-width: 800px) 50vw, (max-width: 1200px) 40vw, 30vw"
           width={
             battle?.battleContestants[index]?.candyMachineDraft?.drop
               ?.pinnedImage?.width || 500

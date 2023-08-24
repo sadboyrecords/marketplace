@@ -81,7 +81,7 @@ function AvatarImage({
       return;
     }
     const imageFile = acceptedFiles.find((file) => file.type.includes("image"));
-    console.log({ imageFile });
+    // console.log({ imageFile });
 
     if (imageFile) {
       setLocalImage(imageFile);
@@ -197,6 +197,7 @@ function AvatarImage({
                   className=" rounded-full !p-2 hover:bg-current"
                   onClick={open}
                   disabled={loadingUpload}
+                  title="camera icon"
                 >
                   <CameraIcon className="h-4 w-4 text-white" />
                 </Button>
@@ -226,12 +227,13 @@ function AvatarImage({
             width={widthNumber || 300}
             height={widthNumber || 300}
             quality={quality}
+            publicImage={true}
             url={
               ipfsUrl(
                 imageHash,
-                quality,
                 path,
                 pinnedStatus
+                // quality,
                 // widthNumber,
                 // widthNumber
               ) ||

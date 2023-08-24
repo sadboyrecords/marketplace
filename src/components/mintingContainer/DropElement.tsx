@@ -62,7 +62,6 @@ function DropElement({
     isDragActive,
     // isDragAccept,
     // isDragReject,
-    acceptedFiles,
     fileRejections,
   } = useDropzone({
     maxFiles: 2,

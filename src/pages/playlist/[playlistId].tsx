@@ -31,7 +31,7 @@ function PlaylistDetails() {
   const query = router.query;
   const { isCurated } = query;
   const playlistId = query.playlistId as string;
-  const [toasted, setToasted] = useState(false);
+  const [toasted] = useState(false);
   const [editing, setEditing] = useState(false);
   // const [isPublic, setIsPublic] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
@@ -250,6 +250,7 @@ function PlaylistDetails() {
             )}
             {playlist?.creator?.isCreator && !editing && (
               <button
+                title="edit playlist"
                 onClick={() => {
                   setEditing(!editing);
                   setPlaylistName(playlist?.name);
@@ -330,7 +331,7 @@ function PlaylistDetails() {
               <span className="mr-2 mt-0 font-bold">
                 {playlist?.likes?.length}
               </span>{" "}
-              <button onClick={handleLikeUnlikePlaylist}>
+              <button title="like playlist" onClick={handleLikeUnlikePlaylist}>
                 {isLiked ? (
                   <HeartIconSolid
                     className={`h-6 w-6 ${

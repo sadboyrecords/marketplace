@@ -91,9 +91,11 @@ function PlayerBar() {
                         pinnedStatus={currentSong?.pinnedImage?.status}
                         path={currentSong?.pinnedImage?.path}
                         width={40}
-                        quality={50}
+                        height={40}
+                        quality={40}
                         alt={currentSong?.title || "Track"}
                         className="m-0  rounded p-0 opacity-90"
+                        sizes="5vw"
                         imgTagClassName="w-16 h-16 object-cover rounded opacity-90 p-0 m-0"
                         // layout="fill"
                         fill

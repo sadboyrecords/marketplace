@@ -58,7 +58,7 @@ export default function ImageDisplay({
   return (
     <>
       {/* <div className="h-full w-full relative "> */}
-      {publicImage || ipfsUrl(hash) ? (
+      {publicImage || hash || (path && pinnedStatus) ? (
         <>
           <Image
             //   className="w-full md:w-72 block rounded-md "
@@ -66,11 +66,11 @@ export default function ImageDisplay({
             src={
               ipfsUrl(
                 hash,
-                quality,
                 path,
-                pinnedStatus,
-                resizeWidth || width,
-                height
+                pinnedStatus
+                // quality,
+                // resizeWidth || width,
+                // height
               ) ||
               url ||
               "/placeholder/music_placeholder.png"
@@ -85,7 +85,12 @@ export default function ImageDisplay({
             quality={quality}
             priority
             fill={fill}
-            sizes={fill ? sizes || "(max-width: 768px) 100vw" : undefined}
+            sizes={
+              fill
+                ? sizes ||
+                  "(max-width: 640px) 90vw, (max-width: 800px) 60vw, (max-width: 800px) 50vw, (max-width: 1200px) 40vw, 30vw"
+                : undefined
+            }
             //   layout="responsive"
             // layout={layout}
             loader={

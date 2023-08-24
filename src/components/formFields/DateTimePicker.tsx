@@ -39,9 +39,9 @@ function DateTimePickerInput({
   minDate = new Date(),
   onChange,
   value,
-  startDateTime,
+  // startDateTime,
   timePickerTitle = "Time",
-  startDateInterval = 0,
+  // startDateInterval = 0,
   tooltip,
   tooltipText,
 }: IDateTimePickerProps) {

@@ -6,8 +6,6 @@ import type {
   Nft,
   NftWithToken,
 } from "@metaplex-foundation/js";
-import parse from "html-react-parser";
-import linkifyStr from "linkify-string";
 
 interface MintDescriptionProps {
   nftDetails?: Sft | SftWithToken | Nft | NftWithToken;

@@ -10,7 +10,7 @@ function CountdownLabel({
   date,
   countDownText,
   inProgress = false,
-  isStarted,
+  // isStarted,
   isEnded,
   label,
   solPrice,
@@ -61,7 +61,7 @@ function CountdownLabel({
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [date]);
+  }, [countDownDate, date]);
 
   useMemo(() => {
     void handleGetPrice();

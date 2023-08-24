@@ -1,20 +1,20 @@
 import { type MintResponseType } from "@/utils/types";
-import { SolIcon, UsdcIcon } from "@/components/iconComponents";
+import { SolIcon } from "@/components/iconComponents";
 import Typography from "@/components/typography";
 import Button from "@/components/buttons/Button";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+// import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import React from "react";
 import { useSession } from "next-auth/react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import Input from "../formFields/Input";
-import { toast } from "react-toastify";
-import confetti from "canvas-confetti";
+// import Input from "../formFields/Input";
+// import { toast } from "react-toastify";
+// import confetti from "canvas-confetti";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
-import { useDispatch } from "react-redux";
-import { closeJoinBattleFansModal } from "@/lib/slices/appSlice";
+// import { useDispatch } from "react-redux";
+// import { closeJoinBattleFansModal } from "@/lib/slices/appSlice";
 import Coinflow from "@/components/onRamp/Coinflow";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
@@ -33,71 +33,70 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
   const { data: session } = useSession();
   const { publicKey } = useWallet();
 
-  const { fetchCandyMachineById, candyMachines, mint, solUsdPrice } =
-    useMetaplex();
+  const { fetchCandyMachineById, candyMachines } = useMetaplex();
 
   const candyMachine = candyMachines?.[candyMachineId || ""];
 
   const [mintAmount, setMintAmount] = React.useState<number>(1);
 
-  const handleIncrease = () => {
-    setMintAmount(mintAmount + 1);
-  };
+  // const handleIncrease = () => {
+  //   setMintAmount(mintAmount + 1);
+  // };
 
-  const handleDecrease = () => {
-    if (mintAmount > 1) {
-      setMintAmount(mintAmount - 1);
-    }
-  };
+  // const handleDecrease = () => {
+  //   if (mintAmount > 1) {
+  //     setMintAmount(mintAmount - 1);
+  //   }
+  // };
   const [purchasedNft, setPurchasedNft] = React.useState<MintResponseType>();
 
-  const [isMinting, setIsMinting] = React.useState<boolean>(false);
+  // const [isMinting, setIsMinting] = React.useState<boolean>(false);
   const [modalOpen, setModalOpen] = React.useState<boolean>(false);
   const handleCloseModal = () => {
     setModalOpen(false);
     setPurchasedNft(undefined);
   };
-  const dispatch = useDispatch();
-  async function handleMint() {
-    if (!mintAmount || !candyMachineId) {
-      return;
-    }
-    setIsMinting(true);
-    const toastId = toast.loading("Purchase in progress");
-    try {
-      const data = await mint({
-        candyMachineId,
-        quantityString: mintAmount,
-        label: candyMachine?.guardsAndEligibility?.[0]?.label || "",
-        refetchTheseIds: competitorCandyId ? [competitorCandyId] : undefined,
-      });
-      setPurchasedNft(data as MintResponseType);
-      setIsMinting(false);
-      toast.done(toastId);
-      dispatch(closeJoinBattleFansModal());
-      setModalOpen(true);
+  // const dispatch = useDispatch();
+  // async function handleMint() {
+  //   if (!mintAmount || !candyMachineId) {
+  //     return;
+  //   }
+  //   setIsMinting(true);
+  //   const toastId = toast.loading("Purchase in progress");
+  //   try {
+  //     const data = await mint({
+  //       candyMachineId,
+  //       quantityString: mintAmount,
+  //       label: candyMachine?.guardsAndEligibility?.[0]?.label || "",
+  //       refetchTheseIds: competitorCandyId ? [competitorCandyId] : undefined,
+  //     });
+  //     setPurchasedNft(data as MintResponseType);
+  //     setIsMinting(false);
+  //     toast.done(toastId);
+  //     dispatch(closeJoinBattleFansModal());
+  //     setModalOpen(true);
 
-      void confetti({
-        particleCount: 100,
-        angle: 60,
-        spread: 70,
-        origin: { x: 0.2 },
-      });
+  //     void confetti({
+  //       particleCount: 100,
+  //       angle: 60,
+  //       spread: 70,
+  //       origin: { x: 0.2 },
+  //     });
 
-      void confetti({
-        particleCount: 100,
-        angle: 120,
-        spread: 70,
-        origin: { x: 0.8 },
-      });
-    } catch (error) {
-      console.log(error);
-      toast.done(toastId);
+  //     void confetti({
+  //       particleCount: 100,
+  //       angle: 120,
+  //       spread: 70,
+  //       origin: { x: 0.8 },
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.done(toastId);
 
-      setIsMinting(false);
-      toast.error("Error minting");
-    }
-  }
+  //     setIsMinting(false);
+  //     toast.error("Error minting");
+  //   }
+  // }
   React.useMemo(() => {
     if (candyMachineId) {
       void fetchCandyMachineById(candyMachineId);
@@ -127,7 +126,12 @@ function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
             </Link>
           ))}
         </div>
-        <Button onClick={handleCloseModal} color="neutral" variant="outlined">
+        <Button
+          title="close"
+          onClick={handleCloseModal}
+          color="neutral"
+          variant="outlined"
+        >
           Close
         </Button>
       </GenericModal>

@@ -215,7 +215,7 @@ function TokenProfilePage() {
 
   const handleGetNftTransactions = async (mintAddress: string) => {
     try {
-      const transactions = await getNftTransactions(mintAddress);
+      await getNftTransactions(mintAddress);
     } catch (error) {
       console.log({ error });
     }
@@ -223,7 +223,7 @@ function TokenProfilePage() {
 
   const handleGetPrice = async () => {
     try {
-      const pricing = await getSolUsdPrice();
+      await getSolUsdPrice();
       // console.log({ pricing });
     } catch (error) {}
   };

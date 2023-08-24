@@ -5,9 +5,9 @@ import {
   sol,
   PublicKey,
 } from "@metaplex-foundation/js";
-import type { FindNftsByOwnerOutput } from "@metaplex-foundation/js";
+// import type { FindNftsByOwnerOutput } from "@metaplex-foundation/js";
 
-import { Connection, clusterApiUrl, Keypair } from "@solana/web3.js";
+import { Connection } from "@solana/web3.js";
 import type { CreatorInput } from "@metaplex-foundation/js";
 import { addresses } from "@/utils/constants";
 
@@ -16,21 +16,21 @@ import { addresses } from "@/utils/constants";
 // Create the Collection NFT.
 //  { nft: collectionNft }
 
-interface Creator {
-  address: string;
-  verified: boolean;
-  share: number;
-}
+// interface Creator {
+//   address: string;
+//   verified: boolean;
+//   share: number;
+// }
 
-interface CollectionCreation {
-  uri: string;
-  collectionName: string;
-  sellerFeeBasisPoints?: number;
-  maxSupply?: number;
-  isMutable?: boolean;
-  retainAuthority?: boolean;
-  creators?: CreatorInput[];
-}
+// interface CollectionCreation {
+//   uri: string;
+//   collectionName: string;
+//   sellerFeeBasisPoints?: number;
+//   maxSupply?: number;
+//   isMutable?: boolean;
+//   retainAuthority?: boolean;
+//   creators?: CreatorInput[];
+// }
 
 type IMxFields = {
   metaplex: Metaplex;

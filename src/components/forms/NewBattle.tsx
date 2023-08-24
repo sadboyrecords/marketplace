@@ -33,7 +33,7 @@ const UploadedFileIpfs = dynamic(
 
 type FormSubmissionType = RouterOutput["battle"]["createBattle"];
 
-type IMintKeys = keyof IMint;
+// type IMintKeys = keyof IMint;
 
 interface FormValues {
   battleName: string;
@@ -155,8 +155,8 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
   const audioHash2 = watch("secondContestant.audioHash");
   const imageHash2 = watch("secondContestant.imageHash");
 
-  const first = watch("firstContestant");
-  const second = watch("secondContestant");
+  // const first = watch("firstContestant");
+  // const second = watch("secondContestant");
 
   const [preventUpload, setPreventUpload] = React.useState(false);
   const [editedState, setEditedState] = React.useState(false);

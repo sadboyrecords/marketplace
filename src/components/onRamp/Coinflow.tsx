@@ -242,6 +242,7 @@ function CoinflowContent({
                         </Dialog.Title>
 
                         <button
+                          title="Close"
                           onClick={() => setIsOpen(false)}
                           className=" text-gray-neutral"
                         >

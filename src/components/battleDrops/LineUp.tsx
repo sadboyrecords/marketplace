@@ -1,7 +1,7 @@
 import Typography from "@/components/typography";
 import type { BattleType, BattleTypeSummary } from "@/utils/types";
 import BattleCard from "@/components/battleDrops/BattleCard";
-import SolIcon from "@/components/iconComponents/SolIcon";
+// import SolIcon from "@/components/iconComponents/SolIcon";
 import Countdown from "@/components/countdown/Countdown";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
 import { useState, useMemo } from "react";

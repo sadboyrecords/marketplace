@@ -74,6 +74,7 @@ function DropHead() {
             quality={80}
             fill
             width={300}
+            height={300}
             sizes="10vw"
             hash={null}
           />

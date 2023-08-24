@@ -10,7 +10,7 @@ import Typography from "@/components/typography";
 import Link from "next/link";
 import { routes } from "@/utils/constants";
 import { api } from "@/utils/api";
-import type { SongType, PlaylistType } from "@/utils/types";
+import type { PlaylistType } from "@/utils/types";
 
 export default function PlaylistModal({
   open,
@@ -24,7 +24,7 @@ export default function PlaylistModal({
   songTitle: string;
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState("");
+  // const [searchInput, setSearchInput] = useState("");
 
   // const { publicKey } = useWallet();
   const { data: session } = useSession();
@@ -40,7 +40,7 @@ export default function PlaylistModal({
 
   type PlaylistsType = typeof playlists;
 
-  const [filteredPlaylists, setFilteredPlaylists] = useState<PlaylistsType>([]);
+  const [filteredPlaylists] = useState<PlaylistsType>([]);
 
   const createPlaylistWithTracks =
     api.playlist.createPlaylistWithTracks.useMutation();
@@ -204,16 +204,16 @@ export default function PlaylistModal({
     }
   }, [open]);
 
-  useEffect(() => {
-    if (searchInput) {
-      const filtered = playlists?.filter((playlist) =>
-        playlist.name.toLowerCase().includes(searchInput.toLowerCase())
-      );
-      setFilteredPlaylists(filtered || []);
-    } else {
-      setFilteredPlaylists(playlists || []);
-    }
-  }, [searchInput, playlists]);
+  // useEffect(() => {
+  //   if (searchInput) {
+  //     const filtered = playlists?.filter((playlist) =>
+  //       playlist.name.toLowerCase().includes(searchInput.toLowerCase())
+  //     );
+  //     setFilteredPlaylists(filtered || []);
+  //   } else {
+  //     setFilteredPlaylists(playlists || []);
+  //   }
+  // }, [searchInput, playlists]);
 
   return (
     <>
@@ -236,7 +236,7 @@ export default function PlaylistModal({
             <>
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-base-100 p-6 text-left align-middle shadow-xl transition-all">
                 <div className="mt-2 border-b-2 py-2">
-                  <button onClick={handleCreatePlaylist}>
+                  <button title="create" onClick={handleCreatePlaylist}>
                     <Typography variant="body1" color="primary">
                       Create Playlist
                     </Typography>

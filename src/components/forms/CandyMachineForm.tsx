@@ -28,6 +28,7 @@ type CandyMachineFormType = {
   getValues: UseFormGetValues<FormValues>;
   handleSubmit: UseFormHandleSubmit<FormValues>;
   watch: UseFormWatch<FormValues>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   control: Control<FormValues, any>;
 };
 
@@ -315,6 +316,7 @@ function CandyMachineForm({
               </div>
               <div>
                 <Button
+                  title="delete"
                   type="button"
                   variant="ghost"
                   className="space-x-1 px-2 text-xs"

@@ -44,9 +44,9 @@ const Icon = ({
   name = "BACKWARD",
   className,
   style,
-  width,
-  height,
-}: IconProps) => {
+}: // width,
+// height,
+IconProps) => {
   const IconSVG = Icons[name];
 
   if (!IconSVG) {
