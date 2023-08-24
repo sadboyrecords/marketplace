@@ -81,7 +81,7 @@ function AvatarImage({
       return;
     }
     const imageFile = acceptedFiles.find((file) => file.type.includes("image"));
-    console.log({ imageFile });
+    // console.log({ imageFile });
 
     if (imageFile) {
       setLocalImage(imageFile);

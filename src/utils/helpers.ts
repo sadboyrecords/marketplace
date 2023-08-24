@@ -43,7 +43,7 @@ export const getHashAndUriFromNFT = (
     imageHash = imageIpfsHash?.replace(/^ipfs:\/\/|\//g, "");
   }
   const imageUrl = nftData.json?.image;
-  // console.log({ imageHash, audioHash, audioUrl, imageUrl });
+  // ageHash, audioHash, audioUrl, imageUrl });
 
   return {
     imageHash,
