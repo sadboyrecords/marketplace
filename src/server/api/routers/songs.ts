@@ -129,6 +129,7 @@ export const songRouter = createTRPCRouter({
     const filteredSongs = (
       data.filter(
         (s) => s.status === "fulfilled"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ) as PromiseFulfilledResult<any>[]
     )
       .map((m) => m?.value)
@@ -174,7 +175,7 @@ export const songRouter = createTRPCRouter({
           },
         },
       });
-      type songType = typeof songs;
+      // type songType = typeof songs;
 
       // const filteredSongs = (
       //   data.filter(

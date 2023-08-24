@@ -11,13 +11,18 @@ import Header from "@/components/headersNav/Header";
 import Typography from "@/components/typography";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { routes } from "@/utils/constants";
+import { privacyPolicy, routes, termsConditions } from "@/utils/constants";
 import { useTheme } from "next-themes";
 // import { useWallet } from "@solana/wallet-adapter-react";
 import NewPlaylistButton from "../buttons/NewPlaylist";
 import { api } from "@/utils/api";
 import { useDispatch } from "react-redux";
 import { setLookupAddress } from "@/lib/slices/appSlice";
+import {
+  InstagramIcon,
+  TwitterIcon,
+  DiscordIcon,
+} from "@/components/iconComponents";
 
 // import { useWallet } from '@solana/wallet-adapter-react';
 // import { trpc } from 'utils/trpc';
@@ -383,6 +388,74 @@ export default function MainLayout({ children }: LayoutProps) {
               
             </div> */}
           </main>
+          <div className=" flex flex-wrap justify-between gap-3 bg-base-300 px-10 py-28 text-white">
+            <div className="flex-col justify-between space-y-4">
+              <Image
+                alt="logo"
+                priority
+                src={
+                  theme === "dark"
+                    ? "/logo/icon_no_bg_white_1000.png"
+                    : "/logo/icon_no_bg_black_1000.png"
+                }
+                width={40}
+                height={40}
+                className="flex  justify-center p-2"
+                // fill
+              />
+              <div>
+                <Typography size="body-sm">
+                  © Copyright
+                  {new Date().getFullYear()} All Rights Reserved. NiftyTunes
+                  Inc.{" "}
+                </Typography>
+                <Typography size="body-sm">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={termsConditions}
+                  >
+                    Terms and Conditions |{" "}
+                  </a>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={privacyPolicy}
+                  >
+                    Privacy Policy
+                  </a>
+                </Typography>
+              </div>
+            </div>
+
+            <div className="flex flex-col space-y-4">
+              <Typography className="font-bold">Follow Us</Typography>
+              <div className="flex flex-row space-x-2">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={"https://twitter.com/TunesNifty"}
+                >
+                  <TwitterIcon className="h-6 w-6 text-base-content" />
+                </a>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={"https://www.instagram.com/tunesnifty"}
+                >
+                  <InstagramIcon className="h-5 w-5 text-base-content" />
+                </a>
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={"https://discord.gg/YE5S8BrS"}
+                >
+                  <DiscordIcon className="h-6 w-6 text-base-content" />
+                </a>
+              </div>
+              {/* <Typography>Email: info@niftytunes.xyz</Typography> */}
+            </div>
+          </div>
         </div>
       </div>
     </>

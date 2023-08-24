@@ -70,6 +70,7 @@ export default function OnrampModal() {
                         </Dialog.Title>
 
                         <button
+                          title="Close panel"
                           onClick={() => dispatch(closeOnramp())}
                           className=" text-gray-neutral"
                         >

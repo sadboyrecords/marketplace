@@ -1,4 +1,4 @@
-import { Connection, clusterApiUrl, Keypair, PublicKey } from "@solana/web3.js";
+import { Connection, clusterApiUrl, PublicKey } from "@solana/web3.js";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 
 const network =

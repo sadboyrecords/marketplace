@@ -40,6 +40,7 @@ function ModalContainer({
         <div className="modal-box relative border-2 border-base-300">
           {!hideCloseButton && (
             <Button
+              title="Close"
               variant="outlined"
               color="neutral"
               className="absolute right-2 top-2"

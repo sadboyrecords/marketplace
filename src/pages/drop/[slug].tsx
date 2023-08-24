@@ -19,7 +19,7 @@ import DropLikes from "@/components/likes-plays/DropLikes";
 // import DropMintButton from "@/components/dropMintButton";
 import type { IFullCredits } from "@/utils/types";
 import SongCredits from "@/components/songCredits";
-import dynamic from "next/dynamic";
+// import dynamic from "next/dynamic";
 import { type inferRouterOutputs } from "@trpc/server";
 import { type AppRouter } from "@/server/api/root";
 import { useMetaplex } from "@/components/providers/MetaplexProvider";
@@ -34,12 +34,12 @@ import PlayButton from "@/components/likes-plays/PlayButton";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
-const UpdateSettings = dynamic(
-  () => import("@/components/candyMachineUpdate/UpdateSettings"),
-  {
-    ssr: false,
-  }
-);
+// const UpdateSettings = dynamic(
+//   () => import("@/components/candyMachineUpdate/UpdateSettings"),
+//   {
+//     ssr: false,
+//   }
+// );
 
 export type DropDetailsProps = RouterOutput["candyMachine"]["getBySlug"];
 
@@ -75,15 +75,15 @@ function DropDetails() {
     candyMachines,
     mint,
     solUsdPrice,
-    walletBalance,
+    // walletBalance,
   } = useMetaplex();
-  const [imageUri, setImageUri] = useState<string | undefined>();
+  // const [imageUri, setImageUri] = useState<string | undefined>();
   const [parsedDescription, setParsedDescription] = useState<string | null>();
   const [metaData, setMetaData] = useState<IMetadata>();
   const [textOpen, setTextOpen] = useState(false);
   const [overflowActive, setOverflowActive] = useState(true);
   const [songCredits, setSongCredits] = useState<IFullCredits[]>();
-  const [isOwner, setIsOwner] = useState(false);
+  // const [isOwner, setIsOwner] = useState(false);
 
   const candy = candyMachines?.[drop?.candyMachineId || ""];
   useMemo(() => {
@@ -94,9 +94,9 @@ function DropDetails() {
   }, [drop?.candyMachineId]);
 
   const guardsAndEligibility = candy?.guardsAndEligibility;
-  const candyMachine = candy?.candyMachine;
+  // const candyMachine = candy?.candyMachine;
 
-  const [percentagePot, setPercentagePot] = useState<number>();
+  // const [percentagePot, setPercentagePot] = useState<number>();
   // const totalPot = drop?.
   // useMemo(() => {
   //   if (candy?.items?.redeemed && totalPot?.items) {
@@ -233,7 +233,7 @@ function DropDetails() {
 
   useMemo(() => {
     if (drop && drop.candyMachineId) {
-      setImageUri(drop.candyMachineImageUrl);
+      // setImageUri(drop.candyMachineImageUrl);
       if (drop?.description) {
         setParsedDescription(
           linkifyStr(drop.description, {

@@ -14,10 +14,10 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { SigninMessage } from "@/utils/SignMessage";
 import { getCsrfToken } from "next-auth/react";
 import { type NextApiRequest } from "next";
-import { adminWallets } from "@/utils/constants";
+// import { adminWallets } from "@/utils/constants";
 import { Magic, WalletType } from "@magic-sdk/admin";
 import { authProviderNames } from "@/utils/constants";
-import { api } from "@/utils/api";
+// import { api } from "@/utils/api";
 import { env } from "@/env.mjs";
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -106,8 +106,8 @@ export function authOptions(req: NextApiRequest): NextAuthOptions {
             throw new Error("Could not validate the signed message");
 
           return {
-            id: signinMessage.publicKey as string,
-            walletAddress: signinMessage.publicKey as string,
+            id: signinMessage.publicKey,
+            walletAddress: signinMessage.publicKey,
           };
         } catch (e) {
           return null;

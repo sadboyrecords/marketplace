@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import type { IMint as FormValues, GuardFormType, IMint } from "@/utils/types";
-import Button from "@/components/buttons/Button";
-import Typography from "@/components/typography";
-import ModalContainer from "@/components/modalContainer";
-import { useMetaplex } from "@/components/providers/MetaplexProvider";
-import CandyMachineForm from "@/components/forms/CandyMachineForm";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { toast } from "react-toastify";
-import { getLowestSolpaymentFromGuard } from "@/utils/helpers";
+// import { useEffect, useMemo, useState } from "react";
+// import { useForm, type SubmitHandler } from "react-hook-form";
+// import type { IMint as FormValues, GuardFormType, IMint } from "@/utils/types";
+// import Button from "@/components/buttons/Button";
+// import Typography from "@/components/typography";
+// import ModalContainer from "@/components/modalContainer";
+// import { useMetaplex } from "@/components/providers/MetaplexProvider";
+// import CandyMachineForm from "@/components/forms/CandyMachineForm";
+// import { useWallet } from "@solana/wallet-adapter-react";
+// import { toast } from "react-toastify";
+// import { getLowestSolpaymentFromGuard } from "@/utils/helpers";
 
 export default function UpdateSettings() {
-  const { candyMachines } = useMetaplex();
+  // const { candyMachines } = useMetaplex();
   // const guardsAndEligibility = candyMachines?
 
   // const wallet = useWallet();

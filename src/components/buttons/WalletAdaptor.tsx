@@ -10,7 +10,6 @@ import { getCsrfToken, signIn, useSession, signOut } from "next-auth/react";
 import { api } from "@/utils/api";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
-import { useRouter } from "next/router";
 
 import {
   selectAuthModal,
@@ -21,7 +20,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { authProviderNames } from "@/utils/constants";
 import { magic } from "@/lib/magic";
-import { router } from "@trpc/server";
+// import { router } from "@trpc/server";
 
 const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
   ssr: false,
@@ -42,7 +41,7 @@ export default function WalletAdaptor() {
   const { publicKey, signMessage, disconnect, connected } = useWallet();
 
   const dispatch = useDispatch();
-  const router = useRouter();
+  // const router = useRouter();
   const authModal = useSelector(selectAuthModal);
 
   const { data: session, status } = useSession();
@@ -160,7 +159,12 @@ export default function WalletAdaptor() {
         <DynamicAuthMethods />
       </GenericModal>
       {!session && !loading && (
-        <Button loading={loading} size="sm" onClick={() => dispatch(open())}>
+        <Button
+          title="Sign in"
+          loading={loading}
+          size="sm"
+          onClick={() => dispatch(open())}
+        >
           Sign In
         </Button>
       )}

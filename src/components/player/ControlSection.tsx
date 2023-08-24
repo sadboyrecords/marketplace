@@ -1,8 +1,8 @@
 import React from "react";
 import PlayPauseButton from "./PlayPauseButton";
 import Icon from "@/components/icons";
-import PlayerRange from "./Range";
-import { AVAILABLE_PLAYBACK_STATES } from "./constants";
+// import PlayerRange from "./Range";
+// import { AVAILABLE_PLAYBACK_STATES } from "./constants";
 import {
   pause,
   play,

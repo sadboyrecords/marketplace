@@ -2,41 +2,41 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import MoneyIcon from "@heroicons/react/24/outline/BanknotesIcon";
 
-import { loadStripeOnramp } from "@stripe/crypto";
-import { useCallback, useState } from "react";
-import dynamic from "next/dynamic";
-import { toast } from "react-toastify";
-import { LoadingSpinner } from "@/components/iconComponents";
-import { useSession } from "next-auth/react";
-import { selectPublicAddress } from "@/lib/slices/appSlice";
-import { useMetaplex } from "@/components/providers/MetaplexProvider";
-import { useTheme } from "next-themes";
-import { useSelector, useDispatch } from "react-redux";
+// import { loadStripeOnramp } from "@stripe/crypto";
+// import { useState } from "react";
+// import dynamic from "next/dynamic";
+// import { toast } from "react-toastify";
+// import { LoadingSpinner } from "@/components/iconComponents";
+// import { useSession } from "next-auth/react";
+// import { selectPublicAddress } from "@/lib/slices/appSlice";
+// import { useMetaplex } from "@/components/providers/MetaplexProvider";
+// import { useTheme } from "next-themes";
+import { useDispatch } from "react-redux";
 import {
-  selectOnrampModal,
+  // selectOnrampModal,
   openOnramp,
-  closeOnramp,
+  // closeOnramp,
 } from "@/lib/slices/appSlice";
 
-const OnrampModal = dynamic(() => import("@/components/modals/OnrampModal"), {
-  ssr: false,
-});
+// const OnrampModal = dynamic(() => import("@/components/modals/OnrampModal"), {
+//   ssr: false,
+// });
 
-type Props = {
-  close?: () => void;
-};
+// type Props = {
+//   close?: () => void;
+// };
 
-function AddFunds({ close }: Props) {
-  const { theme } = useTheme();
+function AddFunds() {
+  // const { theme } = useTheme();
   const dispatch = useDispatch();
 
-  const { candyMachines, fetchCandyMachineById, getUserBalance } =
-    useMetaplex();
-  const [open, setOpen] = useState(false);
+  // const { candyMachines, fetchCandyMachineById, getUserBalance } =
+  //   useMetaplex();
+  // const [open, setOpen] = useState(false);
 
-  const { data: session } = useSession();
-  // const [message, setMessage] = useState("");
-  const [loading, setIsLoading] = useState(false);
+  // const { data: session } = useSession();
+  // // const [message, setMessage] = useState("");
+  // const [loading, setIsLoading] = useState(false);
 
   return (
     <div className="flex w-fit flex-col items-center space-x-3 space-y-2">

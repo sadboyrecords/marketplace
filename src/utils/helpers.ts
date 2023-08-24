@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import slugify from "slugify";
 import { imageDomains, routes } from "@/utils/constants";
-import { type inferRouterOutputs } from "@trpc/server";
-import { type AppRouter } from "@/server/api/root";
+// import { type inferRouterOutputs } from "@trpc/server";
+// import { type AppRouter } from "@/server/api/root";
 import type { PartialSongType, SongType } from "./types";
 import axios from "axios";
 import { liveIpfsGateway, cdnUrl } from "@/utils/constants";
@@ -15,7 +15,7 @@ import type {
   NftWithToken,
 } from "@metaplex-foundation/js";
 
-type RouterOutput = inferRouterOutputs<AppRouter>;
+// type RouterOutput = inferRouterOutputs<AppRouter>;
 
 export function classNames(...classes: [string]) {
   return classes.filter(Boolean).join(" ");
@@ -195,30 +195,30 @@ export const hashJsonToNumber = (json: string) => {
   });
 };
 
-interface ipfsUploadType {
-  contentType: string;
-}
+// interface ipfsUploadType {
+//   contentType: string;
+// }
 
-interface ipfJsonUploadType extends ipfsUploadType {
-  json: JSON;
-}
+// interface ipfJsonUploadType extends ipfsUploadType {
+//   json: JSON;
+// }
 
-interface ipfFileUploadType extends ipfsUploadType {
-  audioFile: File;
-}
-interface ipfFileUploadType2 extends ipfsUploadType {
-  imageFile: File;
-}
+// interface ipfFileUploadType extends ipfsUploadType {
+//   audioFile: File;
+// }
+// interface ipfFileUploadType2 extends ipfsUploadType {
+//   imageFile: File;
+// }
 
-type ipfsUploadParams =
-  | ipfJsonUploadType
-  | ipfFileUploadType
-  | ipfFileUploadType2;
+// type ipfsUploadParams =
+//   | ipfJsonUploadType
+//   | ipfFileUploadType
+//   | ipfFileUploadType2;
 
 interface UploadFileToIpfsParams {
   audioFile?: File;
   imageFile?: File;
-  json?: any;
+  json?: unknown;
 }
 
 interface ImageDimensions {
@@ -359,13 +359,13 @@ export function myImageLoader({
 
 export const ipfsUrl = (
   hash: string | null | undefined,
-  quality = 90,
   path?: string,
-  pinnedStatus?: string,
-  width?: number,
-  height?: number
+  pinnedStatus?: string
+  // quality = 90,
+  // width?: number,
+  // height?: number
 ) => {
-  if (!hash) return;
+  // console.log({ hash, path, pinnedStatus, quality, width, height });
   if (path && pinnedStatus === "PINNED") {
     // console.log("returning cdn url---------", cdnUrl, path, quality, width, height)
     return path;
@@ -373,7 +373,7 @@ export const ipfsUrl = (
   }
   // const pinataUrl = `https://reamp.mypinata.cloud/ipfs/${hash}?img-width=250&img-height=250&img-fit=scale-down&img-quality=${quality}`;
   // const pinataUrl = `https://reamp.mypinata.cloud/ipfs/${hash}`;
-
+  if (!hash) return;
   const ipfsUrl = `${liveIpfsGateway}${hash}`;
   // ?img-quality=${quality}&img-width=250&img-height=250&img-fit=scale-down&
 
@@ -396,8 +396,8 @@ export const mainPinataUrl = (hash?: string) => {
 
 export const handleImageUrl = (
   url: string | null | undefined,
-  hash: string | null,
-  quality = 50
+  hash: string | null
+  // quality = 50
 ) => {
   // console.log({ url, hash })
   if (!url) return;

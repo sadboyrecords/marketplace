@@ -7,7 +7,7 @@ import {
 } from "@/server/api/trpc";
 
 export const playlistRouter = createTRPCRouter({
-  hello: publicProcedure.input(z.string().nullish()).query(({ input, ctx }) => {
+  hello: publicProcedure.input(z.string().nullish()).query(({ input }) => {
     return {
       greeting: `Hello ${input ?? "world"}`,
     };
@@ -214,7 +214,7 @@ export const playlistRouter = createTRPCRouter({
     }),
   getTopPlaylists: publicProcedure
     // .input(z.object({ walletAddress: z.string() }))
-    .query(async ({ input, ctx }) => {
+    .query(async ({ ctx }) => {
       const getTopPlaylists = await ctx.prisma.playlists.findMany({
         take: 6,
         where: {
@@ -593,7 +593,7 @@ export const playlistRouter = createTRPCRouter({
           playlistId: input.playlistId,
         },
       });
-      const playlist = await ctx.prisma.playlists.delete({
+      await ctx.prisma.playlists.delete({
         where: {
           userWalletAndPlaylistId: {
             id: input.playlistId,

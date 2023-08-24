@@ -2,20 +2,16 @@ import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { HeartIcon as HeartIconOutline } from "@heroicons/react/24/outline";
 import { toast } from "react-toastify";
 // import { abbreviateNumber } from "@/utils/helpers";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { api } from "@/utils/api";
 import Typography from "@/components/typography";
 import Button from "@/components/buttons/Button";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useSelector } from "react-redux";
-import { selectPublicAddress } from "@/lib/slices/appSlice";
 
 function GeneralLikes({
   hideNumber = false,
   isPrimary = true,
   sideView = false,
-  padding = "sm",
   candyMachineId,
   songId,
 }: {
@@ -85,6 +81,7 @@ function GeneralLikes({
   return (
     <>
       <Button
+        title="Like"
         variant="ghost"
         className={`${sideView ? "flex space-x-2" : "flex-col space-y-2"}`}
         // eslint-disable-next-line @typescript-eslint/no-misused-promises

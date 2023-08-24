@@ -2,8 +2,8 @@ import React from "react";
 
 function Replay({
   className,
-  style,
-}: {
+}: // style,
+{
   className?: string;
   style?: React.CSSProperties;
 }) {

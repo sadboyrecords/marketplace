@@ -8,8 +8,8 @@ import { useSession } from "next-auth/react";
 import TextArea from "@/components/formFields/TextArea";
 import { PublicKey } from "@solana/web3.js";
 import { coinflowFeePayer } from "@/utils/constants";
-import { useRef, useState } from "react";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { useState } from "react";
+// import { useConnection } from "@solana/wallet-adapter-react";
 
 function Lookup() {
   const { data: session, status } = useSession();
@@ -36,26 +36,40 @@ function Lookup() {
   // GigARaWnLsKrTUq8FNveo3rn18Dp4sV8ic6Y6i5yJ7Z5
   // 3br7VsdU37pANBsyQs1THULFkTAfZWsQvkqVfWyvA59H
 
-  const keys = [
-    "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd",
-    "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
-    // "xiYt83sR4FdjKaXQSqmKK79Mpx36Tk2cjVsDP7TJA2u",
-    // "8QMfUK7ddi9rL35eD9hWwUhYG75Hasu5ivwLVgr4D7Jk",
-    // "J6ixAz8rWkbfEgdRDRVkwVtqk7EU65fT26Uk8g3WWUjP",
-    // "G2Zocm2qzDxjUUPNrDDG7fDHrk65pzdy42qgfMFjXd3W",
-    // "BT2NjP37JaRFztcnLpSYruwyi96DJRby2qugLGuGwGHz",
-    // "Ht73hWt7HfAvyYz8Lrs8yoP6X7XPrsG7keqT3ZbfpKzL",
-    // "DPAGjw9K59tuo3JmxAntfnWzh6BizKmsc3V3doQGr4yh",
-    // "GJoXJ7hrGnKcjxSvbxXYzCHCKBnCowFBQH12i7DQYSQM",
-    "11111111111111111111111111111111",
-    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-    "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
-    "Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g",
-    // "42GcyvZVmcs6hACKKw4SCJBHHm5qUQuzeBVUXrSsFgyo",
-    // "8TaM76EfrY1rF7LUMAc2FrdYbpnzcjraz4VR6Q1P2Qi4",
-    // "GLWvnXmm2Tenq3RoN9rsDsSVPqZFS2nC25HXCcQ6Ds39",
-    // "GVhiAGXDitf8xGnK1fpCrxHmjPtoVWh8PVUHMxnGskYi"
-  ];
+  // const keys = [
+  //   "75N3e5H9o8VswtNcAnWr9gHN1HCE1yAWdiaEHEesXssd",
+  //   "3h2MDz4z4zEb71UngawB7pcCrDWN19htAARA6gP123hh",
+  //   // "xiYt83sR4FdjKaXQSqmKK79Mpx36Tk2cjVsDP7TJA2u",
+  //   // "8QMfUK7ddi9rL35eD9hWwUhYG75Hasu5ivwLVgr4D7Jk",
+  //   // "J6ixAz8rWkbfEgdRDRVkwVtqk7EU65fT26Uk8g3WWUjP",
+  //   // "G2Zocm2qzDxjUUPNrDDG7fDHrk65pzdy42qgfMFjXd3W",
+  //   // "BT2NjP37JaRFztcnLpSYruwyi96DJRby2qugLGuGwGHz",
+  //   // "Ht73hWt7HfAvyYz8Lrs8yoP6X7XPrsG7keqT3ZbfpKzL",
+  //   // "DPAGjw9K59tuo3JmxAntfnWzh6BizKmsc3V3doQGr4yh",
+  //   // "GJoXJ7hrGnKcjxSvbxXYzCHCKBnCowFBQH12i7DQYSQM",
+  //   "11111111111111111111111111111111",
+  //   "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  //   "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+  //   "Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g",
+  //   // "42GcyvZVmcs6hACKKw4SCJBHHm5qUQuzeBVUXrSsFgyo",
+  //   // "8TaM76EfrY1rF7LUMAc2FrdYbpnzcjraz4VR6Q1P2Qi4",
+  //   // "GLWvnXmm2Tenq3RoN9rsDsSVPqZFS2nC25HXCcQ6Ds39",
+  //   // "GVhiAGXDitf8xGnK1fpCrxHmjPtoVWh8PVUHMxnGskYi"
+  // ];
+
+  //   A2k9wo2TRm4saX4oAEGjfUubBxNA3CaZJFAWvpPeeurX
+  // Guard1JwRhJkVH6XZhzoYxeBVQe872VH6QggF4BWmS9g
+  // ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL
+  // 11111111111111111111111111111111
+  // TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA
+  // metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s
+  // CndyV3LdqHUfDLmE5naZjVN8rBZz4tqhdefbAnjHG3JR
+  // SysvarS1otHashes111111111111111111111111111
+  // 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
+  // 5ppVfhB9weJe9oBWEY97DArrbXmzzZ2fSkz28F92uQ7U
+  // Sysvar1nstructions1111111111111111111111111
+  // SysvarRent111111111111111111111111111111111
+  // 8WQHB9umX9wLUsa6Reia9E96EiSaGWbYEiHzAqgDN4dM
 
   const knownAddresses = [
     new PublicKey(coinflowFeePayer),

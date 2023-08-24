@@ -1,12 +1,8 @@
 import React, { useCallback } from "react";
 import Typography from "@/components/typography";
 import { useDropzone } from "react-dropzone";
-import Draggable, { DraggableCore } from "react-draggable";
-import type {
-  DraggableEventHandler,
-  DraggableData,
-  DraggableEvent,
-} from "react-draggable";
+import Draggable from "react-draggable";
+import type { DraggableData, DraggableEvent } from "react-draggable";
 import { CameraIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
 
@@ -25,12 +21,13 @@ function DropElement({
   setImageIpfsHash,
   setImageUrl,
   originalImageUrl,
-  originalImageHash,
-}: {
+}: // originalImageHash,
+{
   setLoadingUpload: (loading: boolean) => void;
   loadingUpload: boolean;
   setImageIpfsHash: (hash: string) => void;
   setImageUrl: (url: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setAxis?: any;
   isBanner?: boolean;
   originalImageUrl?: string;
@@ -79,6 +76,7 @@ function DropElement({
         setLoadingUpload(false);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const {
@@ -87,7 +85,7 @@ function DropElement({
     isDragActive,
     // isDragAccept,
     // isDragReject,
-    acceptedFiles,
+    // acceptedFiles,
     fileRejections,
 
     open,
