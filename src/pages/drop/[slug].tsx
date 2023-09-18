@@ -31,6 +31,7 @@ import { toast } from "react-toastify";
 import confetti from "canvas-confetti";
 import { useSession } from "next-auth/react";
 import PlayButton from "@/components/likes-plays/PlayButton";
+import Buy from "@/components/battleDrops/Buy";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
@@ -92,6 +93,8 @@ function DropDetails() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drop?.candyMachineId]);
+
+  const candyMachineId = drop?.candyMachineId;
 
   const guardsAndEligibility = candy?.guardsAndEligibility;
   // const candyMachine = candy?.candyMachine;
@@ -477,7 +480,7 @@ function DropDetails() {
                       ></progress> */}
                       {/* <div className="w-full"></div> */}
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                    {/* <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center space-x-2 ">
                           <SolIcon height={20} />
@@ -505,7 +508,6 @@ function DropDetails() {
                                   className="!p-1"
                                   color="neutral"
                                   size="sm"
-                                  // rounded="full"
                                   onClick={handleIncrease}
                                   variant="outlined"
                                 >
@@ -527,7 +529,6 @@ function DropDetails() {
                                     className="w-10"
                                     value={mintAmount.toString()}
                                   />
-                                  {/* <Input /> */}
                                 </div>
                                 <Button
                                   className="!p-1"
@@ -553,7 +554,6 @@ function DropDetails() {
                                 // rounded="lg"
                               >
                                 Buy
-                                {/* {isMinting ? 'Minting...' : 'Mint'} */}
                               </Button>
                             </div>
                           </>
@@ -561,18 +561,14 @@ function DropDetails() {
                           <>Connect your wallet</>
                         )}
                       </div>
-                      {/* {candy?.guardsAndEligibility?.[0]
-                        ?.maxPurchaseQuantity && (
-                        <Typography color="neutral-gray">
-                          You can buy up to{" "}
-                          {
-                            candy?.guardsAndEligibility?.[0]
-                              ?.maxPurchaseQuantity
-                          }
-                          . Buy more sol to purchase more
-                        </Typography>
-                      )} */}
-                    </div>
+                    </div> */}
+                    {candyMachineId &&
+                      !candy.guardsAndEligibility?.[0]?.hasEnded && (
+                        <Buy
+                          candyMachineId={candyMachineId}
+                          // competitorCandyId={competitorCandyId}
+                        />
+                      )}
                     {!candy?.guardsAndEligibility?.[0]?.isEligible && (
                       <Typography size="body-xs" color="neutral-gray">
                         {
