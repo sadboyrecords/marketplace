@@ -265,7 +265,20 @@ function BattleCard({
       >
         {battle?.battleContestants[index]?.candyMachineDraft?.dropName}
       </Typography>
-      <div className="relative aspect-1 w-full flex-1 lg:h-full ">
+      <Link
+        href={
+          draft?.candyMachineSlug
+            ? routes.dropDetails(draft?.candyMachineSlug)
+            : "#"
+        }
+        className="relative aspect-1 w-full flex-1 lg:h-full "
+      >
+        {/* <Link
+          href={routes.userProfile(
+            battle?.battleContestants[index]?.user?.walletAddress || ""
+          )}
+          className="flex items-center space-x-2"
+        > */}
         <ImageDisplay
           className="aspect-1 h-full w-full rounded-xl object-cover"
           // object-cover
@@ -302,7 +315,7 @@ function BattleCard({
             </div>
           </div>
         )}
-      </div>
+      </Link>
       <div className="flex flex-shrink items-center justify-between">
         <Link
           href={routes.userProfile(
@@ -341,6 +354,9 @@ function BattleCard({
             playlistName={battle?.battleName}
             tracks={
               tracks && tracks?.length > 0 ? (tracks as SongType[]) : undefined
+            }
+            disabled={
+              battle?.battleStartDate && battle?.battleStartDate > new Date()
             }
           />
           {battle?.isActive && (

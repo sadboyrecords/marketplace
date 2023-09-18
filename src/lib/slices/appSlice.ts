@@ -22,6 +22,8 @@ export interface RootState {
     competitorCandyId?: string;
     supporters: ISupporters | undefined | null;
     isEnded?: boolean;
+    startDate?: Date;
+    endDate?: Date;
   } | null;
   onRamperModal: boolean;
   lookupAddress: string | null;
