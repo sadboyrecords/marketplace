@@ -28,12 +28,20 @@ function DropHead() {
   const [text, setText] = React.useState<string>("");
 
   React.useMemo(() => {
+    console.log({ start: battle?.battleStartDate });
+    const todaysDate = new Date().getTime();
+    // if (
+    //   battle?.battleStartDate &&
+    //   todaysDate < battle?.battleStartDate?.getTime()
+    // ) {
+    //   setText("Support your favourite Artist In...");
+    // }
     if (battle?.battleStartDate && battle?.battleStartDate > new Date()) {
       setText("Support your favourite Artist In...");
-    }
-
-    if (battle?.battleEndDate && battle?.battleEndDate > new Date()) {
-      setText("Support your favourite Artist For Another...");
+    } else {
+      if (battle?.battleEndDate && battle?.battleEndDate > new Date()) {
+        setText("Support your favourite Artist For Another...");
+      }
     }
 
     if (

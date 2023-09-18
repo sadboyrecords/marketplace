@@ -27,7 +27,7 @@ const GenericModal = dynamic(() => import("@/components/modals/GenericModal"), {
 
 type BuyProps = {
   candyMachineId: string;
-  competitorCandyId: string;
+  competitorCandyId?: string;
 };
 function Buy({ candyMachineId, competitorCandyId }: BuyProps) {
   const { data: session } = useSession();
