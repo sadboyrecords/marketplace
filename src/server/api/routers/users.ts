@@ -355,7 +355,7 @@ export const userRouter = createTRPCRouter({
     const users = await ctx.prisma.user.findMany({
       where: {
         walletAddress: {
-          in: ctx.session.user.walletAddress,
+          equals: ctx.session.user.walletAddress,
         },
       },
     });
@@ -368,7 +368,8 @@ export const userRouter = createTRPCRouter({
     const user = await ctx.prisma.user.findFirst({
       where: {
         walletAddress: {
-          in: ctx.session.user.walletAddress,
+          // in: ctx.session.user.walletAddress,
+          equals: ctx.session.user.walletAddress,
         },
       },
       select: {
