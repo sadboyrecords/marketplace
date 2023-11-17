@@ -474,12 +474,9 @@ export const battleRouter = createTRPCRouter({
         throw new Error("No wallet address found in session");
       }
       const battle = await ctx.prisma.$transaction(async (tx) => {
-        const b = await tx.battle.findUnique({ where: { id: input.battleId } });
-        if (
-          !b?.createdByWallet ||
-          b?.createdByWallet !== ctx.session.user.walletAddress
-        ) {
-          throw new Error("Battle not found");
+        // const b = await tx.battle.findUnique({ where: { id: input.battleId } });
+        if (!ctx.session.user.isAdmin) {
+          throw new Error("Not authoirized");
         }
         const createdBattle = await tx.battle.update({
           where: {

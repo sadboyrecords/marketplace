@@ -263,7 +263,7 @@ function BattleCard({
         size="body-xl"
         className="text-center font-normal tracking-widest"
       >
-        {battle?.battleContestants[index]?.candyMachineDraft?.dropName}
+        {formSubmission?.trackTitle || ""}
       </Typography>
       <Link
         href={
