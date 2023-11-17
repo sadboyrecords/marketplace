@@ -38,11 +38,13 @@ export async function getStaticProps() {
     },
     transformer: superjson,
   });
-
-  void Promise.allSettled([
+  // await helpers.battle.getHomePageBattle.prefetch();
+  // await helpers.artist.getTopArtists.prefetch();
+  //  await helpers.songs.getRecentTracks.prefetch();
+  void Promise.all([
     await helpers.battle.getHomePageBattle.prefetch(),
-    await helpers.songs.getRecentTracks.prefetch(),
     await helpers.artist.getTopArtists.prefetch(),
+    await helpers.songs.getRecentTracks.prefetch(),
   ]);
 
   return {

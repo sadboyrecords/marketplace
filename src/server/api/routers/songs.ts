@@ -117,26 +117,27 @@ export const songRouter = createTRPCRouter({
         createdAt: "desc",
       },
     });
-    const data = await Promise.allSettled(
-      recentSongs.map(async (song) => {
-        const response = await fetch(song.lossyAudioURL);
-        return { response, song };
-      })
-    );
+    // const data = await Promise.allSettled(
+    //   recentSongs.map(async (song) => {
+    //     const response = await fetch(song.lossyAudioURL);
+    //     return { response, song };
+    //   })
+    // );
 
-    type songType = typeof recentSongs;
+    // type songType = typeof recentSongs;
 
-    const filteredSongs = (
-      data.filter(
-        (s) => s.status === "fulfilled"
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ) as PromiseFulfilledResult<any>[]
-    )
-      .map((m) => m?.value)
-      .filter((d) => d?.response?.status === 200)
-      .map((d) => d?.song);
-
-    return filteredSongs.slice(0, 8) as songType;
+    // const filteredSongs = (
+    //   data.filter(
+    //     (s) => s.status === "fulfilled"
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //   ) as PromiseFulfilledResult<any>[]
+    // )
+    //   .map((m) => m?.value)
+    //   .filter((d) => d?.response?.status === 200)
+    //   .map((d) => d?.song);
+    // const filteredSongs = recentSongs
+    return recentSongs.slice(0, 8);
+    // return filteredSongs.slice(0, 8) as songType;
   }),
   getAllSongsPaginated: publicProcedure
     .input(
