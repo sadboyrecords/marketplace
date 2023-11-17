@@ -73,6 +73,7 @@ const defaultCredits = [
 ];
 
 function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
+  const niftytunesIpfsUrl = "https://niftytunes.myfilebase.com/ipfs/";
   const {
     register,
     setValue,
@@ -107,6 +108,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
   // console.log({ battle });
 
   const [loading, setLoading] = React.useState(false);
+  const [isLoaded, setIsloaded] = React.useState(false);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "firstContestant.walletSplits",
@@ -167,7 +169,12 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
   const [localTrack2, setLocalTrack2] = React.useState<File>();
   const [localImage2, setLocalImage2] = React.useState<File>();
 
-  React.useMemo(() => {
+  React.useEffect(() => {
+    setIsloaded(true);
+  }, []);
+
+  React.useEffect(() => {
+    // Effect for all same components
     if (startDate) {
       setValue("firstContestant.startDateTime", startDate);
       setValue("secondContestant.startDateTime", startDate);
@@ -188,7 +195,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
     }
   }, [startDate, endDate, price, royallties, setValue]);
 
-  React.useMemo(() => {
+  React.useEffect(() => {
     if (audioHash) {
       setValue("firstContestant.audioUri", ipfsPublicGateway + audioHash);
       clearErrors("firstContestant.audioUri");
@@ -221,14 +228,14 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
   //   }
   // },[])
 
-  React.useMemo(() => {
+  React.useEffect(() => {
     if (battleDropsTreasury) {
       setValue("firstContestant.treasuryAddress", battleDropsTreasury);
       setValue("secondContestant.treasuryAddress", battleDropsTreasury);
     }
   }, [setValue]);
 
-  React.useMemo(() => {
+  React.useEffect(() => {
     if (localTrack) {
       clearErrors("firstContestant.audioUri");
     }
@@ -295,8 +302,10 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
       );
     }
     if (!localImage || !localTrack || !localImage2 || !localTrack2) {
-      toast.warn("Please upload your files");
-      return;
+      if (!isEditing) {
+        toast.warn("Please upload your files");
+        return;
+      }
     }
     if (!audioHash || !imageHash || !audioHash2 || !imageHash2) {
       toast.warn("Please wait for your files to uploadt");
@@ -391,8 +400,55 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
     }
   };
 
-  void React.useMemo(async () => {
+  console.log({ editedState });
+  const fetchContents = async (drop1: IMint, drop2: IMint) => {
+    console.log("--in content function-", drop1, drop2);
+    fetch(drop1?.imageUri)
+      .then((res) => {
+        console.log(" image res---->", res);
+      })
+      .catch((err) => {
+        console.log("err-----", err);
+      });
+
+    const imageRes = await fetch(drop1?.imageUri);
+    console.log({ imageRes });
+    const imageBlob = await imageRes.blob();
+    const imageType = imageRes.headers.get("content-type");
+    const imageFile = new File([imageBlob], "", {
+      type: imageType || "image/jpeg",
+    });
+    setLocalImage(imageFile);
+    const imageRes2 = await fetch(drop2?.imageUri);
+    const imageBlob2 = await imageRes2.blob();
+    const imageType2 = imageRes2.headers.get("content-type");
+    const imageFile2 = new File([imageBlob2], "", {
+      type: imageType2 || "image/jpeg",
+    });
+    setLocalImage2(imageFile2);
+    if (drop1?.audioHash) {
+      console.log("--audio hashj-");
+      const audioRes = await fetch(`${niftytunesIpfsUrl}${drop1?.audioHash}`);
+      console.log({ audioRes });
+      const audioBlob = await audioRes.blob();
+      const type = audioRes.headers.get("content-type");
+      const audioFile = new File([audioBlob], "", {
+        type: type || "audio/mp3",
+      });
+      setLocalTrack(audioFile);
+    }
+
+    const audioRes2 = await fetch(drop2?.audioUri);
+    const audioBlob2 = await audioRes2.blob();
+    const type2 = audioRes2.headers.get("content-type");
+    const audioFile2 = new File([audioBlob2], "", {
+      type: type2 || "audio/mp3",
+    });
+    setLocalTrack2(audioFile2);
+  };
+  React.useEffect(() => {
     if (battle && !editedState) {
+      console.log("----effect to updated");
       // Object.keys(battle).forEach((key) => {
       //   console.log({ key, value: battle[key] });
       // });
@@ -420,14 +476,14 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
         secondContestant?.user.walletAddress || ""
       );
       // console.log({ drop1 });
-      if (drop1) {
-        // Object.keys(drop1).forEach((key) => {
-        //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        //   // @ts-ignore
-        //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        //   return setValue(`firstContestant.${key}`, drop1[key]);
-        // });
-      }
+      // if (drop1) {
+      //   // Object.keys(drop1).forEach((key) => {
+      //   //   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //   //   // @ts-ignore
+      //   //   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      //   //   return setValue(`firstContestant.${key}`, drop1[key]);
+      //   // });
+      // }
 
       // setValue("firstContestant.trackTitle", drop1?.trackTitle || "");
       // setValue("secondContestant.trackTitle", drop2?.trackTitle || "");
@@ -458,35 +514,16 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
       setValue("secondContestant.audioUri", drop2?.audioUri || "");
       setValue("firstContestant.imageUri", drop1?.imageUri || "");
       setValue("secondContestant.imageUri", drop2?.imageUri || "");
-
-      const audioRes = await fetch(drop1?.audioUri);
-      const audioBlob = await audioRes.blob();
-      const type = audioRes.headers.get("content-type");
-      const audioFile = new File([audioBlob], "", {
-        type: type || "audio/mp3",
-      });
-      setLocalTrack(audioFile);
-      const audioRes2 = await fetch(drop2?.audioUri);
-      const audioBlob2 = await audioRes2.blob();
-      const type2 = audioRes2.headers.get("content-type");
-      const audioFile2 = new File([audioBlob2], "", {
-        type: type2 || "audio/mp3",
-      });
-      setLocalTrack2(audioFile2);
-      const imageRes = await fetch(drop1?.imageUri);
-      const imageBlob = await imageRes.blob();
-      const imageType = imageRes.headers.get("content-type");
-      const imageFile = new File([imageBlob], "", {
-        type: imageType || "image/jpeg",
-      });
-      setLocalImage(imageFile);
-      const imageRes2 = await fetch(drop2?.imageUri);
-      const imageBlob2 = await imageRes2.blob();
-      const imageType2 = imageRes2.headers.get("content-type");
-      const imageFile2 = new File([imageBlob2], "", {
-        type: imageType2 || "image/jpeg",
-      });
-      setLocalImage2(imageFile2);
+      console.log("----fetching contents");
+      fetchContents(drop1, drop2)
+        .then(() => {
+          console.log("---finished");
+          setEditedState(true);
+        })
+        .catch((err) => {
+          console.log("err-----", err);
+          setEditedState(true);
+        });
       setEditedState(true);
     }
   }, [battle, editedState, setValue]);
