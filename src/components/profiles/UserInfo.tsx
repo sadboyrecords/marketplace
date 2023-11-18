@@ -258,7 +258,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
         <div className="sm:mt-[-75px]">
           <div className="flex max-w-3xl flex-wrap  gap-6 ">
             {user ? (
-              <div className="flex w-full flex-wrap items-center justify-between space-y-4 sm:w-auto sm:flex-col">
+              <div className="flex w-full flex-wrap items-center justify-between space-y-4 sm:w-auto sm:flex-col sm:justify-start">
                 <Avatar
                   editing={editing}
                   setAxis={setAvatarAxis}
@@ -335,12 +335,12 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                           }
                           inputProps={{
                             ...register("description", {
-                              maxLength: {
-                                value: 160,
-                                message: `You can only enter 160 characters. You currently have ${
-                                  watchDescription?.length || ""
-                                } characters`,
-                              },
+                              // maxLength: {
+                              //   value: 160,
+                              //   message: `You can only enter 160 characters. You currently have ${
+                              //     watchDescription?.length || ""
+                              //   } characters`,
+                              // },
                             }),
                           }}
                         />
@@ -477,7 +477,7 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                         <div
                           data-tip="Copied"
                           className={`ml-1 h-4 w-4 text-neutral-content ${
-                            copied ? "tooltip-open tooltip tooltip-bottom" : ""
+                            copied ? "tooltip tooltip-bottom tooltip-open" : ""
                           } `}
                         >
                           <CopyIcon
