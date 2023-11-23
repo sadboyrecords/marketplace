@@ -13,6 +13,7 @@ import type {
 } from "@metaplex-foundation/js";
 import { useMemo, useState } from "react";
 import TokenCard from "../tokens/TokenCard";
+import { niftyIpfsGateway } from "@/utils/constants";
 
 type Props = {
   walletAddress: string | undefined;
@@ -30,18 +31,31 @@ function OwnedNftsData({ walletAddress }: Props) {
       });
 
       const nftData = owned?.filter((f) => f.collection?.verified);
-
+      console.log({ nftData, amount: nftData?.length });
       const newArray = [] as FindNftsByOwnerOutput;
       if (!nftData) return;
       if (nftData?.length > 0) {
         for (const item of nftData) {
-          const data = (await (await fetch(item.uri)).json()) as JsonMetadata;
+          // console.log({ item, address: item.address.toBase58() });
+          const ipfsHash = item.uri.split("ipfs/").pop();
+          let newUri = item.uri;
+          if (!ipfsHash?.includes("http") && ipfsHash) {
+            newUri = niftyIpfsGateway + ipfsHash;
+          }
+
+          // console.log({ newUri });
+
+          // console.log({ ipfsHash });
+          const data = (await (await fetch(newUri)).json()) as JsonMetadata;
+          // console.log({ data });
           // const data = //await result.json();
           //
 
           const filtered = data.properties?.files?.filter((f) =>
             f?.type?.includes("audio")
           );
+
+          console.log({ filtered });
           //  === 'audio/mp3'
           if (
             (data.properties?.category === "audio" ||
@@ -63,6 +77,8 @@ function OwnedNftsData({ walletAddress }: Props) {
             }
           }
         }
+        console.log("--done---");
+        console.log({ newArray });
 
         // setOwnedNftsLoading(false);
         setOwnedNfts(newArray);

@@ -412,7 +412,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
       });
 
     const imageRes = await fetch(drop1?.imageUri);
-    console.log({ imageRes });
+
     const imageBlob = await imageRes.blob();
     const imageType = imageRes.headers.get("content-type");
     const imageFile = new File([imageBlob], "", {
@@ -982,7 +982,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
                       </div>
                       <div className="flex">
                         <button
-                          className={`btn-link btn flex ${
+                          className={`btn btn-link flex ${
                             credits?.length - 1 === index ? "" : "hidden"
                           }`}
                           // disabled={credits.length < 2}
@@ -1371,7 +1371,7 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
                       </div>
                       <div className="flex">
                         <button
-                          className={`btn-link btn flex ${
+                          className={`btn btn-link flex ${
                             credits2?.length - 1 === index ? "" : "hidden"
                           }`}
                           // disabled={credits.length < 2}
