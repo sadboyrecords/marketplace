@@ -32,28 +32,32 @@ function LineUp({ data }: { data: BattleType | BattleTypeSummary }) {
   }>();
 
   useMemo(() => {
+    console.log("using memo", { candyMachines, id1, id2, solUsdPrice, data });
     if (candyMachines && id1 && id2) {
       const candyMachine1 = candyMachines[id1];
       const candyMachine2 = candyMachines[id2];
+      console.log({ candyMachine1, candyMachine2, solUsdPrice });
 
       if (
         candyMachine1?.items &&
         candyMachine2?.items &&
-        solUsdPrice &&
+        // solUsdPrice &&
         data?.battlePrice
       ) {
         const solTotal =
           (candyMachine1.items?.redeemed + candyMachine2.items?.redeemed) *
           data.battlePrice;
 
+        console.log({ solTotal });
+
         setTotalPot({
-          usd: solTotal * solUsdPrice,
+          usd: solTotal, //* solUsdPrice,
           sol: solTotal,
           items: candyMachine1.items?.redeemed + candyMachine2.items?.redeemed,
         });
       }
     }
-  }, [candyMachines, id1, id2, solUsdPrice, data?.battlePrice]);
+  }, [candyMachines, id1, id2, solUsdPrice, data]);
 
   return (
     <div className="flex h-full w-full flex-col  space-y-12 lg:flex-row lg:space-x-7  lg:space-y-0">

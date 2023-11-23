@@ -334,6 +334,7 @@ function CoinflowContent({
                                 mintAddress: ctx.mintSigner,
                                 tokenAddress: ctx.tokenAddress,
                               });
+                              console.log("nft", nft);
                               setNftData({
                                 address: nft?.address.toBase58(),
                                 name: nft?.name,
