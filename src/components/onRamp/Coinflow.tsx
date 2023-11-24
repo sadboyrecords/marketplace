@@ -96,6 +96,27 @@ function CoinflowContent({
     }
   };
 
+  // React.useEffect(() => {
+  //   console.log("----fecthing---");
+  //   metaplex
+  //     ?.nfts()
+  //     .findByMint({
+  //       mintAddress: new PublicKey(
+  //         "5MtvihwBboTpVuXUyF6jDVmZtsMFAXiWdtxdnnLb8oGh"
+  //       ),
+  //       tokenAddress: new PublicKey(
+  //         "GDFPFFrWC93RCk7VyM1K3P2Ft7w5nVtDyBRfa322N8i5"
+  //       ),
+  //       loadJsonMetadata: false,
+  //     })
+  //     .then((nft) => {
+  //       console.log("---nft---", { nft });
+  //     })
+  //     .catch((error) => {
+  //       console.log({ error });
+  //     });
+  // }, [metaplex]);
+
   // const handleCreateLookup = async () => {
   //   try {
   //     const lookup = await createLookupTable();
@@ -329,10 +350,15 @@ function CoinflowContent({
                             if (!metaplex || !ctx) return;
                             setIsOpen(false);
                             try {
-                              console.log({ ctx });
+                              console.log({
+                                ctx,
+                                mintSigner: ctx.mintSigner.toBase58(),
+                                tokenAddress: ctx.tokenAddress.toBase58(),
+                              });
                               const nft = await metaplex.nfts().findByMint({
                                 mintAddress: ctx.mintSigner,
                                 tokenAddress: ctx.tokenAddress,
+                                loadJsonMetadata: false,
                               });
                               console.log("nft", nft);
                               setNftData({
