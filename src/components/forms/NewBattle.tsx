@@ -15,7 +15,7 @@ import { useRouter } from "next/router";
 import {
   routes,
   battleDropsTreasury,
-  ipfsPublicGateway,
+  liveIpfsGateway,
 } from "@/utils/constants";
 import { toast } from "react-toastify";
 import { api } from "@/utils/api";
@@ -197,25 +197,25 @@ function NewBattle({ isEditing = false }: { isEditing?: boolean }) {
 
   React.useEffect(() => {
     if (audioHash) {
-      setValue("firstContestant.audioUri", ipfsPublicGateway + audioHash);
+      setValue("firstContestant.audioUri", liveIpfsGateway + audioHash);
       clearErrors("firstContestant.audioUri");
     } else {
       setValue("firstContestant.audioUri", "");
     }
     if (audioHash2) {
-      setValue("secondContestant.audioUri", ipfsPublicGateway + audioHash2);
+      setValue("secondContestant.audioUri", liveIpfsGateway + audioHash2);
       clearErrors("secondContestant.audioUri");
     } else {
       setValue("secondContestant.audioUri", "");
     }
     if (imageHash) {
-      setValue("firstContestant.imageUri", ipfsPublicGateway + imageHash);
+      setValue("firstContestant.imageUri", liveIpfsGateway + imageHash);
       clearErrors("firstContestant.imageUri");
     } else {
       setValue("firstContestant.imageUri", "");
     }
     if (imageHash2) {
-      setValue("secondContestant.imageUri", ipfsPublicGateway + imageHash2);
+      setValue("secondContestant.imageUri", liveIpfsGateway + imageHash2);
       clearErrors("secondContestant.imageUri");
     } else {
       setValue("secondContestant.imageUri", "");
