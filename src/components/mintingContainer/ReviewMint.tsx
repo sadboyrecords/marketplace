@@ -154,7 +154,8 @@ function ReviewMint({ battleDrop = false }: { battleDrop?: boolean }) {
       }
       const str = JSON.stringify(metaData);
       const hash = await hashJsonToNumber(str);
-      const jsonUri = ipfsPublicGateway + jsonIpfsHash;
+      // const jsonUri = ipfsPublicGateway + jsonIpfsHash;
+      const jsonUri = liveIpfsGateway + jsonIpfsHash;
       await updateMutation.mutateAsync({
         id: data?.id,
         currentStep: "METADATA_UPLOAD",

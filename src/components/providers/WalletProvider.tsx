@@ -5,11 +5,11 @@ import {
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
-  SolletWalletAdapter,
-  SolletExtensionWalletAdapter,
+  // SolletWalletAdapter,
+  // SolletExtensionWalletAdapter,
   LedgerWalletAdapter,
   SafePalWalletAdapter,
-  SlopeWalletAdapter,
+  // SlopeWalletAdapter,
   SolongWalletAdapter,
   //   LedgerWalletAdapterConfig,
 } from "@solana/wallet-adapter-wallets";
@@ -32,11 +32,11 @@ function Web3Provider({ children }: { children: React.ReactNode }) {
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter({ network }),
-      new SolletWalletAdapter({ network }),
-      new SolletExtensionWalletAdapter({ network }),
+      // new SolletWalletAdapter({ network }),
+      // new SolletExtensionWalletAdapter({ network }),
       new LedgerWalletAdapter(),
       new SafePalWalletAdapter(),
-      new SlopeWalletAdapter({ network }),
+      // new SlopeWalletAdapter({ network }),
       new SolongWalletAdapter(),
       // new WalletConnectWalletAdapter({
       //   network,

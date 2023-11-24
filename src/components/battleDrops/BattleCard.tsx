@@ -41,10 +41,10 @@ function BattleCard({
   totalPot,
   competitorIndex,
 }: BattleCardProps) {
-  console.log({
-    image:
-      battle?.battleContestants[index]?.candyMachineDraft?.drop?.pinnedImage,
-  });
+  // console.log({
+  //   image:
+  //     battle?.battleContestants[index]?.candyMachineDraft?.drop?.pinnedImage,
+  // });
   const { fetchCandyMachineById, candyMachines } = useMetaplex();
   const draft = battle?.battleContestants[index]?.candyMachineDraft;
   const imageHash = battle?.battleContestants[index]?.candyMachineDraft
@@ -263,7 +263,7 @@ function BattleCard({
         size="body-xl"
         className="text-center font-normal tracking-widest"
       >
-        {battle?.battleContestants[index]?.candyMachineDraft?.dropName}
+        {formSubmission?.trackTitle || ""}
       </Typography>
       <Link
         href={
@@ -552,17 +552,17 @@ function BattleCard({
       {!battle?.isActive && (
         <div className="flex items-center justify-between space-x-2">
           {draft?.status === "DRAFT" && (
-            <div className="badge-info badge">
+            <div className="badge badge-info">
               Draft
               {!formSubmission?.walletSplits[0]?.walletAddress &&
                 " - Incomplete"}
             </div>
           )}
           {draft?.status === "PENDING" && (
-            <div className="badge-info badge">In Progress</div>
+            <div className="badge badge-info">In Progress</div>
           )}
           {draft?.status === "LAUNCHED" && (
-            <div className="badge-success badge">Launched</div>
+            <div className="badge badge-success">Launched</div>
           )}
 
           <Link href={routes.battleDropDrafts(draft?.id as string) || "#"}>

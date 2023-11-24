@@ -144,6 +144,9 @@ export const pinata = {
 };
 
 export const ipfsPublicGateway = "https://ipfs.io/ipfs/"; // use for storage
+export const ipfsScheme = "ipfs://"; // use for storage
+
+export const niftyIpfsGateway = "https://niftytunes.myfilebase.com/ipfs/"; // use for storage
 
 export const ipfsPrivateGateway = "https://reamp.mypinata.cloud/ipfs/";
 
