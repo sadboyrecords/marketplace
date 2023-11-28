@@ -416,7 +416,7 @@ export const userRouter = createTRPCRouter({
         profilePictureYAxis: z.number().optional(),
         profileBannerXAxis: z.number().optional(),
         profileBannerYAxis: z.number().optional(),
-        description: z.string().max(160).optional(),
+        description: z.string().optional(),
         socialWebLinks: z.array(z.string()).optional(),
         magicSolanaAddress: z.string().optional(),
         instagram: z.string().optional(),
