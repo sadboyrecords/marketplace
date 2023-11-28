@@ -8,7 +8,7 @@ import { api } from "@/utils/api";
 import Image from "next/image";
 import Avatar from "@/components/avatar/Avatar";
 import MarginLayout from "../layouts/MarginLayout";
-import { getCreatorname } from "@/utils/helpers";
+import { getCreatorname, isValidUrl } from "@/utils/helpers";
 import { DocumentDuplicateIcon as CopyIcon } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
@@ -349,6 +349,10 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                           <Input
                             // label="Name"
                             // type=""
+                            error={!!errors?.instagram?.message}
+                            errorMessage={
+                              (errors?.instagram?.message as string) || "error"
+                            }
                             beginAddOn="@"
                             iconEnd={
                               <span className="flex">
@@ -356,7 +360,14 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                               </span>
                             }
                             inputProps={{
-                              ...register("instagram", {}),
+                              ...register("instagram", {
+                                validate: (value) => {
+                                  if (value && isValidUrl(value)) {
+                                    return "Please enter a valid instagram handle";
+                                  }
+                                  return true;
+                                },
+                              }),
                             }}
                           />
                           <Input
@@ -364,8 +375,19 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             iconEnd={
                               <TikTokIcon className="h-6 w-6 text-base-content" />
                             }
+                            error={!!errors?.tiktok?.message}
+                            errorMessage={
+                              (errors?.tiktok?.message as string) || "error"
+                            }
                             inputProps={{
-                              ...register("tiktok", {}),
+                              ...register("tiktok", {
+                                validate: (value) => {
+                                  if (value && isValidUrl(value)) {
+                                    return "Please enter a valid tiktok handle";
+                                  }
+                                  return true;
+                                },
+                              }),
                             }}
                           />
 
@@ -374,8 +396,19 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             iconEnd={
                               <TwitterIcon className="h-6 w-6 text-base-content" />
                             }
+                            error={!!errors?.twitter?.message}
+                            errorMessage={
+                              (errors?.twitter?.message as string) || "error"
+                            }
                             inputProps={{
-                              ...register("twitter", {}),
+                              ...register("twitter", {
+                                validate: (value) => {
+                                  if (value && isValidUrl(value)) {
+                                    return "Please enter a valid x handle";
+                                  }
+                                  return true;
+                                },
+                              }),
                             }}
                           />
                           <Input
@@ -384,8 +417,19 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             iconEnd={
                               <FacebookIcon className="h-5 w-5 text-base-content" />
                             }
+                            error={!!errors?.facebook?.message}
+                            errorMessage={
+                              (errors?.facebook?.message as string) || "error"
+                            }
                             inputProps={{
-                              ...register("facebook", {}),
+                              ...register("facebook", {
+                                validate: (value) => {
+                                  if (value && isValidUrl(value)) {
+                                    return "Please enter a valid facebook handle";
+                                  }
+                                  return true;
+                                },
+                              }),
                             }}
                           />
                           <Input
@@ -394,8 +438,19 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             iconEnd={
                               <DiscordIcon className="h-6 w-6 text-base-content" />
                             }
+                            error={!!errors?.discord?.message}
+                            errorMessage={
+                              (errors?.discord?.message as string) || "error"
+                            }
                             inputProps={{
-                              ...register("discord", {}),
+                              ...register("discord", {
+                                validate: (value) => {
+                                  if (value && isValidUrl(value)) {
+                                    return true;
+                                  }
+                                  return "Please enter a valid url";
+                                },
+                              }),
                             }}
                           />
 
@@ -404,8 +459,19 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             iconEnd={
                               <SpotifyIcon className="h-6 w-6 text-base-content" />
                             }
+                            error={!!errors?.spotify?.message}
+                            errorMessage={
+                              (errors?.spotify?.message as string) || "error"
+                            }
                             inputProps={{
-                              ...register("spotify", {}),
+                              ...register("spotify", {
+                                validate: (value) => {
+                                  if (value && isValidUrl(value)) {
+                                    return true;
+                                  }
+                                  return "Please enter a valid url";
+                                },
+                              }),
                             }}
                           />
                         </div>
