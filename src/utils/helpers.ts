@@ -21,6 +21,12 @@ export function classNames(...classes: [string]) {
   return classes.filter(Boolean).join(" ");
 }
 
+export function isValidUrl(string: string) {
+  const regex =
+    /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+  return regex.test(string);
+}
+
 export const getHashAndUriFromNFT = (
   nftData: Nft | NftWithToken | Sft | SftWithToken
 ) => {
