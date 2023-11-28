@@ -1,6 +1,7 @@
 import {
   TwitterShareButton,
-  TwitterIcon,
+  // TwitterIcon,
+  XIcon,
   TelegramShareButton,
   TelegramIcon,
   WhatsappShareButton,
@@ -45,7 +46,7 @@ function Share({ url, title }: { url: string; title: string }) {
           hashtags={["NiftyTunes", "musicnfts"]}
           // related={['NiftyTunes', 'Music NFTs']}
         >
-          <TwitterIcon size={32} round />
+          <XIcon size={32} round />
         </TwitterShareButton>
         <TelegramShareButton
           url={url}
@@ -55,7 +56,7 @@ function Share({ url, title }: { url: string; title: string }) {
         </TelegramShareButton>
         <FacebookShareButton
           url={url}
-          quote={title}
+          // quote={title}
           title={`Check out ${title} on NiftyTunes`}
         >
           <FacebookIcon size={32} round />

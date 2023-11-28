@@ -4,7 +4,12 @@ import slugify from "slugify";
 import { imageDomains, routes } from "@/utils/constants";
 // import { type inferRouterOutputs } from "@trpc/server";
 // import { type AppRouter } from "@/server/api/root";
-import type { PartialSongType, SongType } from "./types";
+import type {
+  IFullCredits,
+  IUserCredits,
+  PartialSongType,
+  SongType,
+} from "./types";
 import axios from "axios";
 import { liveIpfsGateway, cdnUrl } from "@/utils/constants";
 import type { GuardFormType } from "./types";
@@ -509,4 +514,36 @@ export const getTrackUrl = (track?: SongType | PartialSongType) => {
     return routes.tokenItemDetails(track?.tokens[0]?.mintAddress);
   }
   return null;
+};
+
+export const returnFullCredits = (credits: IUserCredits[]) => {
+  console.log("function credits", credits);
+  const fullCredits: IFullCredits[] = []; // Object.keys(fullCredits).map((key) => ({ key, value: [] }));
+  credits?.reduce((creditNames, creditData) => {
+    const { name, role, walletAddress } = creditData;
+    role.forEach((roleType) => {
+      const index = fullCredits.findIndex((item) => item.role === roleType);
+      if (index === -1) {
+        fullCredits.push({
+          role: roleType,
+          names: [{ name, walletAddress }],
+        });
+      } else {
+        fullCredits[index]?.names.push({ name, walletAddress });
+      }
+    });
+    // role?.reduce((_acc, roleType) => {
+    //   const index = fullCredits.findIndex((item) => item.role === roleType);
+    //   if (index === -1) {
+    //     fullCredits.push({
+    //       role: roleType,
+    //       names: [{ name, walletAddress }],
+    //     });
+    //   } else {
+    //     fullCredits[index]?.names.push({ name, walletAddress });
+    //   }
+    // }, {});
+    return creditNames;
+  }, {});
+  return fullCredits;
 };
