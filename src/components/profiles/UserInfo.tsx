@@ -345,7 +345,16 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                           }}
                         />
                         <div className="flex flex-col space-y-2">
-                          <p className="font-bold"> Socials</p>
+                          <p className="font-bold">Socials</p>
+                          {/* <div className="flex space-x-8">
+                            <p className="text-sm text-gray-500">
+                              @ - handle only
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              url: full url
+                            </p>
+                          </div> */}
+
                           <Input
                             // label="Name"
                             // type=""
@@ -359,10 +368,14 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                                 <InstagramIcon className="h-5 w-5 text-base-content" />
                               </span>
                             }
+                            placeholder="instagram_handle"
                             inputProps={{
                               ...register("instagram", {
                                 validate: (value) => {
-                                  if (value && isValidUrl(value)) {
+                                  if (
+                                    value &&
+                                    value.includes("instagram.com")
+                                  ) {
                                     return "Please enter a valid instagram handle";
                                   }
                                   return true;
@@ -379,10 +392,11 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             errorMessage={
                               (errors?.tiktok?.message as string) || "error"
                             }
+                            placeholder="tiktok_handle"
                             inputProps={{
                               ...register("tiktok", {
                                 validate: (value) => {
-                                  if (value && isValidUrl(value)) {
+                                  if (value && value.includes("tiktok.com")) {
                                     return "Please enter a valid tiktok handle";
                                   }
                                   return true;
@@ -400,10 +414,11 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             errorMessage={
                               (errors?.twitter?.message as string) || "error"
                             }
+                            placeholder="twitter_handle"
                             inputProps={{
                               ...register("twitter", {
                                 validate: (value) => {
-                                  if (value && isValidUrl(value)) {
+                                  if (value && value.includes("twitter.com")) {
                                     return "Please enter a valid x handle";
                                   }
                                   return true;
@@ -421,10 +436,11 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             errorMessage={
                               (errors?.facebook?.message as string) || "error"
                             }
+                            placeholder="facebook_username"
                             inputProps={{
                               ...register("facebook", {
                                 validate: (value) => {
-                                  if (value && isValidUrl(value)) {
+                                  if (value && value.includes("facebook.com")) {
                                     return "Please enter a valid facebook handle";
                                   }
                                   return true;
@@ -442,22 +458,24 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             errorMessage={
                               (errors?.discord?.message as string) || "error"
                             }
+                            placeholder="https://discord.gg/1234567890"
                             inputProps={{
                               ...register("discord", {
-                                validate: (value) => {
-                                  if (value && isValidUrl(value)) {
-                                    return true;
-                                  } else if (value && !isValidUrl(value)) {
-                                    return "Please enter a valid url";
-                                  }
-                                  return true;
-                                },
+                                // validate: (value) => {
+                                //   if (value && isValidUrl(value)) {
+                                //     return true;
+                                //   } else if (value && !isValidUrl(value)) {
+                                //     return "Please enter a valid url";
+                                //   }
+                                //   return true;
+                                // },
                               }),
                             }}
                           />
 
                           <Input
                             beginAddOn="url"
+                            // description="Enter your spotify profile url"
                             iconEnd={
                               <SpotifyIcon className="h-6 w-6 text-base-content" />
                             }
@@ -465,16 +483,17 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                             errorMessage={
                               (errors?.spotify?.message as string) || "error"
                             }
+                            placeholder="https://open.spotify.com/artist/1234567890192"
                             inputProps={{
                               ...register("spotify", {
-                                validate: (value) => {
-                                  if (value && isValidUrl(value)) {
-                                    return true;
-                                  } else if (value && !isValidUrl(value)) {
-                                    return "Please enter a valid url";
-                                  }
-                                  return true;
-                                },
+                                // validate: (value) => {
+                                //   if (value && isValidUrl(value)) {
+                                //     return true;
+                                //   } else if (value && !isValidUrl(value)) {
+                                //     return "Please enter a valid url";
+                                //   }
+                                //   return true;
+                                // },
                               }),
                             }}
                           />
