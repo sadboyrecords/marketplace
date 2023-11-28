@@ -6,6 +6,10 @@ import type {
   Nft,
   NftWithToken,
 } from "@metaplex-foundation/js";
+import SongCredits from "@/components/songCredits";
+import { returnFullCredits } from "@/utils/helpers";
+import React from "react";
+import { type IMetadata, type IFullCredits } from "@/utils/types";
 
 interface MintDescriptionProps {
   mintAddress?: string;
@@ -20,10 +24,24 @@ function MintDescription({
   ownerAddress,
   tokenAccountAddress,
 }: MintDescriptionProps) {
+  const [credits, setCredits] = React.useState<IFullCredits[] | undefined>(
+    undefined
+  );
+  const [metaData, setMetaData] = React.useState<IMetadata | undefined>();
+  React.useEffect(() => {
+    console.log("ss----- descrioption ssss", { nftDetails });
+    const data = nftDetails?.json as IMetadata | undefined;
+
+    setMetaData(data);
+    if (!data?.credits) return;
+    const fullCredits = returnFullCredits(data?.credits);
+    console.log({ fullCredits });
+    setCredits(fullCredits);
+  }, [mintAddress, nftDetails]);
   return (
     <div
       tabIndex={1}
-      className="collapse-arrow collapse-open collapse rounded-lg border-2 border-base-300 bg-base-100"
+      className="collapse collapse-open collapse-arrow rounded-lg border-2 border-base-300 bg-base-100"
     >
       <Typography size="display-xs" className="collapse-title bg-base-300">
         Description
@@ -39,12 +57,12 @@ function MintDescription({
 
               <Typography>Token Address</Typography>
               <Typography>Owner</Typography>
-              <Typography>Royalties</Typography>
+              {/* <Typography>Royalties</Typography> */}
               {/* fees depends on if its primary or secondary sales */}
-              <Typography>Fees</Typography>
+              {/* <Typography>Fees</Typography>
               <Typography>Artists</Typography>
               <Typography>Songwriters</Typography>
-              <Typography>Producers</Typography>
+              <Typography>Producers</Typography> */}
               {/* <Typography  >Labels</Typography>
               <Typography  >Distributors</Typography> */}
             </div>
@@ -110,7 +128,7 @@ function MintDescription({
               ) : (
                 <Typography>N/A</Typography>
               )}
-              {nftDetails?.sellerFeeBasisPoints ? (
+              {/* {nftDetails?.sellerFeeBasisPoints ? (
                 <Typography>
                   {nftDetails?.sellerFeeBasisPoints &&
                     nftDetails?.sellerFeeBasisPoints / 100}
@@ -118,7 +136,14 @@ function MintDescription({
                 </Typography>
               ) : (
                 <Typography>N/A</Typography>
-              )}
+              )} */}
+            </div>
+            <div className="mt-4">
+              <SongCredits
+                credits={credits}
+                pLine={metaData?.pline}
+                cLine={metaData?.cline}
+              />
             </div>
           </div>
         </div>
