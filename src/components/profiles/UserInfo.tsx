@@ -447,8 +447,10 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                                 validate: (value) => {
                                   if (value && isValidUrl(value)) {
                                     return true;
+                                  } else if (value && !isValidUrl(value)) {
+                                    return "Please enter a valid url";
                                   }
-                                  return "Please enter a valid url";
+                                  return true;
                                 },
                               }),
                             }}
@@ -468,8 +470,10 @@ function UserInfo({ walletAddress }: UserInfoProps) {
                                 validate: (value) => {
                                   if (value && isValidUrl(value)) {
                                     return true;
+                                  } else if (value && !isValidUrl(value)) {
+                                    return "Please enter a valid url";
                                   }
-                                  return "Please enter a valid url";
+                                  return true;
                                 },
                               }),
                             }}
