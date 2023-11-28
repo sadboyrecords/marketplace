@@ -159,7 +159,7 @@ function TokenProfilePage() {
         mintAddress: new PublicKey(mintAddress),
         loadJsonMetadata: true,
       });
-      // console.log('token', token);
+      console.log("token", token);
       setNftDetails(token);
       setCreators(
         token?.creators.filter((c) => c.share).map((c) => c.address?.toBase58())
