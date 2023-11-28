@@ -11,6 +11,7 @@ export default function SongCredits({
   pLine?: string;
   cLine?: string;
 }) {
+  console.log({ credits });
   return (
     <>
       {credits && (
