@@ -2,7 +2,7 @@ import { Fragment, useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import HomeIcon from "@heroicons/react/24/outline/HomeIcon";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
-import UsersIcon from "@heroicons/react/24/outline/UsersIcon";
+import EyeDropperIcon from "@heroicons/react/24/outline/EyeDropperIcon";
 import MusicalNoteIcon from "@heroicons/react/24/outline/MusicalNoteIcon";
 import NewspaperIcon from "@heroicons/react/24/outline/NewspaperIcon";
 import { ToastContainer } from "react-toastify";
@@ -39,26 +39,40 @@ const navigation = [
     hidden: false,
   },
   {
-    name: "Creators",
-    href: routes.artists,
-    icon: UsersIcon,
-    current: false,
-    hidden: false,
-  },
-  {
-    name: "Playlists",
-    href: routes.playlists,
-    icon: NewspaperIcon,
-    current: false,
-    hidden: false,
-  },
-  {
-    name: "Songs",
-    href: routes.songs,
+    name: "Battle Drops",
+    href: routes.battleDropsHome,
     icon: MusicalNoteIcon,
     current: false,
     hidden: false,
   },
+  {
+    name: "Solo Drops",
+    href: routes.soloDropsHome,
+    icon: MusicalNoteIcon,
+    current: false,
+    hidden: false,
+  },
+  // {
+  //   name: "Creators",
+  //   href: routes.artists,
+  //   icon: UsersIcon,
+  //   current: false,
+  //   hidden: false,
+  // },
+  // {
+  //   name: "Playlists",
+  //   href: routes.playlists,
+  //   icon: NewspaperIcon,
+  //   current: false,
+  //   hidden: false,
+  // },
+  // {
+  //   name: "Songs",
+  //   href: routes.songs,
+  //   icon: MusicalNoteIcon,
+  //   current: false,
+  //   hidden: false,
+  // },
   //   { name: 'Collections', href: '#', icon: FolderIcon, current: false },
   // {
   //   name: "Drops",
@@ -219,9 +233,9 @@ function NavSection() {
           </div>
         </div>
       )} */}
-      <div className="mt-32 flex justify-center">
+      {/* <div className="mt-32 flex justify-center">
         <NewPlaylistButton isNav />
-      </div>
+      </div> */}
     </nav>
   );
 }

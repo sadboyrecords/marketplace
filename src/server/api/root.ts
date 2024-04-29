@@ -12,6 +12,7 @@ import { tokenRouter } from "./routers/tokens";
 import { transactionRouter } from "./routers/transactions";
 import { onrampRouter } from "./routers/onramp";
 import { adminRouter } from "./routers/admin";
+import { leaksRouter } from "./routers/Leaks";
 /**
  * This is the primary router for your server.
  *
@@ -31,6 +32,7 @@ export const appRouter = createTRPCRouter({
   transaction: transactionRouter,
   onramp: onrampRouter,
   admin: adminRouter,
+  leaks: leaksRouter,
   // healthcheck: publicProcedure.query(() => 'yay!'),
 
   //
