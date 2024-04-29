@@ -138,7 +138,7 @@ function AvatarNav() {
                 sizes="50px"
                 pinnedStatus={data?.pinnedProfilePicture?.status}
               />
-              {!publicAddress && <div className="loading btn-ghost btn" />}
+              {!publicAddress && <div className="btn loading btn-ghost" />}
               {publicAddress && (
                 <div className="items-center">
                   <Typography size="body" className=" font-semibold">
@@ -152,7 +152,7 @@ function AvatarNav() {
                   </Typography>
                   <div
                     className={`${
-                      copied ? "tooltip-open tooltip tooltip-bottom" : ""
+                      copied ? "tooltip tooltip-bottom tooltip-open" : ""
                     }  cursor-pointer`}
                     data-tip="Copied"
                     onClick={() => handleCopy(publicAddress)}
@@ -172,7 +172,7 @@ function AvatarNav() {
                   </div>
                   <div
                     className={`${
-                      copiedUsdc ? "tooltip-open tooltip tooltip-bottom" : ""
+                      copiedUsdc ? "tooltip tooltip-bottom tooltip-open" : ""
                     }  cursor-pointer`}
                     data-tip="Copied"
                     onClick={
@@ -302,6 +302,32 @@ function AvatarNav() {
                     </Link>
                   )}
                 </Menu.Item> */}
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href={routes.leaks}
+                    className={`${
+                      active ? "bg-primary-500 text-white" : "text-base-content"
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  >
+                    View All Leaks
+                  </Link>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href={routes.createLeak}
+                    className={`${
+                      active ? "bg-primary-500 text-white" : "text-base-content"
+                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                  >
+                    Create a leak
+                  </Link>
+                )}
+              </Menu.Item>
               <Menu.Item>
                 {({ active }) => (
                   <Link

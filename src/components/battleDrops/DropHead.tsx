@@ -68,7 +68,7 @@ function DropHead() {
   return (
     <div>
       <ThreeJsBg />
-      <div className="flex min-h-[20rem] flex-col items-center justify-center space-y-10">
+      <div className="flex min-h-[90vh] flex-col items-center justify-center space-y-10">
         <Typography
           size="display-lg"
           className="text-center font-bold uppercase !tracking-[1rem]"

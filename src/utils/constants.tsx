@@ -77,6 +77,12 @@ export const routes = {
   battleDetailsAdminView: (id: string) => `/admin/battles/${id}`,
   createBattle: "/admin/new-battle",
   lookupTable: "/admin/lookup",
+  leaks: "/admin/leaks",
+  createLeak: "/admin/leaks/new-leak",
+  leakDetails: (slug: string) => `/admin/leaks/detail/${slug}`,
+  editLeak: (slug: string) => `/admin/leaks/edit/${slug}`,
+  battleDropsHome: "/battle-drops",
+  soloDropsHome: "/solo-drops",
 };
 
 export const tabMenuRoutes = {

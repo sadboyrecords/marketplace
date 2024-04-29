@@ -569,14 +569,14 @@ function DropDetails() {
                           // competitorCandyId={competitorCandyId}
                         />
                       )}
-                    {!candy?.guardsAndEligibility?.[0]?.isEligible && (
+                    {/* {!candy?.guardsAndEligibility?.[0]?.isEligible && (
                       <Typography size="body-xs" color="neutral-gray">
                         {
                           candy?.guardsAndEligibility?.[0]
                             ?.inEligibleReasons?.[0]
                         }
                       </Typography>
-                    )}
+                    )} */}
                   </div>
                 )}
             </div>
