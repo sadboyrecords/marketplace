@@ -23,37 +23,37 @@ function Supporters({ candyMachineId, hasEnded }: Props) {
     }
   );
 
-  const supporters = getSupporters(transactions?.data);
+  // const supporters = getSupporters(transactions?.data);
   const dispatch = useDispatch();
-  const handleOpenSupporters = () => {
-    if (supporters) {
-      dispatch(
-        openJoinBattleFansModal({
-          supporters,
-          competitorCandyId,
-          candymachineId: candyMachineId || "",
-          artistName,
-        })
-      );
-    }
-  };
-  const handleOpenTopFans = () => {
-    if (supporters) {
-      dispatch(
-        openTopFansModal({
-          supporters,
-          competitorCandyId,
-          candymachineId: candyMachineId || "",
-          artistName,
-          isEnded: candyMachine?.guardsAndEligibility?.[0]?.hasEnded,
-        })
-      );
-    }
-  };
+  // const handleOpenSupporters = () => {
+  //   if (supporters) {
+  //     dispatch(
+  //       openJoinBattleFansModal({
+  //         supporters,
+  //         competitorCandyId,
+  //         candymachineId: candyMachineId || "",
+  //         artistName,
+  //       })
+  //     );
+  //   }
+  // };
+  // const handleOpenTopFans = () => {
+  //   if (supporters) {
+  //     dispatch(
+  //       openTopFansModal({
+  //         supporters,
+  //         competitorCandyId,
+  //         candymachineId: candyMachineId || "",
+  //         artistName,
+  //         isEnded: candyMachine?.guardsAndEligibility?.[0]?.hasEnded,
+  //       })
+  //     );
+  //   }
+  // };
   return (
     <div>
       <div className="">
-        <div
+        {/* <div
           onClick={
             candyMachine.guardsAndEligibility?.[0]?.hasEnded
               ? handleOpenTopFans
@@ -106,25 +106,25 @@ function Supporters({ candyMachineId, hasEnded }: Props) {
               {percentagePot.toFixed(2)}% of pot
             </Typography>
           )}
-        </div>
+        </div> */}
 
-        <progress
+        {/* <progress
           className="progress progress-primary h-1 w-full bg-base-300"
           value={percentagePot || 0}
           max={100}
-        ></progress>
+        ></progress> */}
         {/* <div className="w-full"></div> */}
       </div>
 
       {/* BUY SECTION  */}
-      {candyMachineId &&
+      {/* {candyMachineId &&
         competitorCandyId &&
         !candyMachine.guardsAndEligibility?.[0]?.hasEnded && (
           <Buy
             candyMachineId={candyMachineId}
             competitorCandyId={competitorCandyId}
           />
-        )}
+        )} */}
 
       {/* <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
               <div>
