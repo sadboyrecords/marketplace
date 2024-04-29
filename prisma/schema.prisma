@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["filteredRelationCount"]
+    provider = "prisma-client-js"
+    // previewFeatures = ["filteredRelationCount"]
 }
 
 datasource db {
@@ -437,7 +437,7 @@ model Songs {
     createdAt            DateTime        @default(now())
     updatedAt            DateTime        @updatedAt
     title                String
-    slug                 String          @db.VarChar(1020)
+    slug                 String          @unique @db.VarChar(1020)
     lossyAudioIPFSHash   String?         @unique
     lossyAudioURL        String          @unique
     lossyArtworkIPFSHash String?         @db.VarChar(255)
@@ -457,7 +457,7 @@ model Songs {
     likes                LikedTracks[]
     pinnedImage          PinnedFiles?    @relation("PinnedSongImage", fields: [lossyArtworkIPFSHash], references: [ipfsHash])
     pinnedAudio          PinnedFiles?    @relation("PinnedSongAudio", fields: [lossyAudioIPFSHash], references: [ipfsHash])
-
+    leaks                Leaks[]
     // tokens               TokenItems[]
     // artistId                     String?                  @db.VarChar(255)
     // rawArtists                   RawArtists?              @relation(fields: [artistId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "raw_processed_tracks_artistid_foreign")
@@ -471,6 +471,24 @@ model Songs {
     // primaryArtist        String?
     // featuredArtists      String?
     @@index([lossyAudioIPFSHash])
+}
+
+model Leaks {
+    id            String       @id @default(uuid())
+    slug          String       @unique
+    createdAt     DateTime     @default(now())
+    updatedAt     DateTime     @updatedAt
+    leakName      String
+    // audioUri      String
+    // audioIpfsHash String
+    priority      Int?         @default(0)
+    imageIpfsHash String
+    // likes                LikedDrops[]
+    isFeatured    Boolean      @default(false)
+    isPublic      Boolean      @default(true)
+    songs         Songs[]
+    // song          Songs        @relation("LeakSong", fields: [audioIpfsHash], references: [lossyAudioIPFSHash])
+    pinnedImage   PinnedFiles? @relation("LeakImage", fields: [imageIpfsHash], references: [ipfsHash])
 }
 
 model Tokens {
@@ -487,7 +505,7 @@ model Tokens {
     song                 Songs           @relation(fields: [songId], references: [id])
     title                String
     description          String?
-    slug                 String          @db.VarChar(1020)
+    slug                 String          @unique @db.VarChar(1020)
     // lossyAudioIPFSHash   String?
     // lossyAudioURL        String?
     lossyArtworkIPFSHash String?         @db.VarChar(255)
@@ -544,6 +562,7 @@ model PinnedFiles {
     tokenImage        Tokens[]          @relation("PinnedTokenImage")
     tokenAudio        Tokens[]          @relation("PinnedTokenAudio")
     candyMachineImage CandyMachines[]   @relation("PinnedCandyMachineImage")
+    leakImage         Leaks[]           @relation("LeakImage")
 }
 
 // model Creators {
